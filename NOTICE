@@ -1,0 +1,72 @@
+ESDroid
+Copyright 2026 F² Cyanic
+
+The Android port code (app/src/main/cpp/android-backend, android_main.cpp,
+precompile_mr.cpp, ESDroidActivity.java and the build files) and the changes
+made to the vendored libraries listed below for Android support are
+Copyright 2026 F² Cyanic and licensed under the Apache License,
+Version 2.0 (see LICENSE).
+
+This product includes software developed by third parties:
+
+------------------------------------------------------------------------------
+The following components are Copyright (c) 2022 Ange Yaghi and are licensed
+under the MIT License. The license text is contained in the LICENSE file
+inside each directory.
+
+  engine-sim (real-time internal combustion engine simulation)
+    app/src/main/cpp/engine-sim
+    app/src/main/cpp/engine-sim/scripting
+    app/src/main/cpp/engine-sim/dependencies/submodules
+
+  delta-studio (yds framework and delta engine)
+    app/src/main/cpp/delta-studio
+    app/src/main/cpp/engine-sim/dependencies/submodules/delta-studio
+
+  piranha (programming language framework)
+    app/src/main/cpp/piranha
+    app/src/main/cpp/engine-sim/dependencies/submodules/piranha
+
+  scs (2D constraint solver)
+    app/src/main/cpp/scs
+    app/src/main/cpp/engine-sim/dependencies/submodules/simple-2d-constraint-solver
+
+  csv-io
+    app/src/main/cpp/csv-io
+    app/src/main/cpp/engine-sim/dependencies/submodules/csv-io
+
+  direct-to-video
+    app/src/main/cpp/engine-sim/dependencies/submodules/direct-to-video
+
+The engine-sim assets (scripts, sound library, fonts, shaders) included in
+app/src/main/assets are likewise part of the MIT licensed engine-sim project,
+except for the fonts listed below.
+
+------------------------------------------------------------------------------
+Android native_app_glue
+Copyright (C) 2010 The Android Open Source Project
+Licensed under the Apache License, Version 2.0.
+A local copy with a larger thread stack lives at
+app/src/main/cpp/android_native_app_glue.c.
+
+------------------------------------------------------------------------------
+stb single-file public domain libraries
+Copyright (c) 2017 Sean Barrett
+Public domain or MIT (see the license block in each header).
+app/src/main/cpp/delta-studio/dependencies/libraries/stb
+
+------------------------------------------------------------------------------
+Khronos OpenGL headers
+Licensed under the MIT-style Khronos license (see the header of each file).
+app/src/main/cpp/delta-studio/dependencies/libraries/OpenGL/include
+
+------------------------------------------------------------------------------
+FlexLexer.h from the Fast Lexical Analyzer project
+Copyright (c) 2001, 2002 University of Chicago (BSD license, see the header).
+app/src/main/cpp/piranha/dependencies/libraries/flex/include/FlexLexer.h
+
+------------------------------------------------------------------------------
+Fonts bundled under app/src/main/assets/delta-engine-assets/fonts:
+  Silkscreen - Kottke Silkscreen License (see directory)
+  Roboto - Apache License 2.0 (see directory)
+  Josefin Sans - SIL Open Font License 1.1 (see directory)
