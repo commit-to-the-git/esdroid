@@ -30,6 +30,10 @@ private:
     void compileShaders();
     void generateQuadGeometry();
     void drawButton(const TouchButton& b, bool held);
+    void drawRect(float x,float y,float w,float h,const float* color);
+    void drawSettingsButton();
+    void drawSettingsPanel();
+    void drawBlurredBackdrop();
     GLuint m_program=0, m_vao=0, m_vbo=0;
     GLint m_loc_color=-1, m_loc_rect=-1, m_loc_screen=-1, m_loc_pos=-1;
     int m_screenW=0, m_screenH=0;

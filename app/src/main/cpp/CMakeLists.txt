@@ -14,8 +14,10 @@ add_compile_options(-Wno-deprecated-declarations -Wno-unused-variable -Wno-unuse
 add_compile_options(-Wno-shift-count-overflow -Wno-shift-op-parentheses)
 add_compile_options(-Wno-inconsistent-missing-override -Wno-delete-abstract-non-virtual-dtor)
 add_compile_options(-Wno-macro-redefined -Wno-unused-private-field -Wno-unused-but-set-variable)
-# Optimized build: -O3 + LTO for maximum performance
-add_compile_options(-O3 -flto -ffast-math -fno-math-errno -fno-trapping-math)
+# Optimized build: -O3 + LTO for maximum performance. No semantic
+# interposition so LTO can inline across the exported symbols too.
+add_compile_options(-O3 -flto -ffast-math -fno-math-errno -fno-trapping-math
+    -fno-semantic-interposition)
 
 add_compile_definitions(ATG_ANDROID)
 add_compile_definitions($<$<CONFIG:Debug>:ATG_DEBUG>)
@@ -75,9 +77,6 @@ add_library(es_core STATIC
     engine-sim/src/vehicle_drag_constraint.cpp
     engine-sim/src/vtec_valvetrain.cpp
 )
-
-# engine-sim scripting
-file(GLOB_RECURSE ES_SCRIPT_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/engine-sim/scripting/src/*.cpp")
 
 # delta-studio delta-core
 set(DELTA_CORE_SRCS
@@ -167,7 +166,7 @@ target_include_directories(native_app_glue PUBLIC
 )
 
 add_library(android_backend STATIC
-    android-backend/android_backend.cpp android-backend/android_shim.cpp android-backend/touch_ui.cpp android-backend/alloc_tracker.cpp)
+    android-backend/android_backend.cpp android-backend/android_shim.cpp android-backend/touch_ui.cpp)
 
 # Main shared library
 add_library(esdroid SHARED
@@ -193,5 +192,5 @@ add_library(esdroid SHARED
 target_link_libraries(esdroid PRIVATE
     es_core es_script delta_core delta_basic delta_physics piranha csv_io scs android_backend
     EGL GLESv3 OpenSLES android log atomic -Wl,--whole-archive native_app_glue -Wl,--no-whole-archive
-    -flto
+    -flto -Wl,--lto-O3 -Wl,--icf=all
 )

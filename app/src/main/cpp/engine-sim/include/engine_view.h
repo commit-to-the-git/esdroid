@@ -13,6 +13,7 @@ class EngineView : public UiElement {
         virtual void onMouseDown(const Point &mouseLocal);
         virtual void onDrag(const Point &p0, const Point &mouse0, const Point &mouse);
         virtual void onMouseScroll(int scroll);
+        virtual void onPinchZoom(int scroll, const Point &mouseLocal);
 
         void setDrawFrame(bool drawFrame) { m_drawFrame = drawFrame; }
         void setBounds(const Bounds &bounds);

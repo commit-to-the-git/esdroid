@@ -106,6 +106,12 @@ class EngineSimApplication {
         double m_speedSetting = 1.0;
         double m_targetSpeedSetting = 1.0;
 
+#if defined(__ANDROID__)
+        // What fraction of full throttle the touch THROTTLE button applies,
+        // driven by the settings panel (default 100%).
+        double m_androidThrottleScale = 1.0;
+#endif
+
         double m_clutchPressure = 1.0;
         double m_targetClutchPressure = 1.0;
         int m_lastMouseWheel = 0;

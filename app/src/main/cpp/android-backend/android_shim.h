@@ -59,6 +59,7 @@ public:
     virtual bool IsVisible() override { return true; }
     virtual int GetScreenWidth() const override;
     virtual int GetScreenHeight() const override;
+    virtual void ScreenToLocal(int &x, int &y) const override;
     const int GetGameWidth() const;
     const int GetGameHeight() const;
     bool IsOpen() const;
@@ -128,6 +129,19 @@ public:
     virtual ~ysAndroidKeyboard();
     virtual bool IsKeyDown(ysKey::Code key) override;
     virtual bool ProcessKeyTransition(ysKey::Code key, ysKey::State state=ysKey::State::DownTransition) override;
+};
+
+class ysAndroidMouse : public ysMouse {
+public:
+    ysAndroidMouse();
+    virtual ~ysAndroidMouse();
+    // Raw touch position, y-down, exactly what the window's ScreenToLocal
+    // expects as input (same as the raw cursor pos the desktop stores).
+    virtual int GetOsPositionX() const override;
+    virtual int GetOsPositionY() const override;
+    virtual int GetX() const override;
+    virtual int GetY() const override;
+    virtual bool ProcessMouseButton(Button button, ButtonState state) override;
 };
 
 class ysWindowsAudioWaveFile : public ysAudioFile {

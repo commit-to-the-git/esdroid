@@ -7,6 +7,7 @@
 #define LOGE(...) ((void)__android_log_print(ANDROID_LOG_ERROR,"ESDroid",__VA_ARGS__))
 extern "C" void esdroid_wtflog(const char* fmt, ...);
 extern "C" const char *esdroid_get_files_dir();
+extern "C" void esdroid_invalidate_ui_rects();
 #endif
 #include "../include/engine_sim_application.h"
 #include "esdroid_render_log.h"
@@ -802,6 +803,28 @@ void EngineSimApplication::loadScript() {
     loadEngine(engine, vehicle, transmission);
     esdroid_wtflog("loadScript: loadEngine returned");
     refreshUserInterface();
+
+#if defined(__ANDROID__)
+    // A fresh engine means fresh mixer defaults; the settings panel shows
+    // what the engine actually runs, not what the last engine ran.
+    if (m_simulator != nullptr) {
+        auto& settings = esdroid::AndroidBackend::instance().settings();
+        const Synthesizer::AudioParameters audioParams =
+            m_simulator->synthesizer().getAudioParameters();
+        settings.volume = audioParams.volume;
+        settings.convolution = audioParams.convolution;
+        settings.hiFreqGain = audioParams.dF_F_mix;
+        settings.loFreqNoise = audioParams.airNoise;
+        settings.hiFreqNoise = audioParams.inputSampleNoise;
+        settings.simFrequency = m_simulator->getSimulationFrequency();
+        settings.dynoSpeedRpm = units::toRpm(m_dynoSpeed);
+        if (m_iceEngine != nullptr) {
+            settings.dynoMinRpm = units::toRpm(m_iceEngine->getDynoMinSpeed());
+            settings.dynoMaxRpm = units::toRpm(m_iceEngine->getDynoMaxSpeed());
+        }
+        settings.dirty = 0;
+    }
+#endif
 }
 
 void EngineSimApplication::processEngineInput() {
@@ -911,6 +934,47 @@ void EngineSimApplication::processEngineInput() {
     }
 
     const double prevTargetThrottle = m_targetSpeedSetting;
+#if defined(__ANDROID__)
+    // Settings panel: apply what the user dragged or typed. The dirty bits
+    // are set by the touch UI and cleared here, the single consumer.
+    {
+        auto& settings = esdroid::AndroidBackend::instance().settings();
+        m_androidThrottleScale = settings.throttlePct * 0.01;
+        if (m_simulator != nullptr) {
+            constexpr unsigned audioMask =
+                (1u << (int)esdroid::SettingIndex::Volume)
+                | (1u << (int)esdroid::SettingIndex::Convolution)
+                | (1u << (int)esdroid::SettingIndex::HiFreqGain)
+                | (1u << (int)esdroid::SettingIndex::LoFreqNoise)
+                | (1u << (int)esdroid::SettingIndex::HiFreqNoise);
+            if ((settings.dirty & audioMask) != 0) {
+                Synthesizer::AudioParameters audioParams =
+                    m_simulator->synthesizer().getAudioParameters();
+                audioParams.volume = settings.volume;
+                audioParams.convolution = settings.convolution;
+                audioParams.dF_F_mix = settings.hiFreqGain;
+                audioParams.airNoise = settings.loFreqNoise;
+                audioParams.inputSampleNoise = settings.hiFreqNoise;
+                m_simulator->synthesizer().setAudioParameters(audioParams);
+                settings.dirty &= ~audioMask;
+                m_infoCluster->setLogMessage("[SETTINGS] - Mixer updated");
+            }
+            if ((settings.dirty & (1u << (int)esdroid::SettingIndex::SimFrequency)) != 0) {
+                m_simulator->setSimulationFrequency((int)settings.simFrequency);
+                settings.dirty &= ~(1u << (int)esdroid::SettingIndex::SimFrequency);
+                m_infoCluster->setLogMessage(
+                    "[SETTINGS] - Set simulation freq to "
+                    + std::to_string(m_simulator->getSimulationFrequency()));
+            }
+        }
+        if ((settings.dirty & (1u << (int)esdroid::SettingIndex::DynoSpeed)) != 0) {
+            m_dynoSpeed = units::rpm(settings.dynoSpeedRpm);
+            settings.dirty &= ~(1u << (int)esdroid::SettingIndex::DynoSpeed);
+            m_infoCluster->setLogMessage(
+                "[SETTINGS] - Set dyno speed to " + std::to_string(units::toRpm(m_dynoSpeed)));
+        }
+    }
+#endif
     m_targetSpeedSetting = fineControlMode ? m_targetSpeedSetting : 0.0;
     if (m_engine.IsKeyDown(ysKey::Code::Q)) {
         m_targetSpeedSetting = 0.01;
@@ -922,7 +986,13 @@ void EngineSimApplication::processEngineInput() {
         m_targetSpeedSetting = 0.2;
     }
     else if (m_engine.IsKeyDown(ysKey::Code::R)) {
+#if defined(__ANDROID__)
+        // The touch THROTTLE button lands here; the settings panel decides
+        // how much throttle it actually applies.
+        m_targetSpeedSetting = m_androidThrottleScale;
+#else
         m_targetSpeedSetting = 1.0;
+#endif
     }
     else if (fineControlMode && !fineControlInUse) {
         m_targetSpeedSetting = clamp(m_targetSpeedSetting + mouseWheelDelta * 0.0001);
@@ -1062,18 +1132,31 @@ void EngineSimApplication::processEngineInput() {
     m_simulator->getTransmission()->setClutchPressure(m_clutchPressure);
 
 #if defined(__ANDROID__)
-    // Touch has no scroll wheel, the FN zoom buttons drive the same
-    // EngineView zoom path the desktop wheel uses.
+    // Touch has no scroll wheel: the FN zoom buttons and the pinch gesture
+    // drive the same EngineView zoom path the desktop wheel uses.
     if (m_engineView != nullptr) {
         int zoomScroll = 0;
         if (esdroid::AndroidBackend::instance().isKeyDown(esdroid::VirtualKey::ZoomIn)) zoomScroll += 900;
         if (esdroid::AndroidBackend::instance().isKeyDown(esdroid::VirtualKey::ZoomOut)) zoomScroll -= 900;
         if (zoomScroll != 0) m_engineView->onMouseScroll((int)(zoomScroll * dt));
+        const int pinchScroll = esdroid::AndroidBackend::instance().consumePinchScroll();
+        if (pinchScroll != 0) {
+            // The reported touch position is the pinch midpoint; zooming
+            // there keeps the part between the fingers in place.
+            int mx = 0, my = 0;
+            m_engine.GetOsMousePos(&mx, &my);
+            m_engineView->onPinchZoom(pinchScroll, Point { (float)mx, (float)my });
+        }
     }
 #endif
 }
 
 void EngineSimApplication::renderScene() {
+#if defined(__ANDROID__)
+    // UI rects published by the clusters go stale unless re-published this
+    // frame; an unpublished button must not stay tappable.
+    esdroid_invalidate_ui_rects();
+#endif
     getShaders()->ResetBaseColor();
     getShaders()->SetObjectTransform(ysMath::LoadIdentity());
 

@@ -86,6 +86,11 @@ int ysAndroidWindow::GetScreenWidth() const { return esdroid::AndroidBackend::in
 int ysAndroidWindow::GetScreenHeight() const { return esdroid::AndroidBackend::instance().screenHeight(); }
 const int ysAndroidWindow::GetGameWidth() const { return esdroid::AndroidBackend::instance().screenWidth(); }
 const int ysAndroidWindow::GetGameHeight() const { return esdroid::AndroidBackend::instance().screenHeight(); }
+// Touch coords are y-down from the top-left; the UI element bounds are
+// y-up from the bottom-left, like the desktop client-to-local flip.
+void ysAndroidWindow::ScreenToLocal(int &x, int &y) const {
+    y = GetScreenHeight() - y;
+}
 void ysAndroidWindow::SetScreenSize(int w,int h) { m_width=w; m_height=h; }
 void ysAndroidWindow::SetWindowSize(int w,int h) { m_width=w; m_height=h; }
 
@@ -142,7 +147,7 @@ public:
             m_keyboard = m_androidKb;
         }
         else if(t==InputDeviceType::MOUSE) {
-            m_androidMouse=new ysMouse();
+            m_androidMouse=new ysAndroidMouse();
             m_mouse = m_androidMouse;
         }
         SetConnected(true); SetGeneric(false);
@@ -188,6 +193,27 @@ bool ysAndroidKeyboard::ProcessKeyTransition(ysKey::Code key, ysKey::State state
             &&backend.processKeyDown((esdroid::VirtualKey)vk)) return true;
     }
     return false;
+}
+
+ysAndroidMouse::ysAndroidMouse() : ysMouse() {}
+ysAndroidMouse::~ysAndroidMouse() {}
+int ysAndroidMouse::GetOsPositionX() const {
+    return (int)esdroid::AndroidBackend::instance().engineTouchX();
+}
+int ysAndroidMouse::GetOsPositionY() const {
+    return (int)esdroid::AndroidBackend::instance().engineTouchY();
+}
+int ysAndroidMouse::GetX() const { return GetOsPositionX(); }
+int ysAndroidMouse::GetY() const { return GetOsPositionY(); }
+// UiManager polls DownTransition then UpTransition every frame; the backend
+// edges are pulled into the state machine here so each fires exactly once.
+bool ysAndroidMouse::ProcessMouseButton(Button button, ButtonState state) {
+    if(button==Button::Left) {
+        auto& backend = esdroid::AndroidBackend::instance();
+        if(backend.consumeEngineTouchDown()) UpdateButton(Button::Left,ButtonState::DownTransition);
+        else if(backend.consumeEngineTouchUp()) UpdateButton(Button::Left,ButtonState::UpTransition);
+    }
+    return ysMouse::ProcessMouseButton(button,state);
 }
 
 // ysWindowsAudioWaveFile - portable WAV reader

@@ -8,6 +8,7 @@
 
 #if defined(__ANDROID__)
 extern "C" void esdroid_set_logo_rect(float x, float y, float w, float h);
+extern "C" void esdroid_set_title_rect(float x, float y, float w, float h);
 #endif
 
 InfoCluster::InfoCluster() {
@@ -67,6 +68,21 @@ void InfoCluster::render() {
 
     const Bounds titleBounds = grid.get(m_bounds, 1, 0, 5, 2);
     drawFrame(titleBounds, 1.0f, m_app->getForegroundColor(), m_app->getBackgroundColor());
+#if defined(__ANDROID__)
+    // The touch UI draws the SETTINGS button in the bottom-right corner of
+    // this box, so its rect is published every frame like the logo's.
+    {
+        const Bounds worldBounds = getRenderBounds(titleBounds);
+        const Point c = worldBounds.getPosition(Bounds::center);
+        const float screenW = (float)m_app->getScreenWidth();
+        const float screenH = (float)m_app->getScreenHeight();
+        esdroid_set_title_rect(
+            c.x + screenW / 2.0f - worldBounds.width() / 2.0f,
+            screenH / 2.0f - c.y - worldBounds.height() / 2.0f,
+            worldBounds.width(),
+            worldBounds.height());
+    }
+#endif
     ESLOG_STEP(7);
 
     Grid titleSplit;

@@ -23,11 +23,10 @@ them with your own key before installing over a previous build.
 
 ## Controls
 
-- Left column: STARTER, IGNITION, THROTTLE, CLUTCH, FN, time scale (1x, 1/10x, 1/100x)
+- Left column: STARTER, IGNITION, THROTTLE, CLUTCH, time scale (1x, 1/10x, 1/100x)
 - Right column: SHIFT +, SHIFT -, PAUSE, RELOAD, IMPORT, EXIT, CAMERA, OSC PAGE
 - CAMERA cycles the view screens, OSC PAGE pages the oscilloscope focus,
   RELOAD re-runs the engine script, IMPORT loads a .mr file from storage
-  FN changes all of the other buttons to be different, it works like the function key thats mostly on laptops, im too lazy to say what the other buttons are.
 
 very simple controls
 

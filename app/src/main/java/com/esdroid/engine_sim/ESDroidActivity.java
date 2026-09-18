@@ -16,12 +16,28 @@
 
 package com.esdroid.engine_sim;
 
+import android.app.Dialog;
 import android.app.NativeActivity;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Typeface;
+import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.text.InputType;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
@@ -31,6 +47,10 @@ import java.io.PrintWriter;
 public class ESDroidActivity extends NativeActivity {
     private static final String TAG = "ESDroid";
     private static final int REQUEST_CODE_OPEN_MR = 42;
+
+    private Dialog mValueDialog = null;
+    private Typeface mSilk = null;
+    private Typeface mSilkBold = null;
 
     static {
         System.loadLibrary("esdroid");
@@ -199,5 +219,189 @@ public class ESDroidActivity extends NativeActivity {
         }
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // A dialog whose window dies with the pause cannot be dismissed later.
+        dismissValueDialog();
+    }
+
+    // The same Silkscreen faces the native UI bakes, straight from assets.
+    private Typeface silkFont(boolean bold) {
+        try {
+            if (bold) {
+                if (mSilkBold == null) {
+                    mSilkBold = Typeface.createFromAsset(getAssets(),
+                            "delta-engine-assets/fonts/Silkscreen/slkscrb.ttf");
+                }
+                return mSilkBold == null ? Typeface.MONOSPACE : mSilkBold;
+            }
+            if (mSilk == null) {
+                mSilk = Typeface.createFromAsset(getAssets(),
+                        "delta-engine-assets/fonts/Silkscreen/slkscr.ttf");
+            }
+            return mSilk == null ? Typeface.MONOSPACE : mSilk;
+        } catch (Throwable t) {
+            return Typeface.MONOSPACE;
+        }
+    }
+
+    // Value entry for the settings panel. A real Dialog is used because it
+    // owns its own window: its buttons and the IME receive input normally
+    // over a NativeActivity, whose own input all goes to the native queue.
+    public void showValueInput(final int index, final String label, final String current) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    dismissValueDialog();
+                    final Context ctx = ESDroidActivity.this;
+                    final float dp = getResources().getDisplayMetrics().density;
+
+                    LinearLayout panel = new LinearLayout(ctx);
+                    panel.setOrientation(LinearLayout.VERTICAL);
+                    panel.setBackgroundColor(0xFFFFFFFF);
+                    int pad = (int) (14 * dp);
+                    panel.setPadding(pad, pad, pad, pad);
+
+                    TextView title = new TextView(ctx);
+                    title.setText(label);
+                    title.setTextColor(0xFF000000);
+                    title.setTypeface(silkFont(true));
+                    title.setTextSize(20);
+                    panel.addView(title);
+
+                    final EditText input = new EditText(ctx);
+                    input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+                    input.setText(current);
+                    input.setTextColor(0xFF000000);
+                    input.setTypeface(silkFont(false));
+                    input.setTextSize(18);
+                    input.setImeOptions(EditorInfo.IME_ACTION_DONE);
+                    GradientDrawable field = new GradientDrawable();
+                    field.setColor(0xFFFFFFFF);
+                    field.setStroke((int) (2 * dp), 0xFF000000);
+                    input.setBackground(field);
+                    input.setSelection(input.getText().length());
+                    panel.addView(input, new LinearLayout.LayoutParams(
+                            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+                    LinearLayout row = new LinearLayout(ctx);
+                    row.setOrientation(LinearLayout.HORIZONTAL);
+                    int top = (int) (12 * dp);
+                    LinearLayout.LayoutParams rowParams = new LinearLayout.LayoutParams(
+                            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                    rowParams.topMargin = top;
+
+                    Button ok = new Button(ctx);
+                    ok.setText("OK");
+                    Button cancel = new Button(ctx);
+                    cancel.setText("CANCEL");
+                    for (Button b : new Button[] { ok, cancel }) {
+                        b.setTextColor(0xFF000000);
+                        b.setTypeface(silkFont(true));
+                        b.setTextSize(16);
+                        GradientDrawable bg = new GradientDrawable();
+                        bg.setColor(0xFFFFFFFF);
+                        bg.setStroke((int) (2 * dp), 0xFF000000);
+                        b.setBackground(bg);
+                        LinearLayout.LayoutParams bp = new LinearLayout.LayoutParams(
+                                0, ViewGroup.LayoutParams.WRAP_CONTENT);
+                        bp.weight = 1;
+                        bp.leftMargin = top / 2;
+                        bp.rightMargin = top / 2;
+                        row.addView(b, bp);
+                    }
+                    panel.addView(row, rowParams);
+
+                    final Dialog dialog = new Dialog(ctx);
+                    dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                    dialog.setContentView(panel);
+                    dialog.setCancelable(true);
+                    dialog.getWindow().setSoftInputMode(
+                            WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE
+                            | WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+                    dialog.getWindow().setBackgroundDrawable(new GradientDrawable());
+
+                    ok.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            dialog.dismiss();
+                            commitValue(index, input.getText().toString());
+                        }
+                    });
+                    cancel.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            dialog.dismiss();
+                        }
+                    });
+                    input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                        @Override
+                        public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                                dialog.dismiss();
+                                commitValue(index, v.getText().toString());
+                                return true;
+                            }
+                            return false;
+                        }
+                    });
+
+                    dialog.show();
+                    dialog.getWindow().setLayout((int) (320 * dp),
+                            ViewGroup.LayoutParams.WRAP_CONTENT);
+                    input.requestFocus();
+                    InputMethodManager imm =
+                            (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+                    if (imm != null) imm.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT);
+                    mValueDialog = dialog;
+                } catch (Throwable t) {
+                    Log.e(TAG, "value dialog failed", t);
+                    jlog("value dialog failed: " + t);
+                }
+            }
+        });
+    }
+
+    public void hideValueInput() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                dismissValueDialog();
+            }
+        });
+    }
+
+    private void dismissValueDialog() {
+        if (mValueDialog != null) {
+            try {
+                if (mValueDialog.isShowing()) mValueDialog.dismiss();
+            } catch (Throwable ignored) {
+            }
+            mValueDialog = null;
+        }
+    }
+
+    private void commitValue(int index, String text) {
+        if (text == null) return;
+        String trimmed = text.trim();
+        if (trimmed.isEmpty()) {
+            jlog("value entry empty, ignored");
+            return;
+        }
+        try {
+            double value = Double.parseDouble(trimmed);
+            nativeOnValueInput(index, value);
+        } catch (NumberFormatException e) {
+            jlog("value entry not a number: " + trimmed);
+        } catch (Throwable t) {
+            Log.e(TAG, "nativeOnValueInput failed", t);
+            jlog("nativeOnValueInput failed: " + t);
+        }
+    }
+
     public native void nativeOnFilePicked(String path);
+
+    public native void nativeOnValueInput(int index, double value);
 }

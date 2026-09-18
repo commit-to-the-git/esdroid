@@ -100,12 +100,6 @@ void AndroidBackend::destroyWindow() {
     }
 }
 
-void AndroidBackend::makeContextCurrent() {
-    if (m_eglDisplay != EGL_NO_DISPLAY && m_eglContext != EGL_NO_CONTEXT && m_eglSurface != EGL_NO_SURFACE) {
-        eglMakeCurrent(m_eglDisplay, m_eglSurface, m_eglSurface, m_eglContext);
-    }
-}
-
 void AndroidBackend::swapBuffers() {
     if(m_eglDisplay!=EGL_NO_DISPLAY&&m_eglSurface!=EGL_NO_SURFACE)
         eglSwapBuffers(m_eglDisplay,m_eglSurface);
@@ -113,29 +107,64 @@ void AndroidBackend::swapBuffers() {
 
 static int32_t handle_input_event(android_app* app, AInputEvent* event) {
     int32_t type=AInputEvent_getType(event);
+    auto& b=esdroid::AndroidBackend::instance();
+    if(type==AINPUT_EVENT_TYPE_KEY) {
+        // While the settings panel is up, BACK closes it instead of the app.
+        if(AKeyEvent_getKeyCode(event)==AKEYCODE_BACK
+            &&AKeyEvent_getAction(event)==AKEY_EVENT_ACTION_DOWN
+            &&b.settingsOpen()) {
+            b.closeSettings();
+            return 1;
+        }
+        return 0;
+    }
     if(type==AINPUT_EVENT_TYPE_MOTION) {
         int32_t action=AMotionEvent_getAction(event);
         int32_t am=action&AMOTION_EVENT_ACTION_MASK;
-        auto& b=esdroid::AndroidBackend::instance();
+        if(b.settingsOpen()) {
+            b.handleSettingsMotion(event,am);
+            return 1;
+        }
         switch(am) {
         case AMOTION_EVENT_ACTION_DOWN:
         case AMOTION_EVENT_ACTION_POINTER_DOWN: {
             int idx=(action&AMOTION_EVENT_ACTION_POINTER_INDEX_MASK)>>AMOTION_EVENT_ACTION_POINTER_INDEX_SHIFT;
             float x=AMotionEvent_getX(event,idx), y=AMotionEvent_getY(event,idx);
             int pid=AMotionEvent_getPointerId(event,idx);
+            if(b.settingsButtonValid()) {
+                const float* r=b.settingsButtonRect();
+                if(x>=r[0]&&x<r[0]+r[2]&&y>=r[1]&&y<r[1]+r[3]) {
+                    b.openSettings();
+                    return 1;
+                }
+            }
             auto* btn=b.hitTestButton(x,y);
             if(btn){b.pressButton(btn,pid);return 1;}
-            break;
+            b.pressEngineTouch(pid,x,y);
+            return 1;
+        }
+        case AMOTION_EVENT_ACTION_MOVE: {
+            int pc=AMotionEvent_getPointerCount(event);
+            for(int i=0;i<pc;++i) {
+                int pid=AMotionEvent_getPointerId(event,i);
+                b.moveEngineTouch(pid,AMotionEvent_getX(event,i),AMotionEvent_getY(event,i));
+            }
+            return 1;
         }
         case AMOTION_EVENT_ACTION_UP:
         case AMOTION_EVENT_ACTION_POINTER_UP: {
             int idx=(action&AMOTION_EVENT_ACTION_POINTER_INDEX_MASK)>>AMOTION_EVENT_ACTION_POINTER_INDEX_SHIFT;
             int pid=AMotionEvent_getPointerId(event,idx);
+            b.releaseEngineTouch(pid,false);
             b.releaseAllButtons(pid); return 1;
         }
         case AMOTION_EVENT_ACTION_CANCEL: {
             int pc=AMotionEvent_getPointerCount(event);
-            for(int i=0;i<pc;++i) b.releaseAllButtons(AMotionEvent_getPointerId(event,i),true);
+            for(int i=0;i<pc;++i) {
+                int pid=AMotionEvent_getPointerId(event,i);
+                b.releaseEngineTouch(pid,true);
+                b.releaseAllButtons(pid,true);
+            }
             return 1;
         }
         }
@@ -187,6 +216,8 @@ bool AndroidBackend::pollEvents() {
         if(s_app->destroyRequested!=0){m_shouldQuit=true;break;}
     }
     // Input arrives through app->onInputEvent inside source->process().
+    // Typed values came in on the Java UI thread and are applied here.
+    consumePendingValueInput();
     return !m_shouldQuit;
 }
 
@@ -208,6 +239,11 @@ void AndroidBackend::pressButton(TouchButton* btn,int pid) {
     btn->held=true; btn->edge=true; btn->pointerId=pid;
     if(btn->key==VirtualKey::Fn){ m_fnHeld=true; m_fnPressNs=now_ns(); return; }
     int k=(int)effectiveKey(*btn);
+    // "1x": no key held means full speed, so drop any speed hold instead.
+    if(k==(int)VirtualKey::None){
+        for(int i=(int)VirtualKey::N1;i<=(int)VirtualKey::N5;++i) m_keyState[i]=false;
+        return;
+    }
     if(k>0&&k<(int)VirtualKey::Count){m_keyState[k]=true;m_keyEdge[k]=true;}
     if(k==(int)VirtualKey::Insert) requestMrFilePicker();
 }
@@ -235,6 +271,320 @@ void AndroidBackend::releaseAllButtons(int pid, bool cancel) {
     }
 }
 
+// The first finger that misses every button drives the mouse, a second
+// one starts a pinch. Extra fingers are ignored so a resting thumb cannot
+// yank the view.
+void AndroidBackend::pressEngineTouch(int pid,float x,float y) {
+    if(m_touchPid==-1) {
+        m_touchPid=pid;
+        m_touchX1=x; m_touchY1=y;
+        m_touchX=x; m_touchY=y;
+        m_touchDownEdge=true; m_touchUpEdge=false;
+        return;
+    }
+    if(m_touchPid2!=-1) return;
+    m_touchPid2=pid;
+    m_touchX2=x; m_touchY2=y;
+    float dx=x-m_touchX1,dy=y-m_touchY1;
+    m_pinchDist=sqrtf(dx*dx+dy*dy);
+    // The reported position jumps to the midpoint, so the drag has to be
+    // re-anchored there or the view would lurch.
+    m_restartPending=true; m_touchUpEdge=true;
+}
+void AndroidBackend::moveEngineTouch(int pid,float x,float y) {
+    if(pid==m_touchPid){ m_touchX1=x; m_touchY1=y; }
+    else if(pid==m_touchPid2){ m_touchX2=x; m_touchY2=y; }
+    else return;
+    if(m_touchPid2!=-1) {
+        // Zoom tracks the finger distance ratio: spreading the fingers
+        // doubles the zoom when the distance doubles.
+        float dx=m_touchX1-m_touchX2,dy=m_touchY1-m_touchY2;
+        float d=sqrtf(dx*dx+dy*dy);
+        if(m_pinchDist>1.0f) m_pinchWheel+=500.0f*log2f(d/m_pinchDist);
+        m_pinchDist=d;
+    }
+    // Hold the position until a pending drag restart lands it on the new
+    // anchor; reporting the raw jump would yank the view.
+    if(m_restartPending) return;
+    if(m_touchPid2==-1){ m_touchX=m_touchX1; m_touchY=m_touchY1; return; }
+    m_touchX=(m_touchX1+m_touchX2)*0.5f;
+    m_touchY=(m_touchY1+m_touchY2)*0.5f;
+}
+void AndroidBackend::releaseEngineTouch(int pid,bool cancel) {
+    if(pid==m_touchPid2) {
+        // Pinch over, the remaining finger keeps panning.
+        m_touchPid2=-1; m_pinchDist=0.0f;
+        if(!cancel){ m_restartPending=true; m_touchUpEdge=true; }
+        return;
+    }
+    if(pid!=m_touchPid) return;
+    if(m_touchPid2!=-1) {
+        // Engine finger left, the pinch partner takes over.
+        m_touchPid=m_touchPid2; m_touchPid2=-1;
+        m_touchX1=m_touchX2; m_touchY1=m_touchY2;
+        m_pinchDist=0.0f;
+        if(!cancel){ m_restartPending=true; m_touchUpEdge=true; }
+        return;
+    }
+    m_touchPid=-1; m_pinchDist=0.0f;
+    // Both fingers can lift inside one frame; a leftover restart would
+    // leave a phantom drag behind.
+    m_restartPending=false;
+    // A system grab must not fire a click at the last position.
+    if(!cancel) m_touchUpEdge=true;
+}
+
+// ------------------------------------------------------------------
+// Settings panel
+
+static const char* kSettingLabels[esdroid::kSettingCount] = {
+    "VOLUME", "CONVOLUTION", "HI FREQ GAIN", "LO FREQ NOISE",
+    "HI FREQ NOISE", "SIM FREQUENCY", "DYNO SPEED", "THROTTLE"
+};
+
+const char* AndroidBackend::settingLabel(int idx) {
+    if(idx<0||idx>=esdroid::kSettingCount) return "";
+    return kSettingLabels[idx];
+}
+
+void AndroidBackend::formatSettingValue(char* out,int len,int idx) const {
+    switch((SettingIndex)idx) {
+    case SettingIndex::SimFrequency:
+        snprintf(out,len,"%d HZ",(int)(m_settings.simFrequency+0.5));
+        return;
+    case SettingIndex::DynoSpeed:
+        snprintf(out,len,"%d RPM",(int)(m_settings.dynoSpeedRpm+0.5));
+        return;
+    case SettingIndex::Volume:
+        snprintf(out,len,"%d%%",(int)(m_settings.volume*100.0f+0.5f));
+        return;
+    case SettingIndex::Convolution:
+        snprintf(out,len,"%d%%",(int)(m_settings.convolution*100.0f+0.5f));
+        return;
+    case SettingIndex::HiFreqGain:
+        snprintf(out,len,"%d%%",(int)(m_settings.hiFreqGain*100.0f+0.5f));
+        return;
+    case SettingIndex::LoFreqNoise:
+        snprintf(out,len,"%d%%",(int)(m_settings.loFreqNoise*100.0f+0.5f));
+        return;
+    case SettingIndex::HiFreqNoise:
+        snprintf(out,len,"%d%%",(int)(m_settings.hiFreqNoise*100.0f+0.5f));
+        return;
+    case SettingIndex::Throttle:
+        snprintf(out,len,"%d%%",(int)(m_settings.throttlePct+0.5f));
+        return;
+    default:
+        snprintf(out,len,"?");
+        return;
+    }
+}
+
+static float clamp01f(float v) { return v<0.0f?0.0f:(v>1.0f?1.0f:v); }
+static double clampd(double v,double lo,double hi) { return v<lo?lo:(v>hi?hi:v); }
+
+// The 400 Hz..400 kHz sim frequency range is logarithmic on the slider,
+// or the whole low half of the range would sit under the knob.
+static const double kSimFreqMin=400.0, kSimFreqMax=400000.0;
+
+float AndroidBackend::settingSliderT(int idx) const {
+    switch((SettingIndex)idx) {
+    case SettingIndex::Volume: return clamp01f(m_settings.volume);
+    case SettingIndex::Convolution: return clamp01f(m_settings.convolution);
+    case SettingIndex::HiFreqGain: return clamp01f(m_settings.hiFreqGain);
+    case SettingIndex::LoFreqNoise: return clamp01f(m_settings.loFreqNoise);
+    case SettingIndex::HiFreqNoise: return clamp01f(m_settings.hiFreqNoise);
+    case SettingIndex::SimFrequency: {
+        const double v=clampd(m_settings.simFrequency,kSimFreqMin,kSimFreqMax);
+        return (float)(log10(v/kSimFreqMin)/log10(kSimFreqMax/kSimFreqMin));
+    }
+    case SettingIndex::DynoSpeed: {
+        const double lo=m_settings.dynoMinRpm, hi=m_settings.dynoMaxRpm;
+        if(hi<=lo) return 0.0f;
+        return (float)clampd((m_settings.dynoSpeedRpm-lo)/(hi-lo),0.0,1.0);
+    }
+    case SettingIndex::Throttle:
+        return clamp01f(m_settings.throttlePct/100.0f);
+    default:
+        return 0.0f;
+    }
+}
+
+void AndroidBackend::setSettingFromSlider(int idx,float t) {
+    t=clamp01f(t);
+    switch((SettingIndex)idx) {
+    case SettingIndex::Volume: m_settings.volume=t; break;
+    case SettingIndex::Convolution: m_settings.convolution=t; break;
+    case SettingIndex::HiFreqGain: m_settings.hiFreqGain=t; break;
+    case SettingIndex::LoFreqNoise: m_settings.loFreqNoise=t; break;
+    case SettingIndex::HiFreqNoise: m_settings.hiFreqNoise=t; break;
+    case SettingIndex::SimFrequency:
+        m_settings.simFrequency=kSimFreqMin*pow(1000.0,(double)t);
+        break;
+    case SettingIndex::DynoSpeed:
+        m_settings.dynoSpeedRpm=m_settings.dynoMinRpm
+            +(double)t*(m_settings.dynoMaxRpm-m_settings.dynoMinRpm);
+        break;
+    case SettingIndex::Throttle:
+        m_settings.throttlePct=t*100.0f;
+        break;
+    default:
+        return;
+    }
+    m_settings.dirty|= (1u<<idx);
+}
+
+// Typed input arrives in the units the panel shows: percent, Hz, RPM.
+void AndroidBackend::setSettingTyped(int idx,double typed) {
+    switch((SettingIndex)idx) {
+    case SettingIndex::Volume: m_settings.volume=(float)clampd(typed/100.0,0.0,1.0); break;
+    case SettingIndex::Convolution: m_settings.convolution=(float)clampd(typed/100.0,0.0,1.0); break;
+    case SettingIndex::HiFreqGain: m_settings.hiFreqGain=(float)clampd(typed/100.0,0.0,1.0); break;
+    case SettingIndex::LoFreqNoise: m_settings.loFreqNoise=(float)clampd(typed/100.0,0.0,1.0); break;
+    case SettingIndex::HiFreqNoise: m_settings.hiFreqNoise=(float)clampd(typed/100.0,0.0,1.0); break;
+    case SettingIndex::SimFrequency:
+        m_settings.simFrequency=clampd(typed,kSimFreqMin,kSimFreqMax);
+        break;
+    case SettingIndex::DynoSpeed:
+        m_settings.dynoSpeedRpm=clampd(typed,m_settings.dynoMinRpm,m_settings.dynoMaxRpm);
+        break;
+    case SettingIndex::Throttle:
+        m_settings.throttlePct=(float)clampd(typed,0.0,100.0);
+        break;
+    default:
+        return;
+    }
+    m_settings.dirty|= (1u<<idx);
+}
+
+void AndroidBackend::openSettings() {
+    if(m_settings.open) return;
+    m_settings.open=true;
+    const bool engineTouch=(m_touchPid!=-1||m_touchPid2!=-1);
+    clearAllKeys();
+    // A drag that was running under the SETTINGS button has to end with a
+    // clean lift, or the engine mouse would stay pressed forever.
+    if(engineTouch) m_touchUpEdge=true;
+    esdroid_wtflog("settings: opened");
+}
+
+void AndroidBackend::closeSettings() {
+    if(!m_settings.open) return;
+    m_settings.open=false;
+    m_sliderPid=-1; m_sliderIdx=-1;
+    requestHideValueInput();
+    esdroid_wtflog("settings: closed");
+}
+
+void AndroidBackend::layoutSettingsPanel(int sw,int sh) {
+    if(sw<=0||sh<=0) return;
+    auto& L=m_settingsLayout;
+    const float pad=18.0f, gap=8.0f, headerH=64.0f;
+    float panelW=(float)sw*0.72f;
+    if(panelW>980.0f) panelW=980.0f;
+    float rowH=64.0f;
+    const float availH=(float)sh*0.94f-headerH-2.0f*pad-(float)(esdroid::kSettingCount-1)*gap;
+    if(availH<(float)esdroid::kSettingCount*rowH)
+        rowH=availH/(float)esdroid::kSettingCount;
+    if(rowH<30.0f) rowH=30.0f;
+    const float panelH=headerH+2.0f*pad+(float)esdroid::kSettingCount*rowH
+        +(float)(esdroid::kSettingCount-1)*gap;
+    const float px=((float)sw-panelW)*0.5f;
+    const float py=((float)sh-panelH)*0.5f;
+    L.panel[0]=px; L.panel[1]=py; L.panel[2]=panelW; L.panel[3]=panelH;
+    L.rowH=rowH;
+    const float closeW=92.0f, closeH=42.0f;
+    L.close[0]=px+panelW-pad-closeW; L.close[1]=py+pad*0.5f+ (headerH-closeH)*0.5f;
+    L.close[2]=closeW; L.close[3]=closeH;
+    const float labelW=214.0f, valueW=152.0f, trackH=10.0f, cgap=14.0f;
+    const float innerX=px+pad, innerW=panelW-2.0f*pad;
+    const float trackW=innerW-labelW-valueW-3.0f*cgap;
+    float y=py+headerH+pad;
+    for(int i=0;i<esdroid::kSettingCount;++i,y+=rowH+gap) {
+        const float cy=y+rowH*0.5f;
+        L.track[i][0]=innerX+labelW+cgap; L.track[i][1]=cy-trackH*0.5f;
+        L.track[i][2]=trackW; L.track[i][3]=trackH;
+        float valueH=rowH*0.72f;
+        if(valueH>46.0f) valueH=46.0f;
+        if(valueH<28.0f) valueH=28.0f;
+        L.value[i][0]=innerX+labelW+cgap+trackW+cgap;
+        L.value[i][1]=y+(rowH-valueH)*0.5f;
+        L.value[i][2]=valueW; L.value[i][3]=valueH;
+    }
+}
+
+int AndroidBackend::handleSettingsMotion(AInputEvent* event,int32_t am) {
+    auto contains=[](const float* r,float x,float y) {
+        return x>=r[0]&&x<r[0]+r[2]&&y>=r[1]&&y<r[1]+r[3];
+    };
+    if(am==AMOTION_EVENT_ACTION_DOWN||am==AMOTION_EVENT_ACTION_POINTER_DOWN) {
+        const int32_t action=AMotionEvent_getAction(event);
+        const int idx=(action&AMOTION_EVENT_ACTION_POINTER_INDEX_MASK)
+            >>AMOTION_EVENT_ACTION_POINTER_INDEX_SHIFT;
+        const float x=AMotionEvent_getX(event,idx);
+        const float y=AMotionEvent_getY(event,idx);
+        const int pid=AMotionEvent_getPointerId(event,idx);
+        const auto& L=m_settingsLayout;
+        if(contains(L.close,x,y)) { closeSettings(); return 1; }
+        for(int i=0;i<esdroid::kSettingCount;++i)
+            if(contains(L.value[i],x,y)) { requestValueInput(i); return 1; }
+        for(int i=0;i<esdroid::kSettingCount;++i) {
+            const float* t=L.track[i];
+            // The track is thin, so the whole row band grabs the slider.
+            if(x>=t[0]-24.0f&&x<t[0]+t[2]+24.0f
+                &&y>=t[1]-L.rowH*0.5f&&y<t[1]+t[3]+L.rowH*0.5f) {
+                m_sliderPid=pid; m_sliderIdx=i;
+                float tt=(x-t[0])/t[2];
+                setSettingFromSlider(i,clamp01f(tt));
+                return 1;
+            }
+        }
+        return 1;
+    }
+    if(am==AMOTION_EVENT_ACTION_MOVE) {
+        if(m_sliderPid!=-1) {
+            const int pc=AMotionEvent_getPointerCount(event);
+            for(int i=0;i<pc;++i) {
+                if(AMotionEvent_getPointerId(event,i)!=m_sliderPid) continue;
+                const float* t=m_settingsLayout.track[m_sliderIdx];
+                float tt=(AMotionEvent_getX(event,i)-t[0])/t[2];
+                setSettingFromSlider(m_sliderIdx,clamp01f(tt));
+            }
+        }
+        return 1;
+    }
+    if(am==AMOTION_EVENT_ACTION_UP||am==AMOTION_EVENT_ACTION_POINTER_UP) {
+        const int32_t action=AMotionEvent_getAction(event);
+        const int idx=(action&AMOTION_EVENT_ACTION_POINTER_INDEX_MASK)
+            >>AMOTION_EVENT_ACTION_POINTER_INDEX_SHIFT;
+        const int pid=AMotionEvent_getPointerId(event,idx);
+        if(pid==m_sliderPid){ m_sliderPid=-1; m_sliderIdx=-1; }
+        return 1;
+    }
+    if(am==AMOTION_EVENT_ACTION_CANCEL) {
+        m_sliderPid=-1; m_sliderIdx=-1;
+        return 1;
+    }
+    return 1;
+}
+
+void AndroidBackend::stageValueInput(int idx,double value) {
+    std::lock_guard<std::mutex> lk(m_valueInputMutex);
+    m_pendingValueIdx=idx;
+    m_pendingValue=value;
+}
+
+void AndroidBackend::consumePendingValueInput() {
+    int idx=-1; double value=0.0;
+    {
+        std::lock_guard<std::mutex> lk(m_valueInputMutex);
+        if(m_pendingValueIdx<0) return;
+        idx=m_pendingValueIdx; value=m_pendingValue;
+        m_pendingValueIdx=-1; m_pendingValue=0.0;
+    }
+    setSettingTyped(idx,value);
+    esdroid_wtflog("settings: typed %s = %f",settingLabel(idx),value);
+}
+
 bool AndroidBackend::isKeyDown(VirtualKey k) const {
     int i=(int)k; if(i<=0||i>=(int)VirtualKey::Count) return false;
     return m_keyState[i];
@@ -250,6 +600,10 @@ void AndroidBackend::clearAllKeys() {
     for(int i=0;i<(int)VirtualKey::Count;++i){m_keyState[i]=false;m_keyEdge[i]=false;}
     for(auto&b:m_buttons){b.held=false;b.edge=false;b.pointerId=-1;}
     m_fnLatched=false; m_fnHeld=false;
+    m_touchPid=-1; m_touchPid2=-1;
+    m_touchDownEdge=false; m_touchUpEdge=false;
+    m_restartPending=false; m_pinchDist=0.0f; m_pinchWheel=0.0f;
+    m_sliderPid=-1; m_sliderIdx=-1;
 }
 
 void AndroidBackend::layoutButtons(int sw,int sh) {
@@ -279,7 +633,7 @@ void AndroidBackend::layoutButtons(int sw,int sh) {
     // ResetEngine maps to ysKey::Code::Return in the shim: run() reloads the
     // engine script on its edge (loadScript()).
     add("RELOAD","DYNO HOLD",rX,lY-3*(bh+gap),VirtualKey::ResetEngine,VirtualKey::DynoHold);
-    add("1x","1/200x",pad,pad,VirtualKey::Return,VirtualKey::N3);
+    add("1x","1/200x",pad,pad,VirtualKey::None,VirtualKey::N3);
     add("1/10x","1/500x",pad,pad+(bh+gap),VirtualKey::N1,VirtualKey::N4);
     add("1/100x","1/1000x",pad,pad+2*(bh+gap),VirtualKey::N2,VirtualKey::N5);
     add("FN",nullptr,pad,pad+3*(bh+gap),VirtualKey::Fn,VirtualKey::None);
@@ -289,6 +643,8 @@ void AndroidBackend::layoutButtons(int sw,int sh) {
     // No desktop key pages the oscilloscope focus, so this button is consumed
     // directly in EngineSimApplication::run().
     add("OSC PAGE","ROT 0",rX,pad+3*(bh+gap),VirtualKey::OscPage,VirtualKey::F3);
+
+    layoutSettingsPanel(sw,sh);
 }
 
 static void sl_buffer_callback(SLAndroidSimpleBufferQueueItf bq, void* ctx) {
@@ -297,20 +653,27 @@ static void sl_buffer_callback(SLAndroidSimpleBufferQueueItf bq, void* ctx) {
 
     int bufSamps = backend->m_sampleRate / 20 * backend->m_channels; // 50ms buffer
     std::vector<int16_t>* buf = &backend->m_slBuffers[backend->m_slNextBuffer];
-    buf->assign(bufSamps, 0);
 
-    // Copy from ring buffer
+    // Copy from ring buffer. Like desktop DirectSound: always read from ring
+    // buffer, even if underrun. Old data gets replayed briefly until new audio
+    // arrives. This is better than silence. Two memcpys instead of a per
+    // sample modulo loop: this runs on the audio thread.
     {
         std::lock_guard<std::mutex> lk(backend->m_audioMutex);
-        int rs = (int)backend->m_audioRing.size();
-        if (rs > 0) {
-            // Like desktop DirectSound: always read from ring buffer,
-            // even if underrun. Old data gets replayed briefly until
-            // new audio arrives. This is better than silence.
-            for (int i = 0; i < bufSamps; ++i) {
-                (*buf)[i] = backend->m_audioRing[backend->m_audioReadPos];
-                backend->m_audioReadPos = (backend->m_audioReadPos + 1) % rs;
-            }
+        const int rs = (int)backend->m_audioRing.size();
+        if (rs <= 0) {
+            buf->assign(bufSamps, 0);
+        } else {
+            int& rp = backend->m_audioReadPos;
+            int n = bufSamps < rs ? bufSamps : rs;
+            int first = rs - rp; if (first > n) first = n;
+            memcpy(buf->data(), &backend->m_audioRing[rp],
+                (size_t)first * sizeof(int16_t));
+            if (n > first) memcpy(buf->data() + first, &backend->m_audioRing[0],
+                (size_t)(n - first) * sizeof(int16_t));
+            if (bufSamps > n) memset(buf->data() + n, 0,
+                (size_t)(bufSamps - n) * sizeof(int16_t));
+            rp = (rp + n) % rs;
         }
     }
 
@@ -381,17 +744,24 @@ void AndroidBackend::resetAudioRing() {
 bool AndroidBackend::writeAudioSamples(const int16_t* samples,int count,int* written) {
     if(!m_audioInited){if(written)*written=0;return false;}
     std::lock_guard<std::mutex> lk(m_audioMutex);
-    int rs=(int)m_audioRing.size();
-    for(int i=0;i<count;++i) {
-        m_audioRing[m_audioWritePos]=samples[i];
-        m_audioWritePos=(m_audioWritePos+1)%rs;
-        if(m_audioWritePos==m_audioReadPos) m_audioReadPos=(m_audioReadPos+1)%rs;
-    }
+    const int rs=(int)m_audioRing.size();
     if(written)*written=count;
+    if(rs<=0||count<=0) return true;
+    // A block larger than the ring keeps only its tail.
+    if(count>=rs){ samples+=count-rs; count=rs; m_audioWritePos=m_audioReadPos; }
+    // The writer may lap the reader; the reader then advances past exactly
+    // the overwritten samples, same as the old per-sample chase.
+    const int first=count<rs-m_audioWritePos?count:rs-m_audioWritePos;
+    memcpy(&m_audioRing[m_audioWritePos],samples,(size_t)first*sizeof(int16_t));
+    const int rest=count-first;
+    if(rest>0) memcpy(&m_audioRing[0],samples+first,(size_t)rest*sizeof(int16_t));
+    const int valid=(m_audioWritePos-m_audioReadPos+rs)%rs;
+    int drop=count-(rs-valid)+1;
+    if(drop<0) drop=0;
+    m_audioWritePos=(m_audioWritePos+count)%rs;
+    if(drop>0) m_audioReadPos=(m_audioReadPos+drop)%rs;
     return true;
 }
-
-int AndroidBackend::getCurrentWritePosition() const { return m_audioWritePos; }
 
 bool AndroidBackend::readAsset(const char* path,void** outBuf,long* outSize) {
     if(!m_assetManager) return false;
@@ -531,24 +901,65 @@ bool AndroidBackend::consumeScriptReloadPending() {
     return true;
 }
 
-extern "C" void esdroid_update_frame_timing(int64_t frame_ns) {
-    auto& b=esdroid::AndroidBackend::instance();
-    int i=b.m_frameTimeIdx;
-    b.m_frameTimes[i]=frame_ns;
-    b.m_frameTimeIdx=(i+1)%60;
-    if(b.m_frameTimeCount<60) b.m_frameTimeCount++;
+// The value entry dialog is a real Android Dialog: it owns its own window,
+// so its buttons and the IME work on top of the native input queue.
+void AndroidBackend::requestValueInput(int idx) {
+    if (s_app == nullptr || s_app->activity == nullptr) return;
+    JNIEnv* env = nullptr;
+    JavaVM* vm = g_javaVM;
+    if (vm == nullptr) return;
+    bool attached = false;
+    if (vm->GetEnv((void**)&env, JNI_VERSION_1_6) != JNI_OK) {
+        if (vm->AttachCurrentThread(&env, nullptr) != JNI_OK) return;
+        attached = true;
+    }
+    jobject activity = s_app->activity->clazz;
+    if (activity == nullptr) { if (attached) vm->DetachCurrentThread(); return; }
+    jclass cls = env->GetObjectClass(activity);
+    jmethodID method = env->GetMethodID(cls, "showValueInput", "(ILjava/lang/String;Ljava/lang/String;)V");
+    if (method != nullptr) {
+        char current[32];
+        formatSettingValue(current, sizeof(current), idx);
+        jstring label = env->NewStringUTF(settingLabel(idx));
+        jstring value = env->NewStringUTF(current);
+        if (label != nullptr && value != nullptr) {
+            env->CallVoidMethod(activity, method, (jint)idx, label, value);
+            if (env->ExceptionCheck()) {
+                esdroid_wtflog("showValueInput threw a Java exception");
+                env->ExceptionDescribe();
+                env->ExceptionClear();
+            }
+        }
+        if (label != nullptr) env->DeleteLocalRef(label);
+        if (value != nullptr) env->DeleteLocalRef(value);
+    }
+    env->DeleteLocalRef(cls);
+    if (attached) vm->DetachCurrentThread();
 }
 
-double AndroidBackend::getFrameLength() const {
-    if(m_frameTimeCount==0) return 1.0/60.0;
-    int64_t sum=0;
-    for(int i=0;i<m_frameTimeCount;++i) sum+=m_frameTimes[i];
-    return (double)sum/(double)m_frameTimeCount/1e9;
-}
-
-double AndroidBackend::getAverageFramerate() const {
-    double dt=getFrameLength();
-    return (dt<=0)?60.0:1.0/dt;
+void AndroidBackend::requestHideValueInput() {
+    if (s_app == nullptr || s_app->activity == nullptr) return;
+    JNIEnv* env = nullptr;
+    JavaVM* vm = g_javaVM;
+    if (vm == nullptr) return;
+    bool attached = false;
+    if (vm->GetEnv((void**)&env, JNI_VERSION_1_6) != JNI_OK) {
+        if (vm->AttachCurrentThread(&env, nullptr) != JNI_OK) return;
+        attached = true;
+    }
+    jobject activity = s_app->activity->clazz;
+    if (activity == nullptr) { if (attached) vm->DetachCurrentThread(); return; }
+    jclass cls = env->GetObjectClass(activity);
+    jmethodID method = env->GetMethodID(cls, "hideValueInput", "()V");
+    if (method != nullptr) {
+        env->CallVoidMethod(activity, method);
+        if (env->ExceptionCheck()) {
+            env->ExceptionDescribe();
+            env->ExceptionClear();
+        }
+    }
+    env->DeleteLocalRef(cls);
+    if (attached) vm->DetachCurrentThread();
 }
 
 extern "C" void esdroid_install_app_callbacks(struct android_app* app) {
@@ -565,9 +976,12 @@ extern "C" void esdroid_pre_main(struct android_app* app) {
 extern "C" JNIEXPORT void JNICALL
 Java_com_esdroid_engine_1sim_ESDroidActivity_nativeOnFilePicked(JNIEnv* env, jobject thiz, jstring path);
 
+extern "C" JNIEXPORT void JNICALL
+Java_com_esdroid_engine_1sim_ESDroidActivity_nativeOnValueInput(JNIEnv* env, jobject thiz, jint index, jdouble value);
+
 extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*) {
     g_javaVM=vm;
-    // Bind the java facing method explicitly. The package name contains an
+    // Bind the java facing methods explicitly. The package name contains an
     // underscore, which JNI name mangling encodes as _1, and a plain symbol
     // name with a raw underscore is invisible to the VM. Registering by
     // method name here does not depend on symbol name mangling at all.
@@ -578,8 +992,10 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*) {
             JNINativeMethod methods[]={
                 {"nativeOnFilePicked","(Ljava/lang/String;)V",
                  (void*)Java_com_esdroid_engine_1sim_ESDroidActivity_nativeOnFilePicked},
+                {"nativeOnValueInput","(ID)V",
+                 (void*)Java_com_esdroid_engine_1sim_ESDroidActivity_nativeOnValueInput},
             };
-            env->RegisterNatives(cls,methods,1);
+            env->RegisterNatives(cls,methods,2);
             if (env->ExceptionCheck()) env->ExceptionClear();
             env->DeleteLocalRef(cls);
         } else if (env->ExceptionCheck()) {
@@ -625,4 +1041,11 @@ Java_com_esdroid_engine_1sim_ESDroidActivity_nativeOnFilePicked(JNIEnv* env, job
         esdroid::AndroidBackend::instance().onMrFilePicked(std::string(pathStr));
         env->ReleaseStringUTFChars(path, pathStr);
     }
+}
+
+// Typed value from the settings dialog. Runs on the Java UI thread, so it
+// is staged and applied by the render thread on its next poll.
+extern "C" JNIEXPORT void JNICALL
+Java_com_esdroid_engine_1sim_ESDroidActivity_nativeOnValueInput(JNIEnv* env, jobject thiz, jint index, jdouble value) {
+    esdroid::AndroidBackend::instance().stageValueInput((int)index, (double)value);
 }

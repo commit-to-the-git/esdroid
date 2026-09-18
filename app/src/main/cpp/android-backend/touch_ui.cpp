@@ -23,11 +23,16 @@
 #include <stb/stb_image.h>
 
 static unsigned char* s_fontBitmap = nullptr;
+static unsigned char* s_fontBitmapBig = nullptr;
 static stbtt_bakedchar s_fontChars[96];
+static stbtt_bakedchar s_fontCharsBig[96];
 static GLuint s_fontTexture = 0;
+static GLuint s_fontTextureBig = 0;
 static int s_fontLoaded = 0;
 static const int FONT_TEX_SIZE = 512;
 static const float FONT_SIZE = 20.0f;
+static const float FONT_SIZE_BIG = 28.0f;
+static float s_settingsLabelW = 0.0f; // real "SETTINGS" advance, set at font load
 
 // Text rendering for button labels, using the engine's Silkscreen font.
 static GLuint s_textProgram = 0;
@@ -48,13 +53,23 @@ static void loadTouchFont() {
     }
 
     s_fontBitmap = new unsigned char[FONT_TEX_SIZE * FONT_TEX_SIZE];
-    int result = stbtt_BakeFontBitmap((unsigned char*)ttfData, 0, FONT_SIZE, s_fontBitmap, FONT_TEX_SIZE, FONT_TEX_SIZE,
-        32, 96, s_fontChars);
+    s_fontBitmapBig = new unsigned char[FONT_TEX_SIZE * FONT_TEX_SIZE];
+    int result = stbtt_BakeFontBitmap((unsigned char*)ttfData, 0, FONT_SIZE, s_fontBitmap,
+        FONT_TEX_SIZE, FONT_TEX_SIZE, 32, 96, s_fontChars);
+    int resultBig = stbtt_BakeFontBitmap((unsigned char*)ttfData, 0, FONT_SIZE_BIG,
+        s_fontBitmapBig, FONT_TEX_SIZE, FONT_TEX_SIZE, 32, 96, s_fontCharsBig);
     free(ttfData);
-    if (result <= 0) {
+    if (result <= 0 || resultBig <= 0) {
         __android_log_print(ANDROID_LOG_ERROR, "ESDroid", "TouchUI: bake failed");
         delete[] s_fontBitmap; s_fontBitmap = nullptr;
+        delete[] s_fontBitmapBig; s_fontBitmapBig = nullptr;
         return;
+    }
+
+    // Measure the real advance so the SETTINGS button is sized to its text.
+    for (const char* p = "SETTINGS"; *p; ++p) {
+        if (*p < 32 || *p >= 128) continue;
+        s_settingsLabelW += s_fontChars[*p - 32].xadvance;
     }
 
     glGenTextures(1, &s_fontTexture);
@@ -63,6 +78,12 @@ static void loadTouchFont() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, FONT_TEX_SIZE, FONT_TEX_SIZE, 0,
                  GL_RED, GL_UNSIGNED_BYTE, s_fontBitmap);
+    glGenTextures(1, &s_fontTextureBig);
+    glBindTexture(GL_TEXTURE_2D, s_fontTextureBig);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, FONT_TEX_SIZE, FONT_TEX_SIZE, 0,
+                 GL_RED, GL_UNSIGNED_BYTE, s_fontBitmapBig);
     glBindTexture(GL_TEXTURE_2D, 0);
 
     static const char* tvs = R"ES3(#version 300 es
@@ -130,6 +151,156 @@ static bool s_logoRectValid = false;
 extern "C" void esdroid_set_logo_rect(float x, float y, float w, float h) {
     s_logoRect[0] = x; s_logoRect[1] = y; s_logoRect[2] = w; s_logoRect[3] = h;
     s_logoRectValid = true;
+}
+
+// The info cluster publishes its title box every rendered frame; the
+// SETTINGS button is derived from it so it can never escape the box.
+extern "C" void esdroid_set_title_rect(float x, float y, float w, float h) {
+    const float margin = 8.0f;
+    float bh = h * 0.24f;
+    if (bh > 28.0f) bh = 28.0f;
+    if (bh < 16.0f) bh = 16.0f;
+    const float labelW = (s_settingsLabelW > 0.0f) ? s_settingsLabelW
+        : 8.0f * FONT_SIZE * 0.6f;
+    const float bw = labelW + 26.0f; // "SETTINGS" + padding
+    if (w - 2.0f * margin < bw || h - 2.0f * margin < bh) {
+        esdroid::AndroidBackend::instance().setSettingsButtonRect(0, 0, 0, 0);
+        return;
+    }
+    esdroid::AndroidBackend::instance().setSettingsButtonRect(
+        x + w - margin - bw, y + h - margin - bh, bw, bh);
+}
+
+// Called at the top of every renderScene(): a rect that stops being
+// published (info cluster hidden on another screen) stops being tappable.
+extern "C" void esdroid_invalidate_ui_rects() {
+    esdroid::AndroidBackend::instance().invalidateUiRects();
+}
+
+// ------------------------------------------------------------------
+// Frosted backdrop: capture the finished engine frame, downsample it,
+// run a separable gaussian over it and stretch it back over the screen.
+
+static GLuint s_blurTexA = 0, s_blurTexB = 0;
+static GLuint s_blurFboA = 0, s_blurFboB = 0;
+static GLuint s_blurProgram = 0;
+static GLuint s_blurVao = 0, s_blurVbo = 0;
+static GLint s_blurLocScreen = -1, s_blurLocStep = -1;
+static int s_blurW = 0, s_blurH = 0;
+
+static void ensureBlurResources(int sw, int sh) {
+    const int bw = sw > 6 ? sw / 6 : 1;
+    const int bh = sh > 6 ? sh / 6 : 1;
+    if (s_blurTexA != 0 && s_blurW == bw && s_blurH == bh) return;
+    s_blurW = bw; s_blurH = bh;
+
+    if (s_blurTexA == 0) {
+        glGenTextures(1, &s_blurTexA);
+        glGenTextures(1, &s_blurTexB);
+        glGenFramebuffers(1, &s_blurFboA);
+        glGenFramebuffers(1, &s_blurFboB);
+        glGenVertexArrays(1, &s_blurVao);
+        glGenBuffers(1, &s_blurVbo);
+    }
+
+    for (int t = 0; t < 2; ++t) {
+        glBindTexture(GL_TEXTURE_2D, t == 0 ? s_blurTexA : s_blurTexB);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, bw, bh, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+    }
+    glBindFramebuffer(GL_FRAMEBUFFER, s_blurFboA);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, s_blurTexA, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, s_blurFboB);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, s_blurTexB, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    if (s_blurProgram == 0) {
+        static const char* bvs = R"ES3(#version 300 es
+            uniform vec2 uScreen;
+            in vec2 aPos; in vec2 aUV; out vec2 vUV;
+            void main(){
+                gl_Position=vec4((aPos.x/uScreen.x)*2.0-1.0, 1.0-(aPos.y/uScreen.y)*2.0, 0.0, 1.0);
+                vUV=aUV;
+            })ES3";
+        static const char* bfs = R"ES3(#version 300 es
+            precision mediump float;
+            uniform sampler2D uTex; uniform vec2 uStep;
+            in vec2 vUV; out vec4 fragColor;
+            void main(){
+                vec4 c=vec4(0.0);
+                c+=texture(uTex, vUV+uStep*-4.0)*0.01621622;
+                c+=texture(uTex, vUV+uStep*-3.0)*0.05405405;
+                c+=texture(uTex, vUV+uStep*-2.0)*0.12162162;
+                c+=texture(uTex, vUV+uStep*-1.0)*0.19459459;
+                c+=texture(uTex, vUV)*0.22702703;
+                c+=texture(uTex, vUV+uStep*1.0)*0.19459459;
+                c+=texture(uTex, vUV+uStep*2.0)*0.12162162;
+                c+=texture(uTex, vUV+uStep*3.0)*0.05405405;
+                c+=texture(uTex, vUV+uStep*4.0)*0.01621622;
+                fragColor=c;
+            })ES3";
+        auto compile = [](GLenum t, const char* src) -> GLuint {
+            GLuint s = glCreateShader(t);
+            glShaderSource(s, 1, &src, nullptr);
+            glCompileShader(s);
+            GLint ok = 0;
+            glGetShaderiv(s, GL_COMPILE_STATUS, &ok);
+            if (!ok) { glDeleteShader(s); return 0; }
+            return s;
+        };
+        GLuint vs = compile(GL_VERTEX_SHADER, bvs);
+        GLuint fs = compile(GL_FRAGMENT_SHADER, bfs);
+        s_blurProgram = glCreateProgram();
+        glAttachShader(s_blurProgram, vs);
+        glAttachShader(s_blurProgram, fs);
+        glLinkProgram(s_blurProgram);
+        glDeleteShader(vs);
+        glDeleteShader(fs);
+        s_blurLocScreen = glGetUniformLocation(s_blurProgram, "uScreen");
+        s_blurLocStep = glGetUniformLocation(s_blurProgram, "uStep");
+        const GLint locPos = glGetAttribLocation(s_blurProgram, "aPos");
+        const GLint locUV = glGetAttribLocation(s_blurProgram, "aUV");
+        glBindVertexArray(s_blurVao);
+        glBindBuffer(GL_ARRAY_BUFFER, s_blurVbo);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 4 * 6, nullptr, GL_DYNAMIC_DRAW);
+        if (locPos >= 0) {
+            glEnableVertexAttribArray(locPos);
+            glVertexAttribPointer(locPos, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+        }
+        if (locUV >= 0) {
+            glEnableVertexAttribArray(locUV);
+            glVertexAttribPointer(locUV, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+        }
+        glBindVertexArray(0);
+    }
+}
+
+// Draws a rect (0,0)-(w,h) of the currently bound draw framebuffer using
+// the given texture and texel step (zero step = plain copy).
+static void drawBlurQuad(float w, float h, GLuint tex, float stepX, float stepY) {
+    const float verts[4 * 6] = {
+        0, 0, 0, 0,
+        w, 0, 1, 0,
+        0, h, 0, 1,
+        0, h, 0, 1,
+        w, 0, 1, 0,
+        w, h, 1, 1,
+    };
+    glUseProgram(s_blurProgram);
+    glBindVertexArray(s_blurVao);
+    glBindBuffer(GL_ARRAY_BUFFER, s_blurVbo);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(verts), verts);
+    glUniform2f(s_blurLocScreen, w, h);
+    glUniform2f(s_blurLocStep, stepX, stepY);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, tex);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glBindVertexArray(0);
+    glUseProgram(0);
 }
 
 static void loadTouchIcon() {
@@ -248,19 +419,23 @@ static void drawTouchIcon(float screenW, float screenH) {
     glUseProgram(0);
 }
 
-static void drawTouchText(const char* text, float x, float y, float screenW, float screenH) {
-    if (!s_fontBitmap || s_fontTexture == 0 || s_textProgram == 0) return;
+static void drawTouchText(const char* text, float x, float y, float screenW, float screenH,
+                           const float* color, bool big) {
+    const stbtt_bakedchar* chars = big ? s_fontCharsBig : s_fontChars;
+    const GLuint tex = big ? s_fontTextureBig : s_fontTexture;
+    const float fontSize = big ? FONT_SIZE_BIG : FONT_SIZE;
+    if (!s_fontBitmap || tex == 0 || s_textProgram == 0) return;
 
     float verts[4 * 6 * 64]; // pos.xy, uv.xy per vertex, 6 verts per quad, max 64 chars
     int nVerts = 0;
-    float penX = x, penY = y + FONT_SIZE; // stbtt pen y is the baseline
+    float penX = x, penY = y + fontSize; // stbtt pen y is the baseline
     int len = strlen(text);
 
     for (int i = 0; i < len && i < 64; i++) {
         if (text[i] < 32 || text[i] >= 128) continue;
         stbtt_aligned_quad q;
         float qx = penX, qy = penY;
-        stbtt_GetBakedQuad(s_fontChars, FONT_TEX_SIZE, FONT_TEX_SIZE,
+        stbtt_GetBakedQuad(chars, FONT_TEX_SIZE, FONT_TEX_SIZE,
                            text[i] - 32, &qx, &qy, &q, 1);
         float* v = &verts[nVerts];
         v[0]=q.x0; v[1]=q.y0; v[2]=q.s0; v[3]=q.t0;
@@ -280,9 +455,9 @@ static void drawTouchText(const char* text, float x, float y, float screenW, flo
     glBindBuffer(GL_ARRAY_BUFFER, s_textVbo);
     glBufferSubData(GL_ARRAY_BUFFER, 0, nVerts * sizeof(float), verts);
     glUniform2f(s_textLocScreen, screenW, screenH);
-    glUniform4f(s_textLocColor, 1.0f, 1.0f, 1.0f, 0.95f);
+    glUniform4fv(s_textLocColor, 1, color);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, s_fontTexture);
+    glBindTexture(GL_TEXTURE_2D, tex);
     glDrawArrays(GL_TRIANGLES, 0, nVerts / 4);
     glBindVertexArray(0);
     glUseProgram(0);
@@ -291,6 +466,23 @@ static void drawTouchText(const char* text, float x, float y, float screenW, flo
 namespace esdroid {
 TouchUI::TouchUI() {}
 TouchUI::~TouchUI() {}
+
+// Ink box of a baked string: x from pen start, y relative to the baseline.
+// Silkscreen is not monospace, so strlen * 0.6 * size is only a guess.
+static void bakedTextInk(const char* text, const stbtt_bakedchar* chars,
+                          float* advance, float* top, float* bottom) {
+    float adv = 0.0f, t = 0.0f, b = 0.0f;
+    for (const char* p = text; *p; ++p) {
+        unsigned char c = (unsigned char)*p;
+        if (c < 32 || c >= 128) continue;
+        const stbtt_bakedchar& ch = chars[c - 32];
+        adv += ch.xadvance;
+        if (ch.yoff < t) t = ch.yoff;
+        const float bot = ch.yoff + (float)(ch.y1 - ch.y0);
+        if (bot > b) b = bot;
+    }
+    *advance = adv; *top = t; *bottom = b;
+}
 void TouchUI::initialize(int sw,int sh) { m_screenW=sw; m_screenH=sh; compileShaders(); generateQuadGeometry(); loadTouchFont(); loadTouchIcon(); }
 void TouchUI::resize(int sw,int sh) { m_screenW=sw; m_screenH=sh; }
 void TouchUI::compileShaders() {
@@ -344,12 +536,127 @@ void TouchUI::drawButton(const TouchButton& b, bool held) {
     const bool fn=AndroidBackend::instance().fnActive();
     const char* label=(fn&&b.altLabel)?b.altLabel:b.label;
     if (label) {
+        const float labelColor[4]={1.0f,1.0f,1.0f,0.95f};
         float tw = strlen(label) * FONT_SIZE * 0.6f;
         float tx = b.x + (b.w - tw) / 2.0f;
         float ty = b.y + (b.h - FONT_SIZE) / 2.0f - 2.0f;
-        drawTouchText(label, tx, ty, (float)m_screenW, (float)m_screenH);
+        drawTouchText(label, tx, ty, (float)m_screenW, (float)m_screenH, labelColor, false);
     }
 }
+void TouchUI::drawRect(float x, float y, float w, float h, const float* color) {
+    if (w <= 0 || h <= 0) return;
+    glUseProgram(m_program); glBindVertexArray(m_vao);
+    glUniform2f(m_loc_screen,(float)m_screenW,(float)m_screenH);
+    glUniform4f(m_loc_rect,x,y,w,h); glUniform4fv(m_loc_color,1,color);
+    glDrawArrays(GL_TRIANGLES,0,6);
+    glBindVertexArray(0); glUseProgram(0);
+}
+
+// The SETTINGS button on the info cluster's title box: white on black,
+// the two colors the engine UI itself uses.
+void TouchUI::drawSettingsButton() {
+    auto& backend=AndroidBackend::instance();
+    if(!backend.settingsButtonValid()) return;
+    const float* r=backend.settingsButtonRect();
+    const float white[4]={1.0f,1.0f,1.0f,1.0f};
+    const float black[4]={0.0f,0.0f,0.0f,1.0f};
+    drawRect(r[0],r[1],r[2],r[3],white);
+    const char* label="SETTINGS";
+    float adv,inkTop,inkBot;
+    bakedTextInk(label,s_fontChars,&adv,&inkTop,&inkBot);
+    // Center the actual ink box, not a guessed em box.
+    const float baseline=r[1]+(r[3]-(inkBot-inkTop))*0.5f-inkTop;
+    drawTouchText(label,r[0]+(r[2]-adv)*0.5f,baseline-FONT_SIZE,
+        (float)m_screenW,(float)m_screenH,black,false);
+}
+
+void TouchUI::drawBlurredBackdrop() {
+    const float sw=(float)m_screenW, sh=(float)m_screenH;
+    ensureBlurResources(m_screenW,m_screenH);
+    const float scrim[4]={0.0f,0.0f,0.0f,0.45f};
+    if(s_blurProgram==0||s_blurFboA==0) {
+        drawRect(0,0,sw,sh,scrim);
+        return;
+    }
+    glDisable(GL_BLEND);
+    // Capture the finished engine frame. The reversed destination rect
+    // flips it so texture v=0 is the top of the screen, like the UI quads.
+    glBindFramebuffer(GL_READ_FRAMEBUFFER,0);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER,s_blurFboA);
+    glBlitFramebuffer(0,0,m_screenW,m_screenH, 0,s_blurH,s_blurW,0,
+        GL_COLOR_BUFFER_BIT, GL_LINEAR);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER,s_blurFboB);
+    glViewport(0,0,s_blurW,s_blurH);
+    drawBlurQuad((float)s_blurW,(float)s_blurH,s_blurTexA,1.0f/(float)s_blurW,0.0f);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER,s_blurFboA);
+    glViewport(0,0,s_blurW,s_blurH);
+    drawBlurQuad((float)s_blurW,(float)s_blurH,s_blurTexB,0.0f,1.0f/(float)s_blurH);
+    glBindFramebuffer(GL_FRAMEBUFFER,0);
+    glViewport(0,0,m_screenW,m_screenH);
+    drawBlurQuad(sw,sh,s_blurTexA,0.0f,0.0f);
+    glEnable(GL_BLEND);
+    drawRect(0,0,sw,sh,scrim);
+}
+
+void TouchUI::drawSettingsPanel() {
+    auto& backend=AndroidBackend::instance();
+    const SettingsLayout& L=backend.settingsLayout();
+    const float sw=(float)m_screenW, sh=(float)m_screenH;
+    const float white[4]={1.0f,1.0f,1.0f,1.0f};
+    const float black[4]={0.0f,0.0f,0.0f,1.0f};
+
+    drawBlurredBackdrop();
+
+    drawRect(L.panel[0],L.panel[1],L.panel[2],L.panel[3],white);
+    auto border=[&](const float* r,float t,const float* c){
+        drawRect(r[0],r[1],r[2],t,c);
+        drawRect(r[0],r[1]+r[3]-t,r[2],t,c);
+        drawRect(r[0],r[1],t,r[3],c);
+        drawRect(r[0]+r[2]-t,r[1],t,r[3],c);
+    };
+    border(L.panel,3.0f,black);
+
+    // Header: big title + close button, in the panel's own font colors.
+    drawTouchText("SETTINGS",L.panel[0]+22.0f,L.close[1]+(L.close[3]-FONT_SIZE_BIG)*0.5f-2.0f,
+        sw,sh,black,true);
+    drawRect(L.close[0],L.close[1],L.close[2],L.close[3],white);
+    border(L.close,2.0f,black);
+    {
+        const char* x="CLOSE";
+        const float tw=(float)strlen(x)*FONT_SIZE*0.6f;
+        drawTouchText(x,L.close[0]+(L.close[2]-tw)*0.5f,
+            L.close[1]+(L.close[3]-FONT_SIZE)*0.5f-2.0f,sw,sh,black,false);
+    }
+
+    for(int i=0;i<esdroid::kSettingCount;++i) {
+        const float* t=L.track[i];
+        const float* v=L.value[i];
+        const float cy=t[1]+t[3]*0.5f;
+
+        drawTouchText(backend.settingLabel(i),L.panel[0]+18.0f,cy-FONT_SIZE*0.5f-1.0f,
+            sw,sh,black,false);
+
+        // Slider: black outline, black fill bar, black knob.
+        border(t,2.0f,black);
+        const float tt=backend.settingSliderT(i);
+        drawRect(t[0]+2.0f,t[1]+2.0f,(t[2]-4.0f)*tt,t[3]-4.0f,black);
+        const float kw=12.0f, kh=t[3]+14.0f;
+        float kx=t[0]+t[2]*tt-kw*0.5f;
+        if(kx<t[0]) kx=t[0];
+        if(kx>t[0]+t[2]-kw) kx=t[0]+t[2]-kw;
+        drawRect(kx,cy-kh*0.5f,kw,kh,black);
+
+        // Value box: tappable, opens the system keyboard for typing.
+        drawRect(v[0],v[1],v[2],v[3],white);
+        border(v,2.0f,black);
+        char buf[32];
+        backend.formatSettingValue(buf,sizeof(buf),i);
+        const float tw=(float)strlen(buf)*FONT_SIZE*0.6f;
+        drawTouchText(buf,v[0]+(v[2]-tw)*0.5f,v[1]+(v[3]-FONT_SIZE)*0.5f-2.0f,
+            sw,sh,black,false);
+    }
+}
+
 void TouchUI::render() {
     if (m_program == 0) return;
     GLint prevProgram; glGetIntegerv(GL_CURRENT_PROGRAM, &prevProgram);
@@ -367,9 +674,18 @@ void TouchUI::render() {
 
     drawTouchIcon((float)m_screenW, (float)m_screenH);
 
-    const bool fn=AndroidBackend::instance().fnActive();
-    for (const auto& b : AndroidBackend::instance().buttons())
-        drawButton(b, b.key==VirtualKey::Fn ? fn : b.held);
+    if (AndroidBackend::instance().settingsOpen()) {
+        // Buttons vanish behind the frosted panel; the engine keeps
+        // simulating under the blur.
+        drawSettingsPanel();
+    }
+    else {
+        drawSettingsButton();
+
+        const bool fn=AndroidBackend::instance().fnActive();
+        for (const auto& b : AndroidBackend::instance().buttons())
+            drawButton(b, b.key==VirtualKey::Fn ? fn : b.held);
+    }
 
     glDisable(GL_BLEND);
     if (prevCull) glEnable(GL_CULL_FACE);
