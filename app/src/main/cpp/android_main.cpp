@@ -343,6 +343,7 @@ extern "C" void android_main(struct android_app* app) {
         std::string staleFiles[] = {
             filesDir + "/assets/imported.mr",
             filesDir + "/assets/imported_main.mr",
+            filesDir + "/assets/imported_theme.mr",
             filesDir + "/imported.mr"
         };
         for (const std::string& stale : staleFiles)

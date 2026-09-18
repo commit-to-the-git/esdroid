@@ -31,6 +31,7 @@ JavaVM* g_javaVM=nullptr;
 #include <stdlib.h>
 #include <math.h>
 #include <cstdio>
+#include <array>
 
 #define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO,"ESDroid",__VA_ARGS__))
 #define LOGW(...) ((void)__android_log_print(ANDROID_LOG_WARN,"ESDroid",__VA_ARGS__))
@@ -109,12 +110,18 @@ static int32_t handle_input_event(android_app* app, AInputEvent* event) {
     int32_t type=AInputEvent_getType(event);
     auto& b=esdroid::AndroidBackend::instance();
     if(type==AINPUT_EVENT_TYPE_KEY) {
-        // While the settings panel is up, BACK closes it instead of the app.
+        // While an overlay is up, BACK closes it instead of the app. An open
+        // dropdown list closes first, the menu itself on the second press.
         if(AKeyEvent_getKeyCode(event)==AKEYCODE_BACK
-            &&AKeyEvent_getAction(event)==AKEY_EVENT_ACTION_DOWN
-            &&b.settingsOpen()) {
-            b.closeSettings();
-            return 1;
+            &&AKeyEvent_getAction(event)==AKEY_EVENT_ACTION_DOWN) {
+            if(b.settingsOpen()) { b.closeSettings(); return 1; }
+            if(b.importMenuOpen()) {
+                auto& menu=b.importMenu();
+                if(menu.themeListOpen) menu.themeListOpen=false;
+                else if(menu.engineListOpen) menu.engineListOpen=false;
+                else b.closeImportMenu();
+                return 1;
+            }
         }
         return 0;
     }
@@ -123,6 +130,10 @@ static int32_t handle_input_event(android_app* app, AInputEvent* event) {
         int32_t am=action&AMOTION_EVENT_ACTION_MASK;
         if(b.settingsOpen()) {
             b.handleSettingsMotion(event,am);
+            return 1;
+        }
+        if(b.importMenuOpen()) {
+            b.handleImportMotion(event,am);
             return 1;
         }
         switch(am) {
@@ -245,7 +256,7 @@ void AndroidBackend::pressButton(TouchButton* btn,int pid) {
         return;
     }
     if(k>0&&k<(int)VirtualKey::Count){m_keyState[k]=true;m_keyEdge[k]=true;}
-    if(k==(int)VirtualKey::Insert) requestMrFilePicker();
+    if(k==(int)VirtualKey::Insert) openImportMenu();
 }
 
 void AndroidBackend::releaseButton(TouchButton* btn) {
@@ -347,36 +358,47 @@ const char* AndroidBackend::settingLabel(int idx) {
     return kSettingLabels[idx];
 }
 
-void AndroidBackend::formatSettingValue(char* out,int len,int idx) const {
+static const char* settingUnit(int idx) {
     switch((SettingIndex)idx) {
-    case SettingIndex::SimFrequency:
-        snprintf(out,len,"%d HZ",(int)(m_settings.simFrequency+0.5));
-        return;
-    case SettingIndex::DynoSpeed:
-        snprintf(out,len,"%d RPM",(int)(m_settings.dynoSpeedRpm+0.5));
-        return;
-    case SettingIndex::Volume:
-        snprintf(out,len,"%d%%",(int)(m_settings.volume*100.0f+0.5f));
-        return;
-    case SettingIndex::Convolution:
-        snprintf(out,len,"%d%%",(int)(m_settings.convolution*100.0f+0.5f));
-        return;
-    case SettingIndex::HiFreqGain:
-        snprintf(out,len,"%d%%",(int)(m_settings.hiFreqGain*100.0f+0.5f));
-        return;
-    case SettingIndex::LoFreqNoise:
-        snprintf(out,len,"%d%%",(int)(m_settings.loFreqNoise*100.0f+0.5f));
-        return;
-    case SettingIndex::HiFreqNoise:
-        snprintf(out,len,"%d%%",(int)(m_settings.hiFreqNoise*100.0f+0.5f));
-        return;
-    case SettingIndex::Throttle:
-        snprintf(out,len,"%d%%",(int)(m_settings.throttlePct+0.5f));
-        return;
-    default:
-        snprintf(out,len,"?");
-        return;
+    case SettingIndex::SimFrequency: return "HZ";
+    case SettingIndex::DynoSpeed: return "RPM";
+    default: return "%";
     }
+}
+
+// Bare number, no unit suffix. The value dialog's input field is
+// pre-filled from this, so what the user edits is pure digits and the
+// parse on the way back cannot choke on a leftover " HZ" or "%".
+static void formatSettingNumber(char* out,int len,int idx,const SettingsState& s) {
+    switch((SettingIndex)idx) {
+    case SettingIndex::Volume:
+        snprintf(out,len,"%d",(int)(s.volume*100.0f+0.5f)); return;
+    case SettingIndex::Convolution:
+        snprintf(out,len,"%d",(int)(s.convolution*100.0f+0.5f)); return;
+    case SettingIndex::HiFreqGain:
+        snprintf(out,len,"%d",(int)(s.hiFreqGain*100.0f+0.5f)); return;
+    case SettingIndex::LoFreqNoise:
+        snprintf(out,len,"%d",(int)(s.loFreqNoise*100.0f+0.5f)); return;
+    case SettingIndex::HiFreqNoise:
+        snprintf(out,len,"%d",(int)(s.hiFreqNoise*100.0f+0.5f)); return;
+    case SettingIndex::SimFrequency:
+        snprintf(out,len,"%d",(int)(s.simFrequency+0.5)); return;
+    case SettingIndex::DynoSpeed:
+        snprintf(out,len,"%d",(int)(s.dynoSpeedRpm+0.5)); return;
+    case SettingIndex::Throttle:
+        snprintf(out,len,"%d",(int)(s.throttlePct+0.5f)); return;
+    default:
+        snprintf(out,len,"0"); return;
+    }
+}
+
+void AndroidBackend::formatSettingValue(char* out,int len,int idx) const {
+    if(idx<0||idx>=esdroid::kSettingCount){snprintf(out,len,"?");return;}
+    char num[24];
+    formatSettingNumber(num,sizeof(num),idx,m_settings);
+    const char* u=settingUnit(idx);
+    if(u[0]=='%') snprintf(out,len,"%s%%",num);
+    else snprintf(out,len,"%s %s",num,u);
 }
 
 static float clamp01f(float v) { return v<0.0f?0.0f:(v>1.0f?1.0f:v); }
@@ -567,6 +589,319 @@ int AndroidBackend::handleSettingsMotion(AInputEvent* event,int32_t am) {
     return 1;
 }
 
+// ------------------------------------------------------------------
+// Import menu
+
+// Verified against the piranha compiler on the host: every entry compiles
+// and executes with a non null engine. node holds the use_*_theme call for
+// themes and the set_engine target for old format engine files, which have
+// no main of their own.
+static const MrAsset kImportThemes[] = {
+    {"themes/default.mr", "use_default_theme", "DEFAULT"},
+    {"themes/amateur.mr", "use_amateur_theme", "AMATEUR"},
+    {"themes/bubble_gum.mr", "use_bubble_gum_theme", "BUBBLE GUM"},
+    {"themes/minimalistic.mr", "use_minimalistic_theme", "MINIMALISTIC"},
+    {"themes/night_vision.mr", "use_night_vision_theme", "NIGHT VISION"},
+    {"themes/paper.mr", "use_paper_theme", "PAPER"},
+};
+
+static const MrAsset kImportEngines[] = {
+    {"engines/atg-video-2/01_subaru_ej25_eh.mr", "", "DEFAULT"},
+    {"engines/atg-video-1/01_honda_trx520.mr", "", "HONDA TRX520 ATV"},
+    {"engines/atg-video-1/02_kohler_ch750.mr", "", "KOHLER CH750"},
+    {"engines/atg-video-1/03_harley_davidson_shovelhead.mr", "", "HARLEY DAVIDSON SHOVELHEAD"},
+    {"engines/atg-video-1/04_hayabusa.mr", "", "SUZUKI HAYABUSA I4"},
+    {"engines/atg-video-1/05_honda_vtec.mr", "", "HONDA B18C5 VTEC I4"},
+    {"engines/atg-video-1/06_subaru_ej25.mr", "", "SUBARU EJ25"},
+    {"engines/atg-video-1/07_audi_i5.mr", "", "AUDI 2.3 INLINE 5"},
+    {"engines/atg-video-1/08_radial_5.mr", "", "RADIAL 5"},
+    {"engines/atg-video-2/02_subaru_ej25_uh.mr", "", "SUBARU EJ25 UH"},
+    {"engines/atg-video-2/03_2jz.mr", "", "2JZ I6"},
+    {"engines/atg-video-2/04_60_degree_v6.mr", "", "GENERIC 60 DEG. V6"},
+    {"engines/atg-video-2/05_odd_fire_v6.mr", "", "GENERIC ODD-FIRE V6"},
+    {"engines/atg-video-2/06_even_fire_v6.mr", "", "GENERIC EVEN-FIRE V6"},
+    {"engines/atg-video-2/07_gm_ls.mr", "", "GM LS"},
+    {"engines/atg-video-2/08_ferrari_f136_v8.mr", "", "FERRARI F136"},
+    {"engines/atg-video-2/09_radial_9.mr", "", "RADIAL 9"},
+    {"engines/atg-video-2/10_lfa_v10.mr", "", "1LR-GUE V10"},
+    {"engines/atg-video-2/11_merlin_v12.mr", "", "MERLIN V-1650-9 V12"},
+    {"engines/atg-video-2/12_ferrari_412_t2.mr", "", "FERRARI 412 T2 V12"},
+    {"engines/audi/i5.mr", "audi_i5_2_2L", "AUDI 2.2 INLINE 5"},
+    {"engines/bmw/M52B28.mr", "M52B28", "BMW M52B28"},
+    {"engines/chevrolet/chev_truck_454.mr", "chev_truck_454", "CHEV. 454 V8"},
+    {"engines/chevrolet/engine_03_for_e1.mr", "engine_03_for_e1", "CHEV. 454 V8 2"},
+    {"engines/kohler/kohler_ch750.mr", "kohler_ch750", "KOHLER CH750 2"},
+};
+
+const MrAsset* AndroidBackend::importThemes(int* count) {
+    if(count) *count=(int)(sizeof(kImportThemes)/sizeof(kImportThemes[0]));
+    return kImportThemes;
+}
+
+const MrAsset* AndroidBackend::importEngines(int* count) {
+    if(count) *count=(int)(sizeof(kImportEngines)/sizeof(kImportEngines[0]));
+    return kImportEngines;
+}
+
+void AndroidBackend::openImportMenu() {
+    if(m_import.open) return;
+    m_import.open=true;
+    const bool engineTouch=(m_touchPid!=-1||m_touchPid2!=-1);
+    clearAllKeys();
+    if(engineTouch) m_touchUpEdge=true;
+    esdroid_wtflog("import menu: opened");
+}
+
+void AndroidBackend::closeImportMenu() {
+    if(!m_import.open) return;
+    m_import.open=false;
+    m_import.themeListOpen=false;
+    m_import.engineListOpen=false;
+    m_import.scrollPid=-1;
+    esdroid_wtflog("import menu: closed");
+}
+
+void AndroidBackend::layoutImportPanel(int sw,int sh) {
+    if(sw<=0||sh<=0) return;
+    auto& L=m_importLayout;
+    const float pad=18.0f, headerH=64.0f, gutter=24.0f;
+    float panelW=(float)sw*0.72f;
+    if(panelW>980.0f) panelW=980.0f;
+    float titleH=36.0f, boxH=50.0f, btnH=50.0f, gap=12.0f;
+    float bodyH=titleH+gap+boxH+gap+btnH+gap+btnH;
+    float panelH=headerH+pad+bodyH+pad;
+    if(panelH>(float)sh*0.94f) {
+        const float s=((float)sh*0.94f)/panelH;
+        titleH*=s; boxH*=s; btnH*=s; gap*=s;
+        bodyH=titleH+gap+boxH+gap+btnH+gap+btnH;
+        panelH=headerH+pad+bodyH+pad;
+    }
+    const float px=((float)sw-panelW)*0.5f;
+    const float py=((float)sh-panelH)*0.5f;
+    L.panel[0]=px; L.panel[1]=py; L.panel[2]=panelW; L.panel[3]=panelH;
+    const float closeW=92.0f, closeH=42.0f;
+    L.close[0]=px+panelW-pad-closeW; L.close[1]=py+pad*0.5f+(headerH-closeH)*0.5f;
+    L.close[2]=closeW; L.close[3]=closeH;
+    const float innerX=px+pad, innerW=panelW-2.0f*pad;
+    const float colW=(innerW-gutter)*0.5f;
+    const float col2X=innerX+colW+gutter;
+    float y=py+headerH+pad;
+    L.rowH=boxH;
+    L.listTop=y+titleH+gap+boxH;
+    // The open list may not run past the bottom of the screen.
+    L.listH=(float)sh*0.55f;
+    if(L.listTop+L.listH>(float)sh-pad) L.listH=(float)sh-pad-L.listTop;
+    if(L.listH<boxH*2.0f) L.listH=boxH*2.0f;
+    auto place=[&](float* r,float x){
+        r[0]=x; r[1]=y+titleH+gap; r[2]=colW; r[3]=boxH;
+    };
+    place(L.themeBox,innerX);
+    place(L.engineBox,col2X);
+    auto placeBtn=[&](float* r,float x,float row){
+        r[0]=x; r[1]=y+titleH+gap+boxH+gap+(float)row*(btnH+gap);
+        r[2]=colW; r[3]=btnH;
+    };
+    placeBtn(L.themeLoad,innerX,0);
+    placeBtn(L.themeImport,innerX,1);
+    placeBtn(L.engineLoad,col2X,0);
+    placeBtn(L.engineImport,col2X,1);
+}
+
+// Builds the main script that pairs an engine with a theme, then stages it
+// for the same full reload the file import uses. Old format engine files
+// get a main node with set_engine only; the C++ side supplies the default
+// vehicle and transmission.
+bool AndroidBackend::stageWrapperReload(const std::string& enginePath,
+        const std::string& engineNode,const std::string& themePath,
+        const std::string& themeNode) {
+    std::string wrapperPath=filesDir()+"/assets/imported_main.mr";
+    std::string body;
+    body+="import \"engine_sim.mr\"\n";
+    body+="import \""+themePath+"\"\n";
+    body+="import \""+enginePath+"\"\n";
+    body+="\n";
+    body+=themeNode+"()\n";
+    if(!engineNode.empty())
+        body+="public node main {\n    set_engine("+engineNode+"())\n}\n";
+    body+="main()\n";
+    FILE* out=fopen(wrapperPath.c_str(),"wb");
+    if(out==nullptr) {
+        esdroid_wtflog("import: could not write %s",wrapperPath.c_str());
+        return false;
+    }
+    size_t written=fwrite(body.data(),1,body.size(),out);
+    fclose(out);
+    if(written!=body.size()) {
+        esdroid_wtflog("import: short write on %s",wrapperPath.c_str());
+        return false;
+    }
+    {
+        std::lock_guard<std::mutex> lk(m_mrMutex);
+        m_pendingMrPath=wrapperPath;
+    }
+    m_scriptReloadPending=true;
+    m_enginePath=enginePath; m_engineNode=engineNode;
+    m_themePath=themePath; m_themeNode=themeNode;
+    esdroid_wtflog("import: staged %s + %s (wrapper %s)",
+        enginePath.c_str(),themePath.c_str(),wrapperPath.c_str());
+    return true;
+}
+
+static float clampListScroll(float scroll,int count,float rowH,float listH) {
+    const float full=(float)count*rowH;
+    if(full<=listH) return 0.0f;
+    if(scroll<0.0f) return 0.0f;
+    if(scroll>full-listH) return full-listH;
+    return scroll;
+}
+
+int AndroidBackend::handleImportMotion(AInputEvent* event,int32_t am) {
+    auto contains=[](const float* r,float x,float y) {
+        return x>=r[0]&&x<r[0]+r[2]&&y>=r[1]&&y<r[1]+r[3];
+    };
+    int themeCount=0, engineCount=0;
+    importThemes(&themeCount);
+    importEngines(&engineCount);
+    const auto& L=m_importLayout;
+    auto listRect=[&](const float* box)->std::array<float,4> {
+        // Open lists draw straight below their selector box.
+        return {box[0],box[1]+box[3],box[2],L.listH};
+    };
+    // On open, bring the selected row into view like a desktop dropdown.
+    auto revealSel=[&](int sel,int count,float& scroll){
+        scroll=clampListScroll(scroll,count,L.rowH,L.listH);
+        if(sel<0||sel>=count) return;
+        const float top=(float)sel*L.rowH;
+        if(top<scroll) scroll=top;
+        else if(top+L.rowH>scroll+L.listH) scroll=top+L.rowH-L.listH;
+        scroll=clampListScroll(scroll,count,L.rowH,L.listH);
+    };
+    if(am==AMOTION_EVENT_ACTION_DOWN||am==AMOTION_EVENT_ACTION_POINTER_DOWN) {
+        const int32_t action=AMotionEvent_getAction(event);
+        const int idx=(action&AMOTION_EVENT_ACTION_POINTER_INDEX_MASK)
+            >>AMOTION_EVENT_ACTION_POINTER_INDEX_SHIFT;
+        const float x=AMotionEvent_getX(event,idx);
+        const float y=AMotionEvent_getY(event,idx);
+        const int pid=AMotionEvent_getPointerId(event,idx);
+        if(m_import.themeListOpen||m_import.engineListOpen) {
+            const bool themeList=m_import.themeListOpen;
+            const float* lr=listRect(themeList?L.themeBox:L.engineBox).data();
+            if(contains(lr,x,y)) {
+                m_import.scrollPid=pid;
+                m_import.scrollDownY=y;
+                m_import.scrollStart=themeList?m_import.themeScroll:m_import.engineScroll;
+                m_import.tapEntry=(int)((y-lr[1]+m_import.scrollStart)/L.rowH);
+                m_import.tapMoved=false;
+                return 1;
+            }
+            m_import.themeListOpen=false;
+            m_import.engineListOpen=false;
+            // A tap on the other selector switches lists in one touch.
+            if(contains(L.themeBox,x,y)&&!themeList) {
+                m_import.themeListOpen=true;
+                revealSel(m_import.themeSel,themeCount,m_import.themeScroll);
+            }
+            else if(contains(L.engineBox,x,y)&&themeList) {
+                m_import.engineListOpen=true;
+                revealSel(m_import.engineSel,engineCount,m_import.engineScroll);
+            }
+            return 1;
+        }
+        if(contains(L.close,x,y)) { closeImportMenu(); return 1; }
+        if(contains(L.themeBox,x,y)) {
+            m_import.themeListOpen=true;
+            revealSel(m_import.themeSel,themeCount,m_import.themeScroll);
+            return 1;
+        }
+        if(contains(L.engineBox,x,y)) {
+            m_import.engineListOpen=true;
+            revealSel(m_import.engineSel,engineCount,m_import.engineScroll);
+            return 1;
+        }
+        if(contains(L.themeLoad,x,y)) {
+            closeImportMenu();
+            // Entry 0 is DEFAULT, so this also covers a reset to stock.
+            const MrAsset* t=&kImportThemes[
+                m_import.themeSel>0?m_import.themeSel:0];
+            stageWrapperReload(m_enginePath,m_engineNode,t->path,t->node);
+            return 1;
+        }
+        if(contains(L.engineLoad,x,y)) {
+            closeImportMenu();
+            const MrAsset* e=&kImportEngines[
+                m_import.engineSel>0?m_import.engineSel:0];
+            stageWrapperReload(e->path,e->node,m_themePath,m_themeNode);
+            return 1;
+        }
+        if(contains(L.themeImport,x,y)) {
+            closeImportMenu();
+            requestThemeFilePicker();
+            return 1;
+        }
+        if(contains(L.engineImport,x,y)) {
+            closeImportMenu();
+            requestMrFilePicker();
+            return 1;
+        }
+        return 1;
+    }
+    if(am==AMOTION_EVENT_ACTION_MOVE) {
+        if(m_import.scrollPid!=-1) {
+            const int pc=AMotionEvent_getPointerCount(event);
+            for(int i=0;i<pc;++i) {
+                if(AMotionEvent_getPointerId(event,i)!=m_import.scrollPid) continue;
+                const float y=AMotionEvent_getY(event,i);
+                if(y-m_import.scrollDownY>12.0f
+                    ||y-m_import.scrollDownY<-12.0f) m_import.tapMoved=true;
+                if(m_import.themeListOpen)
+                    m_import.themeScroll=clampListScroll(
+                        m_import.scrollStart-(y-m_import.scrollDownY),
+                        themeCount,L.rowH,L.listH);
+                else if(m_import.engineListOpen)
+                    m_import.engineScroll=clampListScroll(
+                        m_import.scrollStart-(y-m_import.scrollDownY),
+                        engineCount,L.rowH,L.listH);
+            }
+        }
+        return 1;
+    }
+    if(am==AMOTION_EVENT_ACTION_UP||am==AMOTION_EVENT_ACTION_POINTER_UP) {
+        const int32_t action=AMotionEvent_getAction(event);
+        const int idx=(action&AMOTION_EVENT_ACTION_POINTER_INDEX_MASK)
+            >>AMOTION_EVENT_ACTION_POINTER_INDEX_SHIFT;
+        const int pid=AMotionEvent_getPointerId(event,idx);
+        if(pid==m_import.scrollPid) {
+            const float x=AMotionEvent_getX(event,idx);
+            const float y=AMotionEvent_getY(event,idx);
+            if(!m_import.tapMoved&&m_import.tapEntry>=0) {
+                if(m_import.themeListOpen) {
+                    const float* lr=listRect(L.themeBox).data();
+                    if(contains(lr,x,y)&&m_import.tapEntry<themeCount) {
+                        m_import.themeSel=m_import.tapEntry;
+                        m_import.themeListOpen=false;
+                    }
+                }
+                else if(m_import.engineListOpen) {
+                    const float* lr=listRect(L.engineBox).data();
+                    if(contains(lr,x,y)&&m_import.tapEntry<engineCount) {
+                        m_import.engineSel=m_import.tapEntry;
+                        m_import.engineListOpen=false;
+                    }
+                }
+            }
+            m_import.scrollPid=-1;
+            m_import.tapEntry=-1;
+        }
+        return 1;
+    }
+    if(am==AMOTION_EVENT_ACTION_CANCEL) {
+        m_import.scrollPid=-1;
+        m_import.tapEntry=-1;
+        return 1;
+    }
+    return 1;
+}
+
 void AndroidBackend::stageValueInput(int idx,double value) {
     std::lock_guard<std::mutex> lk(m_valueInputMutex);
     m_pendingValueIdx=idx;
@@ -645,6 +980,7 @@ void AndroidBackend::layoutButtons(int sw,int sh) {
     add("OSC PAGE","ROT 0",rX,pad+3*(bh+gap),VirtualKey::OscPage,VirtualKey::F3);
 
     layoutSettingsPanel(sw,sh);
+    layoutImportPanel(sw,sh);
 }
 
 static void sl_buffer_callback(SLAndroidSimpleBufferQueueItf bq, void* ctx) {
@@ -792,7 +1128,7 @@ bool AndroidBackend::readFile(const char* path,void** outBuf,long* outSize) {
 
 void AndroidBackend::requestMrFilePicker() {
     if (s_app == nullptr || s_app->activity == nullptr) return;
-    esdroid_wtflog("IMPORT pressed, opening the file picker");
+    esdroid_wtflog("import: opening the engine file picker");
     JNIEnv* env = nullptr;
     JavaVM* vm = g_javaVM;
     if (vm == nullptr) return;
@@ -818,12 +1154,41 @@ void AndroidBackend::requestMrFilePicker() {
     if (attached) vm->DetachCurrentThread();
 }
 
+void AndroidBackend::requestThemeFilePicker() {
+    if (s_app == nullptr || s_app->activity == nullptr) return;
+    esdroid_wtflog("import: opening the theme file picker");
+    JNIEnv* env = nullptr;
+    JavaVM* vm = g_javaVM;
+    if (vm == nullptr) return;
+    bool attached = false;
+    if (vm->GetEnv((void**)&env, JNI_VERSION_1_6) != JNI_OK) {
+        if (vm->AttachCurrentThread(&env, nullptr) != JNI_OK) return;
+        attached = true;
+    }
+    jobject activity = s_app->activity->clazz;
+    if (activity == nullptr) { if (attached) vm->DetachCurrentThread(); return; }
+    jclass cls = env->GetObjectClass(activity);
+    jmethodID method = env->GetMethodID(cls, "openThemePicker", "()V");
+    if (method != nullptr) {
+        env->CallVoidMethod(activity, method);
+        if (env->ExceptionCheck()) {
+            esdroid_wtflog("openThemePicker threw a Java exception");
+            env->ExceptionDescribe();
+            env->ExceptionClear();
+        }
+    }
+    env->DeleteLocalRef(cls);
+    if (attached) vm->DetachCurrentThread();
+}
+
 // Builds the main script for an imported engine. Community engine files
 // only contain the engine definition, so the same boilerplate main.mr uses
-// (language import, theme import, use_default_theme(), main()) is wrapped
-// around them. A file that already calls use_default_theme() is treated as
-// a self contained main script and loaded as is.
-static std::string buildImportedMainScript(const std::string& enginePath) {
+// (language import, theme import, theme call, main()) is wrapped around
+// them, pairing the engine with the theme currently in use. A file that
+// already calls use_default_theme() is treated as a self contained main
+// script and loaded as is.
+static std::string buildImportedMainScript(const std::string& enginePath,
+        const std::string& themePath, const std::string& themeNode) {
     bool selfContained = false;
     FILE* fp = fopen(enginePath.c_str(), "rb");
     if (fp != nullptr) {
@@ -850,10 +1215,10 @@ static std::string buildImportedMainScript(const std::string& enginePath) {
     std::string wrapperPath = dir + "/imported_main.mr";
     std::string body =
         "import \"engine_sim.mr\"\n"
-        "import \"themes/default.mr\"\n"
+        "import \"" + themePath + "\"\n"
         "import \"" + base + ".mr\"\n"
         "\n"
-        "use_default_theme()\n"
+        + themeNode + "()\n"
         "main()\n";
 
     FILE* out = fopen(wrapperPath.c_str(), "wb");
@@ -882,13 +1247,55 @@ void AndroidBackend::onMrFilePicked(const std::string& path) {
     // it with the new script. A flag is used instead of a synthetic key press
     // because the button list is rebuilt when the window comes back, which
     // would eat the key edge.
-    std::string mainScript = buildImportedMainScript(path);
+    std::string mainScript = buildImportedMainScript(path, m_themePath, m_themeNode);
     {
         std::lock_guard<std::mutex> lk(m_mrMutex);
         m_pendingMrPath = mainScript;
     }
     m_scriptReloadPending = true;
+    if (mainScript != path) {
+        // Wrapped import: remember it as the current engine so a later
+        // LOAD THEME keeps it. Self contained scripts own their theme.
+        m_enginePath = "imported";
+        m_engineNode = "";
+    }
     esdroid_wtflog("onMrFilePicked: %s (main script: %s)", path.c_str(), mainScript.c_str());
+}
+
+// Theme files publish a use_*_theme node; the name is parsed out of the
+// file so the wrapper can call it. Files without one fall back to the
+// default theme call.
+void AndroidBackend::onThemeFilePicked(const std::string& path) {
+    if (path.empty()) return;
+    std::string node = "use_default_theme";
+    FILE* fp = fopen(path.c_str(), "rb");
+    if (fp != nullptr) {
+        char probe[65536];
+        size_t n = fread(probe, 1, sizeof(probe) - 1, fp);
+        fclose(fp);
+        probe[n] = 0;
+        const char* at = strstr(probe, "node use_");
+        if (at != nullptr) {
+            char name[96];
+            size_t i = 0;
+            for (at += 5; i < sizeof(name) - 1; ++i) {
+                char c = at[i];
+                if (c == 0) break;
+                if (!((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')
+                    || (c >= '0' && c <= '9') || c == '_')) break;
+                name[i] = c;
+            }
+            name[i] = 0;
+            if (strstr(name, "_theme") != nullptr && i > 5) node = name;
+        }
+    }
+    size_t slash = path.rfind('/');
+    size_t nameStart = (slash == std::string::npos) ? 0 : slash + 1;
+    std::string base = path.substr(nameStart);
+    if (base.size() > 3 && base.compare(base.size() - 3, 3, ".mr") == 0)
+        base = base.substr(0, base.size() - 3);
+    esdroid_wtflog("onThemeFilePicked: %s (theme node %s)", path.c_str(), node.c_str());
+    stageWrapperReload(m_enginePath, m_engineNode, base, node);
 }
 
 bool AndroidBackend::consumeScriptReloadPending() {
@@ -919,8 +1326,11 @@ void AndroidBackend::requestValueInput(int idx) {
     jmethodID method = env->GetMethodID(cls, "showValueInput", "(ILjava/lang/String;Ljava/lang/String;)V");
     if (method != nullptr) {
         char current[32];
-        formatSettingValue(current, sizeof(current), idx);
-        jstring label = env->NewStringUTF(settingLabel(idx));
+        formatSettingNumber(current, sizeof(current), idx, m_settings);
+        char labelBuf[64];
+        snprintf(labelBuf, sizeof(labelBuf), "%s (%s)",
+            settingLabel(idx), settingUnit(idx));
+        jstring label = env->NewStringUTF(labelBuf);
         jstring value = env->NewStringUTF(current);
         if (label != nullptr && value != nullptr) {
             env->CallVoidMethod(activity, method, (jint)idx, label, value);
@@ -977,6 +1387,9 @@ extern "C" JNIEXPORT void JNICALL
 Java_com_esdroid_engine_1sim_ESDroidActivity_nativeOnFilePicked(JNIEnv* env, jobject thiz, jstring path);
 
 extern "C" JNIEXPORT void JNICALL
+Java_com_esdroid_engine_1sim_ESDroidActivity_nativeOnThemePicked(JNIEnv* env, jobject thiz, jstring path);
+
+extern "C" JNIEXPORT void JNICALL
 Java_com_esdroid_engine_1sim_ESDroidActivity_nativeOnValueInput(JNIEnv* env, jobject thiz, jint index, jdouble value);
 
 extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*) {
@@ -992,10 +1405,12 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*) {
             JNINativeMethod methods[]={
                 {"nativeOnFilePicked","(Ljava/lang/String;)V",
                  (void*)Java_com_esdroid_engine_1sim_ESDroidActivity_nativeOnFilePicked},
+                {"nativeOnThemePicked","(Ljava/lang/String;)V",
+                 (void*)Java_com_esdroid_engine_1sim_ESDroidActivity_nativeOnThemePicked},
                 {"nativeOnValueInput","(ID)V",
                  (void*)Java_com_esdroid_engine_1sim_ESDroidActivity_nativeOnValueInput},
             };
-            env->RegisterNatives(cls,methods,2);
+            env->RegisterNatives(cls,methods,3);
             if (env->ExceptionCheck()) env->ExceptionClear();
             env->DeleteLocalRef(cls);
         } else if (env->ExceptionCheck()) {
@@ -1039,6 +1454,18 @@ Java_com_esdroid_engine_1sim_ESDroidActivity_nativeOnFilePicked(JNIEnv* env, job
     const char* pathStr = env->GetStringUTFChars(path, nullptr);
     if (pathStr != nullptr) {
         esdroid::AndroidBackend::instance().onMrFilePicked(std::string(pathStr));
+        env->ReleaseStringUTFChars(path, pathStr);
+    }
+}
+
+// Same callback for the theme picker; both run on the Java UI thread and
+// stage their work for the render thread.
+extern "C" JNIEXPORT void JNICALL
+Java_com_esdroid_engine_1sim_ESDroidActivity_nativeOnThemePicked(JNIEnv* env, jobject thiz, jstring path) {
+    if (path == nullptr) return;
+    const char* pathStr = env->GetStringUTFChars(path, nullptr);
+    if (pathStr != nullptr) {
+        esdroid::AndroidBackend::instance().onThemeFilePicked(std::string(pathStr));
         env->ReleaseStringUTFChars(path, pathStr);
     }
 }

@@ -33,6 +33,9 @@ private:
     void drawRect(float x,float y,float w,float h,const float* color);
     void drawSettingsButton();
     void drawSettingsPanel();
+    void drawImportPanel();
+    void drawDropdown(const float* box,const MrAsset* entries,int count,
+        int sel,bool open,float scroll,float listTop,float listH,float rowH);
     void drawBlurredBackdrop();
     GLuint m_program=0, m_vao=0, m_vbo=0;
     GLint m_loc_color=-1, m_loc_rect=-1, m_loc_screen=-1, m_loc_pos=-1;

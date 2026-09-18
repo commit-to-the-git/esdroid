@@ -82,6 +82,34 @@ struct SettingsLayout {
     float rowH=0.0f;
 };
 
+// One pickable entry in the import menu. Every entry in both tables below
+// was compiled and executed through piranha on the host.
+struct MrAsset {
+    const char* path;   // import path relative to the assets root
+    const char* node;   // theme node, or the engine node for old format files
+    const char* name;   // dropdown label
+};
+
+struct ImportMenuState {
+    bool open=false;
+    int themeSel=0, engineSel=0;      // 0 = DEFAULT (stock pair)
+    bool themeListOpen=false, engineListOpen=false;
+    float themeScroll=0.0f, engineScroll=0.0f;
+    int scrollPid=-1;                 // finger driving an open list
+    float scrollDownY=0.0f, scrollStart=0.0f;
+    int tapEntry=-1;                  // entry under that finger at down
+    bool tapMoved=false;
+};
+
+struct ImportLayout {
+    float panel[4]={0,0,0,0};
+    float close[4]={0,0,0,0};
+    float themeBox[4]={0,0,0,0}, engineBox[4]={0,0,0,0};
+    float themeLoad[4]={0,0,0,0}, engineLoad[4]={0,0,0,0};
+    float themeImport[4]={0,0,0,0}, engineImport[4]={0,0,0,0};
+    float listTop=0.0f, listH=0.0f, rowH=0.0f;
+};
+
 class AndroidBackend {
 public:
     static AndroidBackend& instance();
@@ -149,6 +177,17 @@ public:
     void setSettingFromSlider(int idx,float t);
     void setSettingTyped(int idx,double typed);
     void stageValueInput(int idx,double value);
+    // Import menu: engine and theme picks from the bundled assets plus the
+    // custom file pickers. Runs on the render thread like the settings.
+    ImportMenuState& importMenu() { return m_import; }
+    const ImportLayout& importLayout() const { return m_importLayout; }
+    bool importMenuOpen() const { return m_import.open; }
+    void openImportMenu();
+    void closeImportMenu();
+    void layoutImportPanel(int sw,int sh);
+    int handleImportMotion(AInputEvent* event,int32_t actionMasked);
+    static const MrAsset* importThemes(int* count);
+    static const MrAsset* importEngines(int* count);
     // The info cluster publishes the title box every rendered frame; the
     // SETTINGS button lives in its bottom-right corner.
     void setSettingsButtonRect(float x,float y,float w,float h) {
@@ -170,6 +209,8 @@ public:
     void setFilesDir(const std::string& d) { m_filesDir=d; }
     void requestMrFilePicker();
     void onMrFilePicked(const std::string& uri);
+    void requestThemeFilePicker();
+    void onThemeFilePicked(const std::string& uri);
     void requestValueInput(int idx);
     void requestHideValueInput();
     void consumePendingValueInput();
@@ -215,6 +256,16 @@ private:
     float m_pinchWheel=0.0f;
     SettingsState m_settings;
     SettingsLayout m_settingsLayout;
+    ImportMenuState m_import;
+    ImportLayout m_importLayout;
+    // What is currently loaded, so the next pick only swaps one half.
+    std::string m_themePath="themes/default.mr";
+    std::string m_themeNode="use_default_theme";
+    std::string m_enginePath="engines/atg-video-2/01_subaru_ej25_eh.mr";
+    std::string m_engineNode;   // non empty only for old format files
+    bool stageWrapperReload(const std::string& enginePath,
+        const std::string& engineNode,const std::string& themePath,
+        const std::string& themeNode);
     float m_settingsButtonRect[4]={0.0f,0.0f,0.0f,0.0f};
     bool m_settingsButtonValid=false;
     int m_sliderPid=-1;

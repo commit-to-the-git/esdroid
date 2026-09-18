@@ -51,6 +51,8 @@ public class ESDroidActivity extends NativeActivity {
     private Dialog mValueDialog = null;
     private Typeface mSilk = null;
     private Typeface mSilkBold = null;
+    // Which import the picker result belongs to; set when the picker opens.
+    private String mPickerKind = "engine";
 
     static {
         System.loadLibrary("esdroid");
@@ -66,6 +68,7 @@ public class ESDroidActivity extends NativeActivity {
         // Imports are per session, every launch starts on the default engine.
         deleteIfExists(new File(getFilesDir(), "assets/imported.mr"));
         deleteIfExists(new File(getFilesDir(), "assets/imported_main.mr"));
+        deleteIfExists(new File(getFilesDir(), "assets/imported_theme.mr"));
         deleteIfExists(new File(getFilesDir(), "imported.mr"));
     }
 
@@ -152,17 +155,26 @@ public class ESDroidActivity extends NativeActivity {
     }
 
     public void openFilePicker() {
+        startMrPicker("engine", "Select .mr engine file");
+    }
+
+    public void openThemePicker() {
+        startMrPicker("theme", "Select .mr theme file");
+    }
+
+    private void startMrPicker(final String kind, final String title) {
         // MUST run on UI thread, native code runs on a different thread
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 try {
+                    mPickerKind = kind;
                     Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
                     intent.addCategory(Intent.CATEGORY_OPENABLE);
                     intent.setType("*/*");
-                    intent.putExtra(Intent.EXTRA_TITLE, "Select .mr engine file");
+                    intent.putExtra(Intent.EXTRA_TITLE, title);
                     startActivityForResult(intent, REQUEST_CODE_OPEN_MR);
-                    jlog("file picker started");
+                    jlog("file picker started (" + kind + ")");
                 } catch (Throwable e) {
                     Log.e(TAG, "Failed to start file picker: " + e.getMessage());
                     jlog("file picker failed to start: " + e.getMessage());
@@ -191,7 +203,8 @@ public class ESDroidActivity extends NativeActivity {
             // resolves it through the default search paths.
             File assetsDir = new File(getFilesDir(), "assets");
             assetsDir.mkdirs();
-            File outFile = new File(assetsDir, "imported.mr");
+            boolean theme = "theme".equals(mPickerKind);
+            File outFile = new File(assetsDir, theme ? "imported_theme.mr" : "imported.mr");
             FileOutputStream out = new FileOutputStream(outFile);
             byte[] buf = new byte[8192];
             long total = 0;
@@ -207,7 +220,11 @@ public class ESDroidActivity extends NativeActivity {
             // Throwable, not Exception: an UnsatisfiedLinkError must not
             // kill the app here.
             try {
-                nativeOnFilePicked(outFile.getAbsolutePath());
+                if (theme) {
+                    nativeOnThemePicked(outFile.getAbsolutePath());
+                } else {
+                    nativeOnFilePicked(outFile.getAbsolutePath());
+                }
                 jlog("nativeOnFilePicked returned");
             } catch (Throwable t) {
                 Log.e(TAG, "nativeOnFilePicked failed", t);
@@ -390,18 +407,44 @@ public class ESDroidActivity extends NativeActivity {
             jlog("value entry empty, ignored");
             return;
         }
-        try {
-            double value = Double.parseDouble(trimmed);
-            nativeOnValueInput(index, value);
-        } catch (NumberFormatException e) {
+        double value = parseNumericPrefix(trimmed);
+        if (Double.isNaN(value)) {
             jlog("value entry not a number: " + trimmed);
+            return;
+        }
+        try {
+            nativeOnValueInput(index, value);
         } catch (Throwable t) {
             Log.e(TAG, "nativeOnValueInput failed", t);
             jlog("nativeOnValueInput failed: " + t);
         }
     }
 
+    // "2000", "2000 HZ" and "60%" all commit: take the leading numeric
+    // run and ignore whatever follows it. Returns NaN when there is no
+    // number at all.
+    private static double parseNumericPrefix(String s) {
+        int end = 0;
+        if (end < s.length() && (s.charAt(end) == '-' || s.charAt(end) == '+')) end++;
+        int digits = 0;
+        boolean dot = false;
+        while (end < s.length()) {
+            char c = s.charAt(end);
+            if (c >= '0' && c <= '9') { end++; digits++; }
+            else if (c == '.' && !dot) { end++; dot = true; }
+            else break;
+        }
+        if (digits == 0) return Double.NaN;
+        try {
+            return Double.parseDouble(s.substring(0, end));
+        } catch (NumberFormatException e) {
+            return Double.NaN;
+        }
+    }
+
     public native void nativeOnFilePicked(String path);
+
+    public native void nativeOnThemePicked(String path);
 
     public native void nativeOnValueInput(int index, double value);
 }

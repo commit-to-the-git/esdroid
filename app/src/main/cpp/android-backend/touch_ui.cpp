@@ -657,6 +657,153 @@ void TouchUI::drawSettingsPanel() {
     }
 }
 
+// One dropdown: the selector box always, the scrollable entry list below it
+// when open. Entries clip to the list rect through the scissor test, and the
+// selected entry renders inverted.
+void TouchUI::drawDropdown(const float* box,const MrAsset* entries,int count,
+        int sel,bool open,float scroll,float listTop,float listH,float rowH) {
+    const float sw=(float)m_screenW, sh=(float)m_screenH;
+    const float white[4]={1.0f,1.0f,1.0f,1.0f};
+    const float black[4]={0.0f,0.0f,0.0f,1.0f};
+    auto border=[&](const float* r,float t,const float* c){
+        drawRect(r[0],r[1],r[2],t,c);
+        drawRect(r[0],r[1]+r[3]-t,r[2],t,c);
+        drawRect(r[0],r[1],t,r[3],c);
+        drawRect(r[0]+r[2]-t,r[1],t,r[3],c);
+    };
+    auto centerText=[&](const char* text,const float* r,const float* color){
+        float adv,inkTop,inkBot;
+        bakedTextInk(text,s_fontChars,&adv,&inkTop,&inkBot);
+        const float baseline=r[1]+(r[3]-(inkBot-inkTop))*0.5f-inkTop;
+        drawTouchText(text,r[0]+(r[2]-adv)*0.5f,baseline-FONT_SIZE,
+            sw,sh,color,false);
+    };
+
+    const char* label=(sel>=0&&sel<count)?entries[sel].name:"";
+    drawRect(box[0],box[1],box[2],box[3],white);
+    border(box,2.0f,black);
+    // The label clips to the box so long engine names cannot bleed out.
+    const float arrowW=26.0f;
+    {
+        const float textRect[4]={box[0]+4.0f,box[1],box[2]-arrowW-8.0f,box[3]};
+        GLint sx=(GLint)textRect[0], sy=(GLint)(sh-(textRect[1]+textRect[3]));
+        GLint scw=(GLint)textRect[2], sch=(GLint)textRect[3];
+        glEnable(GL_SCISSOR_TEST);
+        glScissor(sx,sy,scw>0?scw:0,sch>0?sch:0);
+        float adv,inkTop,inkBot;
+        bakedTextInk(label,s_fontChars,&adv,&inkTop,&inkBot);
+        const float baseline=box[1]+(box[3]-(inkBot-inkTop))*0.5f-inkTop;
+        // Left aligned, unlike the buttons: the widest names would not fit.
+        drawTouchText(label,box[0]+8.0f,baseline-FONT_SIZE,sw,sh,black,false);
+        glDisable(GL_SCISSOR_TEST);
+    }
+    {
+        const float arrowRect[4]={box[0]+box[2]-arrowW,box[1],arrowW,box[3]};
+        centerText(open?"^":"v",arrowRect,black);
+    }
+
+    if(!open) return;
+
+    const float list[4]={box[0],listTop,box[2],listH};
+    drawRect(list[0],list[1],list[2],list[3],white);
+    border(list,2.0f,black);
+    const float full=(float)count*rowH;
+    if(full>listH) {
+        const float thumbH=listH*listH/full;
+        const float trackH=listH-thumbH;
+        const float thumbY=listTop+(scroll/(full-listH))*trackH;
+        drawRect(list[0]+list[2]-6.0f,listTop,4.0f,listH,black);
+        drawRect(list[0]+list[2]-7.0f,thumbY,6.0f,thumbH,white);
+    }
+    GLint sx=(GLint)list[0], sy=(GLint)(sh-(list[1]+list[3]));
+    GLint scw=(GLint)list[2], sch=(GLint)list[3];
+    glEnable(GL_SCISSOR_TEST);
+    glScissor(sx,sy,scw>0?scw:0,sch>0?sch:0);
+    const int first=(int)(scroll/rowH);
+    for(int i=first;i<=first+(int)(listH/rowH)+1&&i<count;++i) {
+        const float row[4]={list[0],listTop+(float)i*rowH-scroll,list[2],rowH};
+        if(row[1]+row[3]<=list[1]) continue;
+        if(row[1]>=list[1]+list[3]) break;
+        const bool selected=(i==sel);
+        if(selected) drawRect(row[0],row[1],row[2],row[3],black);
+        const float* textColor=selected?white:black;
+        const char* text=entries[i].name;
+        float adv,inkTop,inkBot;
+        bakedTextInk(text,s_fontChars,&adv,&inkTop,&inkBot);
+        const float baseline=row[1]+(row[3]-(inkBot-inkTop))*0.5f-inkTop;
+        drawTouchText(text,row[0]+8.0f,baseline-FONT_SIZE,sw,sh,textColor,false);
+    }
+    glDisable(GL_SCISSOR_TEST);
+}
+
+// The IMPORT overlay: themes on the left half, engines on the right, each
+// with a dropdown, a LOAD button and a custom file IMPORT button.
+void TouchUI::drawImportPanel() {
+    auto& backend=AndroidBackend::instance();
+    const ImportLayout& L=backend.importLayout();
+    const ImportMenuState& menu=backend.importMenu();
+    const float sw=(float)m_screenW, sh=(float)m_screenH;
+    const float white[4]={1.0f,1.0f,1.0f,1.0f};
+    const float black[4]={0.0f,0.0f,0.0f,1.0f};
+
+    drawBlurredBackdrop();
+
+    drawRect(L.panel[0],L.panel[1],L.panel[2],L.panel[3],white);
+    auto border=[&](const float* r,float t,const float* c){
+        drawRect(r[0],r[1],r[2],t,c);
+        drawRect(r[0],r[1]+r[3]-t,r[2],t,c);
+        drawRect(r[0],r[1],t,r[3],c);
+        drawRect(r[0]+r[2]-t,r[1],t,r[3],c);
+    };
+    border(L.panel,3.0f,black);
+
+    drawTouchText("IMPORT",L.panel[0]+22.0f,
+        L.close[1]+(L.close[3]-FONT_SIZE_BIG)*0.5f-2.0f,sw,sh,black,true);
+    drawRect(L.close[0],L.close[1],L.close[2],L.close[3],white);
+    border(L.close,2.0f,black);
+    {
+        const char* x="CLOSE";
+        const float tw=(float)strlen(x)*FONT_SIZE*0.6f;
+        drawTouchText(x,L.close[0]+(L.close[2]-tw)*0.5f,
+            L.close[1]+(L.close[3]-FONT_SIZE)*0.5f-2.0f,sw,sh,black,false);
+    }
+
+    int themeCount=0, engineCount=0;
+    const MrAsset* themes=backend.importThemes(&themeCount);
+    const MrAsset* engines=backend.importEngines(&engineCount);
+
+    // Column titles sit above the selector boxes.
+    drawTouchText("THEME",L.themeBox[0],L.themeBox[1]-30.0f,sw,sh,black,false);
+    drawTouchText("ENGINE",L.engineBox[0],L.engineBox[1]-30.0f,sw,sh,black,false);
+
+    // Selector boxes first, the buttons, then an open list back on top so
+    // it covers the buttons it overlaps.
+    drawDropdown(L.themeBox,themes,themeCount,menu.themeSel,
+        false,menu.themeScroll,L.listTop,L.listH,L.rowH);
+    drawDropdown(L.engineBox,engines,engineCount,menu.engineSel,
+        false,menu.engineScroll,L.listTop,L.listH,L.rowH);
+
+    auto button=[&](const float* r,const char* text){
+        drawRect(r[0],r[1],r[2],r[3],white);
+        border(r,2.0f,black);
+        const float tw=(float)strlen(text)*FONT_SIZE*0.6f;
+        drawTouchText(text,r[0]+(r[2]-tw)*0.5f,
+            r[1]+(r[3]-FONT_SIZE)*0.5f-2.0f,sw,sh,black,false);
+    };
+    button(L.themeLoad,"LOAD THEME");
+    button(L.themeImport,"IMPORT CUSTOM THEME");
+    button(L.engineLoad,"LOAD ENGINE");
+    button(L.engineImport,"IMPORT CUSTOM ENGINE");
+
+    // An open list draws again on top of the buttons it overlaps.
+    if(menu.themeListOpen)
+        drawDropdown(L.themeBox,themes,themeCount,menu.themeSel,
+            true,menu.themeScroll,L.listTop,L.listH,L.rowH);
+    if(menu.engineListOpen)
+        drawDropdown(L.engineBox,engines,engineCount,menu.engineSel,
+            true,menu.engineScroll,L.listTop,L.listH,L.rowH);
+}
+
 void TouchUI::render() {
     if (m_program == 0) return;
     GLint prevProgram; glGetIntegerv(GL_CURRENT_PROGRAM, &prevProgram);
@@ -678,6 +825,9 @@ void TouchUI::render() {
         // Buttons vanish behind the frosted panel; the engine keeps
         // simulating under the blur.
         drawSettingsPanel();
+    }
+    else if (AndroidBackend::instance().importMenuOpen()) {
+        drawImportPanel();
     }
     else {
         drawSettingsButton();

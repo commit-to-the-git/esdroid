@@ -1,5 +1,5 @@
 #ifndef PIRANHA_STANDARD_ALLOCATOR_H
-#if defined(__ANDROID__)
+#if defined(__ANDROID__) || defined(__linux__)
 extern "C" void esdroid_wtflog(const char*,...);
 #endif
 #define PIRANHA_STANDARD_ALLOCATOR_H
