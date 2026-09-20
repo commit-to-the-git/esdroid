@@ -37,7 +37,7 @@ namespace piranha {
             IrReferenceQuery();
             ~IrReferenceQuery();
 
-            // Inputs
+            // inputs
             IrContextTree *inputContext;
             bool recordErrors;
             bool recordInfiniteLoops;
@@ -61,7 +61,7 @@ namespace piranha {
 
             void reset();
 
-            // Ouputs
+            // ouputs
             IrContextTree *newContext;
             CompilationError *err;
 
@@ -132,7 +132,7 @@ namespace piranha {
         virtual void free();
 
     public:
-        // Compilation stages
+        // compilation stages
         void resolveDefinitions();
         virtual void checkCircularDefinitions();
         void checkCircularDefinitions(IrContextTree *context, IrNodeDefinition *root);
@@ -176,11 +176,11 @@ namespace piranha {
     protected:
         const LanguageRules *m_rules;
 
-        // Visibility
+        // visibility
         IrVisibility m_defaultVisibility;
         IrVisibility m_visibility;
 
-        // Compilation flags
+        // compilation flags
         bool m_definitionsResolved;
         bool m_expanded;
         bool m_validated;
@@ -190,10 +190,10 @@ namespace piranha {
         bool m_checkReferences;
 
     public:
-        // Debugging
+        // debugging
         void writeReferencesToFile(std::ofstream &file, IrContextTree *context, int tabLevel = 0);
 
-        // Building
+        // building
     public:
         NodeOutput *generateNodeOutput(IrContextTree *context, NodeProgram *program, NodeContainer *container);
         Node *generateNode(IrContextTree *context, NodeProgram *program, NodeContainer *container);
@@ -204,4 +204,4 @@ namespace piranha {
 
 } /* namespace piranha */
 
-#endif /* PIRANHA_IR_PARSER_STRUCTURE_H */
+#endif /* PIRANHA_IR_PARSER_STRUCTURE_H  */

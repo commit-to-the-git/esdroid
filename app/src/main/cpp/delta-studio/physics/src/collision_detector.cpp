@@ -153,7 +153,7 @@ int dphysics::CollisionDetector::CircleCircleCollision(Collision *collisions, Ri
 
     float s_distance = ysMath::GetScalar(distance);
 
-    // Special case handling
+    // special case handling
     if (s_distance == 0) {
         direction = ysMath::Constants::XAxis;
         s_distance = 0.01f;
@@ -177,7 +177,7 @@ int dphysics::CollisionDetector::CircleCircleCollision(Collision *collisions, Ri
 }
 
 int dphysics::CollisionDetector::RayBoxCollision(Collision *collisions, RigidBody *body1, RigidBody *body2, RayPrimitive *ray, BoxPrimitive *box) {
-    /* TODO */
+    /* todo */
 
     return 0;
 }
@@ -329,7 +329,7 @@ int dphysics::CollisionDetector::BoxBoxVertexPenetration(
 
     float penetration0, penetration1;
 
-    // Top face
+    // top face
     penetration0 = vertexBoxCollision(proj_x[order_y[0]], proj_y[order_y[0]], a->HalfWidth, a->HalfHeight);
     penetration1 = abs(proj_y[order_y[1]] - proj_y[order_y[0]]) < ParallelEpsilon
         ? vertexBoxCollision(proj_x[order_y[1]], proj_y[order_y[1]], a->HalfWidth, a->HalfHeight)
@@ -352,7 +352,7 @@ int dphysics::CollisionDetector::BoxBoxVertexPenetration(
         }
     }
 
-    // Bottom face
+    // bottom face
     penetration0 = vertexBoxCollision(proj_x[order_y[3]], -proj_y[order_y[3]], a->HalfWidth, a->HalfHeight);
     penetration1 = abs(proj_y[order_y[2]] - proj_y[order_y[3]]) < ParallelEpsilon
         ? vertexBoxCollision(proj_x[order_y[2]], -proj_y[order_y[2]], a->HalfWidth, a->HalfHeight)
@@ -375,7 +375,7 @@ int dphysics::CollisionDetector::BoxBoxVertexPenetration(
         }
     }
 
-    // Left face
+    // left face
     penetration0 = vertexBoxCollision(proj_y[order_x[3]], -proj_x[order_x[3]], a->HalfHeight, a->HalfWidth);
     penetration1 = abs(proj_x[order_x[2]] - proj_x[order_x[3]]) < ParallelEpsilon
         ? vertexBoxCollision(proj_y[order_x[2]], -proj_x[order_x[2]], a->HalfHeight, a->HalfWidth, true)
@@ -398,7 +398,7 @@ int dphysics::CollisionDetector::BoxBoxVertexPenetration(
         }
     }
 
-    // Right face
+    // right face
     penetration0 = vertexBoxCollision(proj_y[order_x[0]], proj_x[order_x[0]], a->HalfHeight, a->HalfWidth);
     penetration1 = abs(proj_x[order_x[0]] - proj_x[order_x[1]]) < ParallelEpsilon
         ? vertexBoxCollision(proj_y[order_x[1]], proj_x[order_x[1]], a->HalfHeight, a->HalfWidth, true)

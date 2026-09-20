@@ -23,4 +23,4 @@ struct ApplicationSettings {
     int colorGreen = 0xBDD869;
 };
 
-#endif /* ATG_ENGINE_SIM_APPLICATION_SETTINGS_H */
+#endif /* ATG_ENGINE_SIM_APPLICATION_SETTINGS_H  */

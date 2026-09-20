@@ -70,7 +70,7 @@ namespace dbasic {
         ysError Open(const wchar_t *fname, Mode mode = Mode::Write);
         void Close();
 
-        // Write Functions
+        // write functions
         ysError WriteCustomData(void *data, int size);
         ysError WriteObjectAnimationData(AnimationExportData *objectAnimationData);
 
@@ -85,4 +85,4 @@ namespace dbasic {
 
 } /* namespace dbasic */
 
-#endif /* DELTA_BASIC_ANIMATION_EXPORT_FILE_H */
+#endif /* DELTA_BASIC_ANIMATION_EXPORT_FILE_H  */

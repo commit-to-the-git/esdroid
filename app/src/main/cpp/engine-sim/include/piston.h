@@ -56,4 +56,4 @@ void Piston::setCylinderConstraint(atg_scs::LineConstraint *constraint) {
     m_cylinderConstraint = constraint;
 }
 
-#endif /* ATG_ENGINE_SIM_PISTON_H */
+#endif /* ATG_ENGINE_SIM_PISTON_H  */

@@ -19,4 +19,4 @@ protected:
     void *m_buffer;
 };
 
-#endif /* YDS_DIRECT_SOUND8_AUDIO_BUFFER_H */
+#endif /* YDS_DIRECT_SOUND8_AUDIO_BUFFER_H  */

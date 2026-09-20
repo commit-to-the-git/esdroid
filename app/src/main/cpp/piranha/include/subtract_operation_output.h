@@ -45,4 +45,4 @@ namespace piranha {
 
 } /* namespace piranha */
 
-#endif /* PIRANHA_SUBTRACT_OPERATION_OUTPUT_H */
+#endif /* PIRANHA_SUBTRACT_OPERATION_OUTPUT_H  */

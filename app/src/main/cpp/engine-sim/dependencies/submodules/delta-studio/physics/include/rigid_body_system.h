@@ -34,7 +34,7 @@ namespace dphysics {
         RigidBodySystem();
         ~RigidBodySystem();
 
-        // Collision Detector Interface
+        // collision detector interface
         CollisionDetector CollisionDetector;
 
         void InitializeFrictionTable(
@@ -112,16 +112,16 @@ namespace dphysics {
 
         ysBreakdownTimer *m_breakdownTimer;
 
-        // TEST
+        // test
         GridPartitionSystem m_gridPartitionSystem;
         std::ofstream m_loggingOutput;
 
     protected:
-        // Debug
+        // debug
         std::fstream m_outputFile;
         bool m_replayEnabled;
     };
 
 } /* namespace dbasic */
 
-#endif /* DELTA_BASIC_RIGID_BODY_SYSTEM_H */
+#endif /* DELTA_BASIC_RIGID_BODY_SYSTEM_H  */

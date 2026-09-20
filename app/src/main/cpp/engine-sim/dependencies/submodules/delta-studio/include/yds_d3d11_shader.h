@@ -25,4 +25,4 @@ protected:
     };
 };
 
-#endif /* YDS_D3D11_SHADER_H */
+#endif /* YDS_D3D11_SHADER_H  */

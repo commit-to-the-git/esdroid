@@ -223,7 +223,7 @@ void dphysics::RigidBodySystem::GenerateCollisions(RigidBody *body1, RigidBody *
             body1Ord = body1;
             body2Ord = body2;
 
-            // Check whether these objects have compatible collision layers/masks
+            // check whether these objects have compatible collision layers/masks
             if (!prim1->CheckCollisionMask(prim2)) continue;
 
             int nCollisions = 0;
@@ -337,7 +337,7 @@ void dphysics::RigidBodySystem::GenerateCollisions() {
     ClearCollisions();
     int nObjects = m_rigidBodyRegistry.GetNumObjects();
 
-    // Generate grid cells
+    // generate grid cells
     m_gridPartitionSystem.Reset();
     for (int i = 0; i < nObjects; i++) {
         m_gridPartitionSystem.ProcessRigidBody(m_rigidBodyRegistry.Get(i));
@@ -352,7 +352,7 @@ void dphysics::RigidBodySystem::GenerateCollisions() {
 
     const int load = m_loadMeasurement;
 
-    // Simple tuning algorithm
+    // simple tuning algorithm
     if (load > m_lastLoadMeasurement) {
         m_currentStep = -1.0f * sgn(m_currentStep) * 0.1f;
     }
@@ -426,17 +426,17 @@ void dphysics::RigidBodySystem::ResolveCollision(Collision *collision, ysVector 
         if (collision->m_bodies[i] != nullptr) {
             ysMatrix inverseInertiaTensor = collision->m_bodies[i]->GetInverseInertiaTensorWorld();
 
-            // Use the same procedure as for calculating frictionless
-            // velocity change to work out the angular inertia.
+            // use the same procedure as for calculating frictionless
+            // velocity change to work out the angular inertia
             ysVector angularInertiaWorld = ysMath::Cross(collision->m_relativePosition[i], collision->m_normal);
             angularInertiaWorld = ysMath::MatMult(inverseInertiaTensor, angularInertiaWorld);
             angularInertiaWorld = ysMath::Cross(angularInertiaWorld, collision->m_relativePosition[i]);
             angularInertia[i] = ysMath::GetScalar(ysMath::Dot(angularInertiaWorld, collision->m_normal));
 
-            // The linear component is simply the inverse mass
+            // the linear component is simply the inverse mass
             linearInertia[i] = collision->m_bodies[i]->GetInverseMass();
 
-            // Keep track of the total inertia from all components
+            // keep track of the total inertia from all components
             totalInertia += linearInertia[i] + angularInertia[i];
         }
     }
@@ -454,8 +454,8 @@ void dphysics::RigidBodySystem::ResolveCollision(Collision *collision, ysVector 
         angularMove[1] = -collision->m_penetration * angularInertia[1] / totalInertia;
         linearMove[1] = -collision->m_penetration * collision->m_bodies[1]->GetInverseMass() / totalInertia;
 
-        // To avoid angular projections that are too great (when mass is large
-        // but inertia tensor is small) limit the angular move.
+        // to avoid angular projections that are too great when mass is large
+        // but inertia tensor is small limit the angular move
         ysVector projection = collision->m_relativePosition[1];
         projection = ysMath::Sub(projection, ysMath::Mul(collision->m_normal, ysMath::Dot(collision->m_relativePosition[1], collision->m_normal)));
 
@@ -471,8 +471,8 @@ void dphysics::RigidBodySystem::ResolveCollision(Collision *collision, ysVector 
     angularMove[0] = collision->m_penetration * angularInertia[0] / totalInertia;
     linearMove[0] = collision->m_penetration * collision->m_bodies[0]->GetInverseMass() / totalInertia;
 
-    // To avoid angular projections that are too great (when mass is large
-    // but inertia tensor is small) limit the angular move.
+    // to avoid angular projections that are too great when mass is large
+    // but inertia tensor is small limit the angular move
     ysVector projection = collision->m_relativePosition[0];
     projection = ysMath::Sub(projection, ysMath::Mul(collision->m_normal, ysMath::Dot(collision->m_relativePosition[0], collision->m_normal)));
 
@@ -521,9 +521,9 @@ void dphysics::RigidBodySystem::AdjustVelocities(float timestep) {
     ysVector velocityChange[2], rotationChange[2];
     ysVector cp;
 
-    // iteratively handle impacts in order of severity.
+    // iteratively handle impacts in order of severity
     for (int velocityIterationsUsed = 0; velocityIterationsUsed < ResolutionIterationLimit; ++velocityIterationsUsed) {
-        // Find contact with maximum magnitude of probable velocity change.
+        // find contact with maximum magnitude of probable velocity change
         float max = 1E-4f;
         int index = numContacts;
         for(int i = 0; i < numContacts; ++i) {
@@ -541,15 +541,15 @@ void dphysics::RigidBodySystem::AdjustVelocities(float timestep) {
 
         Collision *biggestCollision = m_collisionAccumulator[index];
 
-        // Match the awake state at the contact
-        //c[index].matchAwakeState();
+        // match the awake state at the contact
+        // cindexmatchawakestate
 
-        // Do the resolution on the contact with the largest desired velocity
+        // do the resolution on the contact with the largest desired velocity
         AdjustVelocity(biggestCollision, velocityChange, rotationChange);
 
-        // With the change in velocity of the two bodies, the update of 
-        // contact velocities means that some of the relative closing 
-        // velocities need recomputing.
+        // with the change in velocity of the two bodies the update of
+        // contact velocities means that some of the relative closing
+        // velocities need recomputing
         for (int i = 0; i < numContacts; ++i) {
             Collision *c = m_collisionAccumulator[i];
 
@@ -600,7 +600,7 @@ void dphysics::RigidBodySystem::AdjustVelocities(float timestep) {
 }
 
 void dphysics::RigidBodySystem::AdjustVelocity(Collision *collision, ysVector velocityChange[2], ysVector rotationChange[2]) {
-    // Inverse mass and inertia tensor in world coordinates
+    // inverse mass and inertia tensor in world coordinates
     ysMatrix inverseInertiaTensor[2];
     inverseInertiaTensor[0] = collision->m_bodies[0]->GetInverseInertiaTensorWorld();
 
@@ -608,55 +608,55 @@ void dphysics::RigidBodySystem::AdjustVelocity(Collision *collision, ysVector ve
     float inverseMass = collision->m_bodies[0]->GetInverseMass();
     ysMatrix impulseToTorque = ysMath::SkewSymmetric(collision->m_relativePosition[0]);
 
-    // Build the matrix to convert contact impulse to change in velocity
-    // in world coordinates.
+    // build the matrix to convert contact impulse to change in velocity
+    // in world coordinates
     ysMatrix deltaVelWorld = impulseToTorque;
     deltaVelWorld = ysMath::MatMult(deltaVelWorld, inverseInertiaTensor[0]);
     deltaVelWorld = ysMath::MatMult(deltaVelWorld, impulseToTorque);
     deltaVelWorld = ysMath::Negate3x3(deltaVelWorld);
 
-    // Check if we need to add body two's data
+    // check if we need to add body twos data
     if (collision->m_bodies[1] != nullptr) {
-        // Find the inertia tensor for this body
+        // find the inertia tensor for this body
         inverseInertiaTensor[1] = collision->m_bodies[1]->GetInverseInertiaTensorWorld();
 
-        // Set the cross product matrix
+        // set the cross product matrix
         impulseToTorque = ysMath::SkewSymmetric(collision->m_relativePosition[1]);
 
-        // Calculate the velocity change matrix
+        // calculate the velocity change matrix
         ysMatrix deltaVelWorld2 = impulseToTorque;
         deltaVelWorld2 = ysMath::MatMult(deltaVelWorld2, inverseInertiaTensor[1]);
         deltaVelWorld2 = ysMath::MatMult(deltaVelWorld2, impulseToTorque);
         deltaVelWorld2 = ysMath::Negate3x3(deltaVelWorld2);
 
-        // Add to the total delta velocity.
+        // add to the total delta velocity
         deltaVelWorld = ysMath::MatAdd(deltaVelWorld2, deltaVelWorld);
 
-        // Add to the inverse mass
+        // add to the inverse mass
         inverseMass += collision->m_bodies[1]->GetInverseMass();
     }
 
-    // Do a change of basis to convert into contact coordinates.
+    // do a change of basis to convert into contact coordinates
     ysMatrix deltaVelocity = ysMath::OrthogonalInverse(collision->m_contactSpace);
     deltaVelocity = ysMath::MatMult(deltaVelocity, deltaVelWorld);
     deltaVelocity = ysMath::MatMult(deltaVelocity, collision->m_contactSpace);
 
-    // Add in the linear velocity change
+    // add in the linear velocity change
     deltaVelocity = ysMath::MatAdd(deltaVelocity, ysMath::ScaleTransform(ysMath::LoadScalar(inverseMass)));
     deltaVelocity = ysMath::MatConvert3x3(deltaVelocity);
 
-    // Invert to get the impulse needed per unit velocity
+    // invert to get the impulse needed per unit velocity
     ysMatrix impulseMatrix = ysMath::Inverse3x3(deltaVelocity);
 
-    // Find the target velocities to kill
+    // find the target velocities to kill
     ysVector velKill = ysMath::LoadVector(collision->m_desiredDeltaVelocity,
         -ysMath::GetY(collision->m_contactVelocity),
         -ysMath::GetZ(collision->m_contactVelocity));
 
-    // Find the impulse to kill target velocities
+    // find the impulse to kill target velocities
     impulseContact = ysMath::MatMult(impulseMatrix, velKill);
 
-    // Check for exceeding friction
+    // check for exceeding friction
     ysVector planarImpulse_v = ysMath::Magnitude(ysMath::Mask(impulseContact, ysMath::Constants::MaskOffX));
     float planarImpulse = ysMath::GetScalar(planarImpulse_v);
     if (planarImpulse > std::abs(ysMath::GetX(impulseContact)) * collision->m_staticFriction) {
@@ -673,25 +673,25 @@ void dphysics::RigidBodySystem::AdjustVelocity(Collision *collision, ysVector ve
         impulseContact = ysMath::Add(ic, icx);
     }
 
-    // Convert impulse to world coordinates
+    // convert impulse to world coordinates
     ysVector impulse = ysMath::MatMult(collision->m_contactSpace, impulseContact);
 
-    // Split in the impulse into linear and rotational components
+    // split in the impulse into linear and rotational components
     ysVector impulsiveTorque = ysMath::Cross(collision->m_relativePosition[0], impulse);
     rotationChange[0] = ysMath::MatMult(inverseInertiaTensor[0], impulsiveTorque);
     velocityChange[0] = ysMath::Mul(impulse, ysMath::LoadScalar(collision->m_bodies[0]->GetInverseMass()));
 
-    // Apply the changes
+    // apply the changes
     collision->m_bodies[0]->AddVelocity(velocityChange[0]);
     collision->m_bodies[0]->AddAngularVelocity(rotationChange[0]);
 
     if (collision->m_bodies[1] != nullptr) {
-        // Work out body one's linear and angular changes
+        // work out body ones linear and angular changes
         ysVector impulsiveTorque = ysMath::Cross(impulse, collision->m_relativePosition[1]);
         rotationChange[1] = ysMath::MatMult(inverseInertiaTensor[1], impulsiveTorque);
         velocityChange[1] = ysMath::Mul(impulse, ysMath::LoadScalar(-collision->m_bodies[1]->GetInverseMass()));
 
-        // And apply them.
+        // and apply them
         collision->m_bodies[1]->AddVelocity(velocityChange[1]);
         collision->m_bodies[1]->AddAngularVelocity(rotationChange[1]);
     }
@@ -818,7 +818,7 @@ void dphysics::RigidBodySystem::CheckAwake() {
 }
 
 void dphysics::RigidBodySystem::Update(float timestep) {
-    //GenerateForces(timestep);
+    // generateforcestimestep
 
     Integrate(timestep);
 
@@ -844,23 +844,23 @@ bool dphysics::RigidBodySystem::CheckState() {
 }
 
 /*
-void dphysics::RigidBodySystem::DrawCollisionDebug(int layer) {
-    int nCollisions = m_collisionAccumulator.GetNumObjects();
-    int color[3] = { 255, 0, 0 };
+void dphysics::rigidbodysystem::drawcollisiondebugint layer {
+    int ncollisions = m_collisionaccumulator.getnumobjects
+    int color3 = { 255 0 0 }
 
-    for (int i = 0; i < nCollisions; i++) {
-        Collision *collision = m_collisionAccumulator[i];
+    for int i = 0 i < ncollisions i++ {
+        collision *collision = m_collisionaccumulatori
 
-        if (collision->m_penetration < -10.0f) {
-            int a = 0;
+        if collision->m_penetration < -10.0f {
+            int a = 0
         }
 
-        m_engine->DrawAxis(color, collision->m_position, collision->m_normal, 0.01f, collision->m_penetration, layer);
+        m_engine->drawaxiscolor collision->m_position collision->m_normal 0.01f collision->m_penetration layer
     }
 
-    int nLinks = m_rigidBodyLinks.GetNumObjects();
-    for (int i = 0; i < nLinks; i++) {
-        //m_rigidBodyLinks.Get(i)->DrawDebug(m_engine, layer);
+    int nlinks = m_rigidbodylinks.getnumobjects
+    for int i = 0 i < nlinks i++ {
+        //m_rigidbodylinks.geti->drawdebugm_engine layer
     }
 }
 */

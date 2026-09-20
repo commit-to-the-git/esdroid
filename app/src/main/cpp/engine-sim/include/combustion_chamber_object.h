@@ -22,4 +22,4 @@ class CombustionChamberObject : public SimulationObject {
         GeometryGenerator::GeometryIndices m_indices;
 };
 
-#endif /* ATG_ENGINE_SIM_COMBUSTION_CHAMBER_OBJECT_H */
+#endif /* ATG_ENGINE_SIM_COMBUSTION_CHAMBER_OBJECT_H  */

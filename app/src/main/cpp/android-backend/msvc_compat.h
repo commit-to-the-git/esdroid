@@ -26,7 +26,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <sys/stat.h>
-#endif // __cplusplus
+#endif //  __cplusplus
 
 #ifndef __stdcall
 #define __stdcall
@@ -134,6 +134,6 @@ static inline int _wstat(const wchar_t *p, struct stat *b) {
     for(i=0;i<sizeof(np)-1&&p[i];++i) np[i]=(char)p[i]; np[i]=0;
     return stat(np,b);
 }
-#endif // !
-#endif // __cplusplus
-#endif // ESDROID_MSVC_COMPAT_H
+#endif //
+#endif //  __cplusplus
+#endif //  ESDROID_MSVC_COMPAT_H

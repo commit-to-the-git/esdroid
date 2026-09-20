@@ -88,8 +88,8 @@ double GasSystem::react(double n, const Mix &mix) {
     const double system_n_inert = n_inert();
     const double system_n = this->n();
 
-    // Assuming the following reaction:
-    // 25[O2] + 2[C8H16] -> 16[CO2] + 18[H2O]
+    // assuming the following reaction
+    // 25o2 + 2c8h16 -> 16co2 + 18h2o
     constexpr double ideal_o2_ratio = 25.0 / 2;
     constexpr double ideal_fuel_ratio = 2.0 / 25;
     constexpr double output_input_ratio = (16.0 + 18.0) / (25 + 2);
@@ -110,7 +110,7 @@ double GasSystem::react(double n, const Mix &mix) {
 
     m_state.n_mol += dn;
 
-    // Adjust mix
+    // adjust mix
     const double new_system_n_fuel = system_n_fuel - a_n_fuel;
     const double new_system_n_o2 = system_n_o2 - a_n_o2;
     const double new_system_n_inert = system_n_inert + products_n;
@@ -144,7 +144,7 @@ double GasSystem::flowConstant(
 
     double flowRate = 0;
     if (p_ratio <= chokedFlowLimit) {
-        // Choked flow
+        // choked flow
         flowRate = std::sqrt(hcr);
         flowRate *= std::pow(2 / (hcr + 1), (hcr + 1) / (2 * (hcr - 1)));
     }
@@ -211,7 +211,7 @@ double GasSystem::flowRate(
     const double p_ratio = p_T / p_0;
     double flowRate = 0;
     if (p_ratio <= chokedFlowLimit) {
-        // Choked flow
+        // choked flow
         flowRate = chokedFlowRateCached;
         flowRate /= std::sqrt(constants::R * T_0);
     }
@@ -405,8 +405,8 @@ double GasSystem::flow(const FlowParameters &params) {
     const double remainingMass = (1 - fraction) * source->mass();
 
     if (flow != 0) {
-        // - Stage 1
-        // Fraction flows from source to sink.
+        // - stage 1
+        // fraction flows from source to sink
 
         const double E_k_bulk_src0 = source->bulkKineticEnergy();
         const double E_k_bulk_sink0 = sink->bulkKineticEnergy();
@@ -447,7 +447,7 @@ double GasSystem::flow(const FlowParameters &params) {
     const double sinkInitialMomentum_x = sink->m_state.momentum[0];
     const double sinkInitialMomentum_y = sink->m_state.momentum[1];
 
-    // Momentum in fraction
+    // momentum in fraction
 
     if (sinkCrossSection != 0) {
         const double sinkFractionVelocity =
@@ -476,7 +476,7 @@ double GasSystem::flow(const FlowParameters &params) {
     }
 
     if (sourceMass != 0) {
-        // Energy conservation
+        // energy conservation
         const double sourceVelocity0_x = sourceInitialMomentum_x * invSourceMass;
         const double sourceVelocity0_y = sourceInitialMomentum_y * invSourceMass;
 
@@ -554,18 +554,18 @@ double GasSystem::flow(double k_flow, double dt, double P_env, double T_env, con
 }
 
 double GasSystem::pressureEquilibriumMaxFlow(const GasSystem *b) const {
-    // pressure_a = (kineticEnergy() + n * b->kineticEnergyPerMol()) / (0.5 * degreesOfFreedom * volume())
-    // pressure_b = (b->kineticEnergy() - n *  / (0.5 * b->degreesOfFreedom * b->volume())
+    // pressure_a = kineticenergy + n * b->kineticenergypermol / 0.5 * degreesoffreedom * volume
+    // pressure_b = b->kineticenergy - n * / 0.5 * b->degreesoffreedom * b->volume
     // pressure_a = pressure_b
 
-    // E_a = kineticEnergy()
-    // E_b = b->kineticEnergy()
-    // D_a = E_a / n()
-    // D_b = E_b / b->n()
-    // Q_a = 1 / (0.5 * degreesOfFreedom * volume())
-    // Q_b = 1 / (0.5 * b->degreesOfFreedom * b->volume())
-    // pressure_a = Q_a * (E_a + dn * D_b)
-    // pressure_b = Q_b * (E_b - dn * D_b)
+    // e_a = kineticenergy
+    // e_b = b->kineticenergy
+    // d_a = e_a / n
+    // d_b = e_b / b->n
+    // q_a = 1 / 0.5 * degreesoffreedom * volume
+    // q_b = 1 / 0.5 * b->degreesoffreedom * b->volume
+    // pressure_a = q_a * e_a + dn * d_b
+    // pressure_b = q_b * e_b - dn * d_b
 
     if (pressure() > b->pressure()) {
         const double maxFlow =

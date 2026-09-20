@@ -27,7 +27,7 @@ int main() {
 	std::cout << "Max: " << sceneBuffer.getMax() << std::endl;
 	std::cout << "Min: " << sceneBuffer.getMin() << std::endl;
 
-	// Remove the file extension
+	// remove the file extension
 	for (int i = (int)fname.length(); i >= 0; i--) {
 		if (fname[i] == '.') {
 			fname = fname.substr(0, i);
@@ -41,7 +41,7 @@ int main() {
 	bool prevValid = false;
 	int iteration = 0;
 
-	// Editing loop
+	// editing loop
 	bool done = false;
 	while (!done) {
 		std::string command;

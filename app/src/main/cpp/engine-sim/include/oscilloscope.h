@@ -52,4 +52,4 @@ class Oscilloscope : public UiElement {
         int m_pointCount;
 };
 
-#endif /* ATG_ENGINE_SIM_OSCILLOSCOPE_H */
+#endif /* ATG_ENGINE_SIM_OSCILLOSCOPE_H  */

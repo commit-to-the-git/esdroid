@@ -13,4 +13,4 @@ class Part {
         atg_scs::RigidBody m_body;
 };
 
-#endif /* ATG_ENGINE_SIM_PART_H */
+#endif /* ATG_ENGINE_SIM_PART_H  */

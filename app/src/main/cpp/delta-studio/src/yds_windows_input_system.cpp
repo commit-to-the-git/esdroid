@@ -87,10 +87,10 @@ ysError ysWindowsInputSystem::CheckDeviceStatus(ysInputDevice *device) {
         if (pRawInputDeviceList[i].hDevice != windowsDevice->m_deviceHandle)
             continue;
         if (type != device->GetType()) continue;
-        return YDS_ERROR_RETURN(ysError::None);// Device exists
+        return YDS_ERROR_RETURN(ysError::None);// device exists
     }
 
-    // Device no longer exists
+    // device no longer exists
     DisconnectDevice(device);
 
     return YDS_ERROR_RETURN(ysError::None);
@@ -99,7 +99,7 @@ ysError ysWindowsInputSystem::CheckDeviceStatus(ysInputDevice *device) {
 ysError ysWindowsInputSystem::CheckAllDevices() {
     YDS_ERROR_DECLARE("CheckAllDevices");
 
-    // More efficient implementation which only loads the input device list once
+    // more efficient implementation which only loads the input device list once
 
     UINT nDevices;
     PRAWINPUTDEVICELIST pRawInputDeviceList;
@@ -131,10 +131,10 @@ ysError ysWindowsInputSystem::CheckAllDevices() {
             if (pRawInputDeviceList[i].hDevice != windowsDevice->m_deviceHandle)
                 continue;
             if (type != windowsDevice->GetType()) continue;
-            break;// Device exists
+            break;// device exists
         }
 
-        // Device no longer exists
+        // device no longer exists
         DisconnectDevice(windowsDevice);
     }
 
@@ -211,7 +211,7 @@ ysWindowsInputSystem::CreateDevice(ysInputDevice::InputDeviceType type,
     memset(&newDevice->m_info, 0, sizeof(newDevice->m_info));
 
     if (type == ysInputDevice::InputDeviceType::KEYBOARD) {
-        // Load Keymap
+        // load keymap
         ysKeyboard *keyboard = newDevice->GetAsKeyboard();
         keyboard->RegisterKeyMap(ysKeyMaps::GetWindowsKeyMap());
     }
@@ -255,7 +255,7 @@ ysWindowsInputSystem::CreateVirtualDevice(ysInputDevice::InputDeviceType type) {
     memset(&newDevice->m_info, 0, sizeof(newDevice->m_info));
 
     if (type == ysInputDevice::InputDeviceType::KEYBOARD) {
-        // Load Keymap
+        // load keymap
         ysKeyboard *keyboard = newDevice->GetAsKeyboard();
         keyboard->RegisterKeyMap(ysKeyMaps::GetWindowsKeyMap());
     }
@@ -266,7 +266,7 @@ ysWindowsInputSystem::CreateVirtualDevice(ysInputDevice::InputDeviceType type) {
 }
 
 ysWindowsInputDevice *ysWindowsInputSystem::AddDevice(RAWINPUT *rawInput) {
-    // Check whether a device exists already
+    // check whether a device exists already
 
     RID_DEVICE_INFO info;
     UINT size = sizeof(info);
@@ -336,7 +336,7 @@ int ysWindowsInputSystem::ProcessInputMessage(HRAWINPUT lparam) {
             else if (raw->data.keyboard.Flags & RI_KEY_E1)
                 newConf = ysKey::Variation::Right;
 
-            newState = ysKey::State::DownTransition;// Default
+            newState = ysKey::State::DownTransition;// default
             if (raw->data.keyboard.Flags & RI_KEY_BREAK)
                 newState = ysKey::State::UpTransition;
 

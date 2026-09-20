@@ -10,7 +10,7 @@
 
 class ysGeometryExportFile : public ysObject {
 public:
-    // Flags
+    // flags
     static const unsigned int MDF_NONE = 0x00;
     static const unsigned int MDF_BONES = 0x01;
     static const unsigned int MDF_NORMALS = 0x02;
@@ -82,4 +82,4 @@ protected:
     std::ofstream m_file;
 };
 
-#endif /* YDS_GEOMETRY_EXPORT_FILE_H */
+#endif /* YDS_GEOMETRY_EXPORT_FILE_H  */

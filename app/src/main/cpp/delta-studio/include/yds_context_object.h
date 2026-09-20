@@ -32,4 +32,4 @@ private:
     std::string m_debugName;
 };
 
-#endif /* YDS_CONTEXT_OBJECT_H */
+#endif /* YDS_CONTEXT_OBJECT_H  */

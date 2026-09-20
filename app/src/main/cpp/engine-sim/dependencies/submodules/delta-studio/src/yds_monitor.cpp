@@ -58,7 +58,7 @@ void ysMonitor::SetPhysicalSize(int w, int h) {
 }
 
 void ysMonitor::SetDeviceName(const wchar_t *deviceName) {
-    //RaiseError(m_deviceName != NULL, "Monitor device name is not initialized.");
+    // raiseerrorm_devicename != null monitor device name is not initialized
     wcscpy(m_deviceName, deviceName);
 }
 

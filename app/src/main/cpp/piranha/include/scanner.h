@@ -6,7 +6,7 @@
 #include "../lib/FlexLexer.h"
 #else
 #include <FlexLexer.h>
-#endif /* PIRANHA_DIST */
+#endif /* PIRANHA_DIST  */
 #endif
 
 #include <parser.auto.h>
@@ -56,4 +56,4 @@ namespace piranha {
 
 } /* namespace piranha */
 
-#endif /* PIRANHA_SCANNER_H */
+#endif /* PIRANHA_SCANNER_H  */

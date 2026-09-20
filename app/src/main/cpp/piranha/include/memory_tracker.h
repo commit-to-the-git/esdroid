@@ -53,7 +53,7 @@ namespace piranha {
 #define TRACK(address) (address)
 #define FTRACK(address) (address)
 
-#endif /* ENABLE_MEMORY_TRACKER */
+#endif /* ENABLE_MEMORY_TRACKER  */
 
     template <typename T>
     T *trackedAllocation(T *address, const char *_filename, int line) {
@@ -72,4 +72,4 @@ namespace piranha {
 
 } /* namespace piranha */
 
-#endif /* PIRANHA_MEMORY_TRACKER_H */
+#endif /* PIRANHA_MEMORY_TRACKER_H  */

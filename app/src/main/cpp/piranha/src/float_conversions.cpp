@@ -2,7 +2,7 @@
 
 #include <sstream>
 
-// CONVERSION =============================================
+// conversion =============================================
 // string -> float
 piranha::StringToFloatConversionOutput::StringToFloatConversionOutput() {
     /* void */
@@ -28,7 +28,7 @@ void piranha::StringToFloatConversionOutput::registerInputs() {
     registerInput(&m_input);
 }
 
-// CONVERSION =============================================
+// conversion =============================================
 // int -> float
 piranha::IntToFloatConversionOutput::IntToFloatConversionOutput() {
     /* void */

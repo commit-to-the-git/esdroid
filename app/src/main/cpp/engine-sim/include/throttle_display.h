@@ -24,4 +24,4 @@ class ThrottleDisplay : public UiElement {
         void renderSpeedControl(const Bounds &bounds);
 };
 
-#endif /* ATG_ENGINE_SIM_THROTTLE_DISPLAY_H */
+#endif /* ATG_ENGINE_SIM_THROTTLE_DISPLAY_H  */

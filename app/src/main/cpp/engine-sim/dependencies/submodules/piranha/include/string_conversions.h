@@ -39,4 +39,4 @@ namespace piranha {
 
 } /* namespace piranha */
 
-#endif /* PIRANHA_STRING_CONVERSIONS_H */
+#endif /* PIRANHA_STRING_CONVERSIONS_H  */

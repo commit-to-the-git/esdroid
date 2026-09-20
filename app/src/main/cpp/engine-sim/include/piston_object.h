@@ -23,4 +23,4 @@ class PistonObject : public SimulationObject {
             m_wristPinHole;
 };
 
-#endif /* ATG_ENGINE_SIM_PISTON_OBJECT_H */
+#endif /* ATG_ENGINE_SIM_PISTON_OBJECT_H  */

@@ -220,7 +220,7 @@ LRESULT WINAPI ysWindowsWindowSystem::WinProc(HWND hWnd, UINT msg,
         }
 
         if (inputSystem != nullptr) {
-            /* if (inputSystem->IsGlobalInputEnabled() || target->IsActive()) */
+            /* if inputsystem->isglobalinputenabled || target->isactive */
             {
                 switch (msg) {
                     case WM_SYSKEYDOWN:
@@ -306,9 +306,9 @@ void ysWindowsWindowSystem::SetCursorVisible(bool visible) {
 
     int displayCount = ShowCursor(visible ? TRUE : FALSE);
 
-    // ShowCursor() increments and returns a "display counter" which
+    // showcursor increments and returns a display counter which
     // must be greater than or equal to 0 in order for the cursor
-    // to be displayed. The code below ensures that the cursor will be
+    // to be displayed the code below ensures that the cursor will be
     // displayed or hidden by forcing the final value of the counter
     if (visible) {
         while (displayCount < 0) { displayCount = ShowCursor(TRUE); }
@@ -316,7 +316,7 @@ void ysWindowsWindowSystem::SetCursorVisible(bool visible) {
         while (displayCount >= 0) { displayCount = ShowCursor(FALSE); }
     }
 
-    // This step may not be necessary but doesn't hurt anything
+    // this step may not be necessary but doesnt hurt anything
     if (visible) { ::SetCursor(m_oldCursor); }
 }
 

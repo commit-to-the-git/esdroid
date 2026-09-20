@@ -38,10 +38,10 @@ namespace atg_scs {
                 Matrix right;
                 Matrix F_ext, F_C, R;
 
-                // Results
+                // results
                 Matrix lambda;
             } m_iv;
     };
 } /* namespace atg_scs */
 
-#endif /* ATG_SIMPLE_2D_CONSTRAINT_SOLVER_GENERIC_RIGID_BODY_SYSTEM_H */
+#endif /* ATG_SIMPLE_2D_CONSTRAINT_SOLVER_GENERIC_RIGID_BODY_SYSTEM_H  */

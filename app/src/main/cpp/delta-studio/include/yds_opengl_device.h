@@ -5,7 +5,7 @@
 #include "yds_opengl_context.h"
 #include "yds_window.h"
 
-// External libraries forward declarations
+// external libraries forward declarations
 struct SDL_Surface;
 
 class ysOpenGLDevice : public ysDevice {
@@ -13,12 +13,12 @@ public:
     ysOpenGLDevice();
     ~ysOpenGLDevice();
 
-    // Setup
+    // setup
     virtual ysError InitializeDevice();
     virtual ysError DestroyDevice();
     virtual bool CheckSupport();
 
-    // Rendering Contexts
+    // rendering contexts
     virtual ysError
     CreateRenderingContext(ysRenderingContext **renderingContext,
                            ysWindow *window);
@@ -48,11 +48,11 @@ public:
     virtual ysError ClearBuffers(const float *clearColor);
     virtual ysError Present();
 
-    // State
+    // state
     virtual ysError SetFaceCulling(bool faceCulling);
     virtual ysError SetFaceCullingMode(CullMode cullMode);
 
-    // GPU Buffers
+    // gpu buffers
     virtual ysError CreateVertexBuffer(ysGPUBuffer **newBuffer, int size,
                                        char *data, bool mirrorToRam = false);
     virtual ysError CreateIndexBuffer(ysGPUBuffer **newBuffer, int size,
@@ -68,7 +68,7 @@ public:
     virtual ysError EditBufferData(ysGPUBuffer *buffer, char *data);
     virtual ysError DestroyGPUBuffer(ysGPUBuffer *&buffer);
 
-    // Shaders
+    // shaders
     virtual ysError CreateVertexShader(ysShader **newShader,
                                        const wchar_t *shaderFilename,
                                        const wchar_t *compiledFilename,
@@ -81,7 +81,7 @@ public:
                                       bool compile) override;
     virtual ysError DestroyShader(ysShader *&shader) override;
 
-    // Shader Programs
+    // shader programs
     virtual ysError CreateShaderProgram(ysShaderProgram **newProgram);
     virtual ysError DestroyShaderProgram(ysShaderProgram *&shader,
                                          bool destroyShaders = false);
@@ -90,7 +90,7 @@ public:
     virtual ysError LinkProgram(ysShaderProgram *program);
     virtual ysError UseShaderProgram(ysShaderProgram *);
 
-    // Input Layouts
+    // input layouts
     virtual ysError
     CreateInputLayout(ysInputLayout **newLayout, ysShader *shader,
                       const ysRenderGeometryFormat *format,
@@ -98,7 +98,7 @@ public:
     virtual ysError UseInputLayout(ysInputLayout *layout);
     virtual ysError DestroyInputLayout(ysInputLayout *&layout);
 
-    // Textures
+    // textures
     virtual ysError CreateTexture(ysTexture **texture,
                                   const wchar_t *fname) override;
     virtual ysError CreateTexture(ysTexture **texture, int width, int height,
@@ -118,18 +118,18 @@ public:
     const ysOpenGLVirtualContext *UpdateContext();
 
 protected:
-    // Set the current rendering context
+    // set the current rendering context
     void SetRenderingContext(ysRenderingContext *context);
 
-    // Hidden Functions
+    // hidden functions
     void ResubmitInputLayout();
 
     ysOpenGLVirtualContext *GetTransferContext();
 
-    // Static functions
-    // --------------------------------------------------------------
+    // static functions
+    //
 
-    // Get a GL type from a geometry channel format
+    // get a gl type from a geometry channel format
     static int GetFormatGLType(ysRenderGeometryChannel::ChannelFormat format);
     static int GetFramebufferName(int slot);
 
@@ -139,7 +139,7 @@ protected:
     bool m_deviceCreated;
 
 protected:
-    // Hidden functionality
+    // hidden functionality
     ysError CreateOpenGLOffScreenRenderTarget(ysRenderTarget *target, int width,
                                               int height,
                                               ysRenderTarget::Format format,
@@ -147,4 +147,4 @@ protected:
     ysError DestroyOpenGLRenderTarget(ysRenderTarget *target);
 };
 
-#endif /* YDS_OPENGL_DEVICE_H */
+#endif /* YDS_OPENGL_DEVICE_H  */

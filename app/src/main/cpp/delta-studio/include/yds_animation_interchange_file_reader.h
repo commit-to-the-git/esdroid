@@ -21,4 +21,4 @@ public:
     virtual ysError ReadAction(std::fstream &f, ysAnimationAction *action) = 0;
 };
 
-#endif /* YDS_ANIMATION_INTERCHANGE_FILE_READER_H */
+#endif /* YDS_ANIMATION_INTERCHANGE_FILE_READER_H  */

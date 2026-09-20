@@ -31,7 +31,7 @@ namespace es_script {
 
         virtual void _evaluate() {           
             setOutput(this);
-            // Read inputs
+            // read inputs
             readAllInputs();
 
         }
@@ -41,4 +41,4 @@ namespace es_script {
 
 } /* namespace es_script */
 
-#endif /* ATG_ENGINE_SIM_VEHICLE_NODE_H */
+#endif /* ATG_ENGINE_SIM_VEHICLE_NODE_H  */

@@ -42,7 +42,7 @@ namespace piranha {
         }
     };
 
-    // Native types
+    // native types
     typedef double          native_float;
     typedef bool            native_bool;
     typedef std::string     native_string;
@@ -59,7 +59,7 @@ namespace piranha {
 
     template <typename T>
     bool dependantFalse() {
-        // This stops clang/gcc from seeing the static_assert is always false
+        // this stops clang/gcc from seeing the static_assert is always false
         return false;
     }
 
@@ -82,4 +82,4 @@ namespace piranha {
 
 } /* namespace piranha */
 
-#endif /* PIRANHA_FUNDAMENTAL_TYPES_H */
+#endif /* PIRANHA_FUNDAMENTAL_TYPES_H  */

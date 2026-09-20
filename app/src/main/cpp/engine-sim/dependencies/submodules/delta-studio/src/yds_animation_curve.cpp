@@ -29,7 +29,7 @@ float ysAnimationCurve::Sample(float s) {
     CurveHandle &handle2 = next->second;
 
     if (handle1.mode == CurveHandle::InterpolationMode::Linear) {
-        // Linear interpolation
+        // linear interpolation
         float dist = (handle2.s - handle1.s);
         float sdist = s - handle1.s;
 
@@ -39,7 +39,7 @@ float ysAnimationCurve::Sample(float s) {
         return handle1.v * w0 + handle2.v * w1;
     }
     else if (handle1.mode == CurveHandle::InterpolationMode::Bezier) {
-        // Cubic bezier interpolation
+        // cubic bezier interpolation
         float t = Bezier_t(s, 
             handle1.s, handle1.r_handle_x, handle2.l_handle_x, handle2.s);
 
@@ -112,16 +112,16 @@ void ysAnimationCurve::Attach(ysAnimationTarget *target) {
         target->SetRotationCurve(this, 3);
         break;
     case CurveType::LocationVec:
-        /* Not implemented */
+        /* not implemented */
         break;
     case CurveType::RotationQuat:
-        /* Not implemented */
+        /* not implemented */
         break;
     }
 }
 
 float ysAnimationCurve::Bezier_t(float x, float p0_x, float p1_x, float p2_x, float p3_x) {
-    // B(t) = (1 - t)^3 * P0 + 3t(1 - t)^2 * P1 + 3t^2(1 - t) * P2 + t^3 * P3
+    // bt = 1 - t^3 * p0 + 3t1 - t^2 * p1 + 3t^21 - t * p2 + t^3 * p3
 
     constexpr float Epsilon = 0.001f;
     constexpr int MaxIterations = 20;

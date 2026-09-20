@@ -45,14 +45,14 @@ namespace es_script {
         virtual void _evaluate() {
             setOutput(this);
 
-            // Read inputs
+            // read inputs
             readAllInputs();
         }
 
-        double m_throttleGammaUnused = 0.0; // Deprecated; to be removed in a future release
+        double m_throttleGammaUnused = 0.0; // deprecated to be removed in a future release
         Intake::Parameters m_parameters;
     };
 
 } /* namespace es_script */
 
-#endif /* ATG_ENGINE_SIM_INTAKE_NODE_H */
+#endif /* ATG_ENGINE_SIM_INTAKE_NODE_H  */

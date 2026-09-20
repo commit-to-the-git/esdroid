@@ -1,4 +1,4 @@
-// OpenGL.h - Android GLES3 replacement for delta-studio's Windows OpenGL.h
+// opengl.h - android gles3 replacement for delta-studios windows opengl.h
 #ifndef OPENGL_H
 #define OPENGL_H
 #include <GLES3/gl3.h>
@@ -58,4 +58,4 @@ typedef int (*PFNWGLCHOOSEPIXELFORMATARBPROC)(void*,const int*,const float*,unsi
 #ifndef GL_DEPTH_COMPONENT32
 #define GL_DEPTH_COMPONENT32 0x81A7
 #endif
-#endif // OPENGL_H
+#endif //  OPENGL_H

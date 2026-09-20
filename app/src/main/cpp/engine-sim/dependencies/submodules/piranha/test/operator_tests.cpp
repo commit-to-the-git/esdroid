@@ -118,7 +118,7 @@ TEST(IrOperatorTests, IrOperatorTest2) {
 
     EXPECT_EQ(channelType, &FundamentalType::FloatType);
 
-    // Test with the alternate context
+    // test with the alternate context
     query.inputContext = parentContext->newChild(node);
     query.recordErrors = false;
     channelType = list
@@ -168,7 +168,7 @@ TEST(IrOperatorTests, IrOperatorTest3) {
     IrContextTree *parent = new IrContextTree(nullptr);
     IrParserStructure::IrReferenceQuery query;
 
-    // Default context first
+    // default context first
     query.inputContext = parent;
     query.recordErrors = false;
     channelType = list

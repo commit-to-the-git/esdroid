@@ -53,4 +53,4 @@ protected:
     bool m_connected;
 };
 
-#endif /* YDS_MONITOR_H */
+#endif /* YDS_MONITOR_H  */

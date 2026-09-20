@@ -45,4 +45,4 @@ namespace piranha {
 
 } /* namespace piranha */
 
-#endif /* PIRANHA_NODE_GRAPH_H */
+#endif /* PIRANHA_NODE_GRAPH_H  */

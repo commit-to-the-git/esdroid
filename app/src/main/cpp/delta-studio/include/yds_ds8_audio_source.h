@@ -49,4 +49,4 @@ private:
     IDirectSoundBuffer8 *m_buffer;
 };
 
-#endif /* YDS_DIRECT_SOUND8_AUDIO_SOURCE_H */
+#endif /* YDS_DIRECT_SOUND8_AUDIO_SOURCE_H  */

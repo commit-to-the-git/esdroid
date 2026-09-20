@@ -100,7 +100,7 @@ void ThrottleDisplay::renderThrottle(const Bounds &bounds) {
     circleParams.center_y = params.y0;
     gen->generateCircle2d(circleParams);
 
-    // Draw throttle plate
+    // draw throttle plate
     const float throttleAngle = (m_engine == nullptr)
         ? 0.0f
         : static_cast<float>(m_engine->getThrottlePlateAngle());

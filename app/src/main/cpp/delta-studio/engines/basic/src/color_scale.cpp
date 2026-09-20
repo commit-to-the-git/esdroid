@@ -29,6 +29,6 @@ ysVector4 dbasic::ColorScale3(float x, const ysVector &col1, const ysVector &col
         return ysMath::GetVector4(lerp);
     }
 
-    // Shouldn't get here
+    // shouldnt get here
     return ysMath::GetVector4(ysMath::Constants::Zero);
 }

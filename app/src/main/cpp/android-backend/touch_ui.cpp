@@ -18,6 +18,7 @@
 #include <cmath>
 #include <cstring>
 #include <cstdlib>
+#include <ctime>
 #include <android/log.h>
 #include <stb/stb_truetype.h>
 #include <stb/stb_image.h>
@@ -32,9 +33,9 @@ static int s_fontLoaded = 0;
 static const int FONT_TEX_SIZE = 512;
 static const float FONT_SIZE = 20.0f;
 static const float FONT_SIZE_BIG = 28.0f;
-static float s_settingsLabelW = 0.0f; // real "SETTINGS" advance, set at font load
+static float s_settingsLabelW = 0.0f; // real settings advance set at font load
 
-// Text rendering for button labels, using the engine's Silkscreen font.
+// text rendering for button labels using the engines silkscreen font
 static GLuint s_textProgram = 0;
 static GLuint s_textVao = 0, s_textVbo = 0;
 static GLint s_textLocScreen = -1, s_textLocColor = -1, s_textLocPos = -1, s_textLocUV = -1;
@@ -66,7 +67,7 @@ static void loadTouchFont() {
         return;
     }
 
-    // Measure the real advance so the SETTINGS button is sized to its text.
+    // measure the real advance so the settings button is sized to its text
     for (const char* p = "SETTINGS"; *p; ++p) {
         if (*p < 32 || *p >= 128) continue;
         s_settingsLabelW += s_fontChars[*p - 32].xadvance;
@@ -139,8 +140,7 @@ static void loadTouchFont() {
                         s_fontTexture, s_textProgram);
 }
 
-// The app icon is drawn over the info cluster's logo box; the engine
-// publishes that rect every frame via esdroid_set_logo_rect().
+// the app icon is drawn over the info clusters logo box
 static GLuint s_iconTexture = 0;
 static GLuint s_iconProgram = 0;
 static GLuint s_iconVao = 0, s_iconVbo = 0;
@@ -153,8 +153,7 @@ extern "C" void esdroid_set_logo_rect(float x, float y, float w, float h) {
     s_logoRectValid = true;
 }
 
-// The info cluster publishes its title box every rendered frame; the
-// SETTINGS button is derived from it so it can never escape the box.
+// the settings button derives from the published title box
 extern "C" void esdroid_set_title_rect(float x, float y, float w, float h) {
     const float margin = 8.0f;
     float bh = h * 0.24f;
@@ -162,7 +161,7 @@ extern "C" void esdroid_set_title_rect(float x, float y, float w, float h) {
     if (bh < 16.0f) bh = 16.0f;
     const float labelW = (s_settingsLabelW > 0.0f) ? s_settingsLabelW
         : 8.0f * FONT_SIZE * 0.6f;
-    const float bw = labelW + 26.0f; // "SETTINGS" + padding
+    const float bw = labelW + 26.0f; // settings + padding
     if (w - 2.0f * margin < bw || h - 2.0f * margin < bh) {
         esdroid::AndroidBackend::instance().setSettingsButtonRect(0, 0, 0, 0);
         return;
@@ -171,15 +170,15 @@ extern "C" void esdroid_set_title_rect(float x, float y, float w, float h) {
         x + w - margin - bw, y + h - margin - bh, bw, bh);
 }
 
-// Called at the top of every renderScene(): a rect that stops being
-// published (info cluster hidden on another screen) stops being tappable.
+// called at the top of every renderscene an unpublished rect stops
+// being tappable
 extern "C" void esdroid_invalidate_ui_rects() {
     esdroid::AndroidBackend::instance().invalidateUiRects();
 }
 
-// ------------------------------------------------------------------
-// Frosted backdrop: capture the finished engine frame, downsample it,
-// run a separable gaussian over it and stretch it back over the screen.
+//
+// frosted backdrop downsample the frame gaussian blur it stretch
+// it back over the screen
 
 static GLuint s_blurTexA = 0, s_blurTexB = 0;
 static GLuint s_blurFboA = 0, s_blurFboB = 0;
@@ -279,8 +278,8 @@ static void ensureBlurResources(int sw, int sh) {
     }
 }
 
-// Draws a rect (0,0)-(w,h) of the currently bound draw framebuffer using
-// the given texture and texel step (zero step = plain copy).
+// draws a fullscreen rect of the bound framebuffer zero step is a
+// plain copy
 static void drawBlurQuad(float w, float h, GLuint tex, float stepX, float stepY) {
     const float verts[4 * 6] = {
         0, 0, 0, 0,
@@ -426,7 +425,7 @@ static void drawTouchText(const char* text, float x, float y, float screenW, flo
     const float fontSize = big ? FONT_SIZE_BIG : FONT_SIZE;
     if (!s_fontBitmap || tex == 0 || s_textProgram == 0) return;
 
-    float verts[4 * 6 * 64]; // pos.xy, uv.xy per vertex, 6 verts per quad, max 64 chars
+    float verts[4 * 6 * 64]; // pos.xy uv.xy per vertex 6 verts per quad max 64 chars
     int nVerts = 0;
     float penX = x, penY = y + fontSize; // stbtt pen y is the baseline
     int len = strlen(text);
@@ -463,12 +462,247 @@ static void drawTouchText(const char* text, float x, float y, float screenW, flo
     glUseProgram(0);
 }
 
+// loading screen drawn straight into the gl surface so it shows even
+// while the engine compiles
+static GLuint s_loadProgram = 0;
+static GLuint s_loadVao = 0, s_loadVbo = 0;
+static GLint s_loadLocScreen = -1, s_loadLocColor = -1;
+static GLuint s_loadWhiteTex = 0;
+static double s_loadLastFrame = -1.0;
+
+static double loadClockSeconds() {
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    return (double)ts.tv_sec + (double)ts.tv_nsec * 1e-9;
+}
+
+static void ensureLoadingResources() {
+    if (s_loadProgram != 0) return;
+
+    static const char* lvs = R"ES3(#version 300 es
+        uniform vec2 uScreen;
+        in vec2 aPos; in vec2 aUV; out vec2 vUV;
+        void main(){
+            gl_Position=vec4((aPos.x/uScreen.x)*2.0-1.0, 1.0-(aPos.y/uScreen.y)*2.0, 0.0, 1.0);
+            vUV=aUV;
+        })ES3";
+    static const char* lfs = R"ES3(#version 300 es
+        precision mediump float;
+        uniform sampler2D uTex; uniform vec4 uColor;
+        in vec2 vUV; out vec4 fragColor;
+        void main(){ fragColor=texture(uTex, vUV)*uColor; })ES3";
+
+    auto compile = [](GLenum t, const char* src) -> GLuint {
+        GLuint s = glCreateShader(t);
+        glShaderSource(s, 1, &src, nullptr);
+        glCompileShader(s);
+        GLint ok = 0;
+        glGetShaderiv(s, GL_COMPILE_STATUS, &ok);
+        if (!ok) { glDeleteShader(s); return 0; }
+        return s;
+    };
+    GLuint vs = compile(GL_VERTEX_SHADER, lvs);
+    GLuint fs = compile(GL_FRAGMENT_SHADER, lfs);
+    if (vs == 0 || fs == 0) {
+        if (vs) glDeleteShader(vs);
+        if (fs) glDeleteShader(fs);
+        return;
+    }
+    s_loadProgram = glCreateProgram();
+    glAttachShader(s_loadProgram, vs);
+    glAttachShader(s_loadProgram, fs);
+    glLinkProgram(s_loadProgram);
+    glDeleteShader(vs);
+    glDeleteShader(fs);
+    s_loadLocScreen = glGetUniformLocation(s_loadProgram, "uScreen");
+    s_loadLocColor = glGetUniformLocation(s_loadProgram, "uColor");
+    GLint locPos = glGetAttribLocation(s_loadProgram, "aPos");
+    GLint locUV = glGetAttribLocation(s_loadProgram, "aUV");
+
+    glGenVertexArrays(1, &s_loadVao);
+    glGenBuffers(1, &s_loadVbo);
+    glBindVertexArray(s_loadVao);
+    glBindBuffer(GL_ARRAY_BUFFER, s_loadVbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 4 * 6, nullptr, GL_DYNAMIC_DRAW);
+    if (locPos >= 0) {
+        glEnableVertexAttribArray(locPos);
+        glVertexAttribPointer(locPos, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+    }
+    if (locUV >= 0) {
+        glEnableVertexAttribArray(locUV);
+        glVertexAttribPointer(locUV, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+    }
+    glBindVertexArray(0);
+
+    // one white pixel so the same shader draws the black backdrop
+    unsigned char white[4] = { 255, 255, 255, 255 };
+    glGenTextures(1, &s_loadWhiteTex);
+    glBindTexture(GL_TEXTURE_2D, s_loadWhiteTex);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, white);
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+static void drawLoadingQuadVerts(const float* pos12, GLuint tex,
+        const float* color, float screenW, float screenH) {
+    const float uv[12] = {
+        0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+        0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f,
+    };
+    float verts[4 * 6];
+    for (int i = 0; i < 6; ++i) {
+        verts[i * 4 + 0] = pos12[i * 2 + 0];
+        verts[i * 4 + 1] = pos12[i * 2 + 1];
+        verts[i * 4 + 2] = uv[i * 2 + 0];
+        verts[i * 4 + 3] = uv[i * 2 + 1];
+    }
+
+    glUseProgram(s_loadProgram);
+    glBindVertexArray(s_loadVao);
+    glBindBuffer(GL_ARRAY_BUFFER, s_loadVbo);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(verts), verts);
+    glUniform2f(s_loadLocScreen, screenW, screenH);
+    glUniform4fv(s_loadLocColor, 1, color);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, tex);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glBindVertexArray(0);
+    glUseProgram(0);
+}
+
+static void drawLoadingQuadRect(float x0, float y0, float x1, float y1,
+        GLuint tex, const float* color, float screenW, float screenH) {
+    const float pos[12] = {
+        x0, y0, x1, y0, x0, y1,
+        x0, y1, x1, y0, x1, y1,
+    };
+    drawLoadingQuadVerts(pos, tex, color, screenW, screenH);
+}
+
+// draws the spinning icon and the loading text
+// alpha under one blends it over the engine frame
+static void loadingDrawContents(float alpha, bool clearScreen) {
+    if (!esdroid::AndroidBackend::instance().isWindowReady()) return;
+
+    loadTouchFont();
+    loadTouchIcon();
+    ensureLoadingResources();
+
+    const int sw = esdroid::AndroidBackend::instance().screenWidth();
+    const int sh = esdroid::AndroidBackend::instance().screenHeight();
+    if (sw <= 0 || sh <= 0) return;
+
+    GLint prevProgram = 0;
+    glGetIntegerv(GL_CURRENT_PROGRAM, &prevProgram);
+    GLint prevFbo = 0;
+    glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &prevFbo);
+    const GLboolean prevDepth = glIsEnabled(GL_DEPTH_TEST);
+    const GLboolean prevBlend = glIsEnabled(GL_BLEND);
+    const GLboolean prevCull = glIsEnabled(GL_CULL_FACE);
+    const GLboolean prevScissor = glIsEnabled(GL_SCISSOR_TEST);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glViewport(0, 0, sw, sh);
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_CULL_FACE);
+    glDisable(GL_SCISSOR_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    if (clearScreen) {
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+    }
+    else if (s_loadProgram != 0) {
+        // fading over the engine frame so the fade needs a black sheet
+        const float black[4] = { 0.0f, 0.0f, 0.0f, alpha };
+        drawLoadingQuadRect(0.0f, 0.0f, (float)sw, (float)sh,
+            s_loadWhiteTex, black, (float)sw, (float)sh);
+    }
+
+    const float fw = (float)sw, fh = (float)sh;
+    const float iconSize = (fw < fh ? fw : fh) * 0.30f;
+    const float gap = (fw < fh ? fw : fh) * 0.035f;
+    const float textH = FONT_SIZE_BIG * 1.25f;
+
+    float textW = 0.0f;
+    for (const char* p = "LOADING..."; *p; ++p) {
+        if (*p < 32 || *p >= 128) continue;
+        textW += s_fontCharsBig[*p - 32].xadvance;
+    }
+
+    const float blockH = iconSize + gap + textH;
+    const float iconCy = fh * 0.5f - blockH * 0.5f + iconSize * 0.5f;
+    const float cx = fw * 0.5f;
+
+    if (s_iconTexture != 0 && s_loadProgram != 0) {
+        // one turn every 900 ms
+        const double now = loadClockSeconds();
+        const float angle = (float)fmod(now / 0.9, 1.0) * 6.2831853f;
+        const float cs = cosf(angle), sn = sinf(angle);
+        const float r = iconSize * 0.5f;
+        // rotate the corner offsets around the icon center
+        const float dx[4] = { -r, r, -r, r };
+        const float dy[4] = { -r, -r, r, r };
+        float corner[4][2];
+        for (int i = 0; i < 4; ++i) {
+            corner[i][0] = cx + dx[i] * cs - dy[i] * sn;
+            corner[i][1] = iconCy + dx[i] * sn + dy[i] * cs;
+        }
+        const float pos[12] = {
+            corner[0][0], corner[0][1],
+            corner[1][0], corner[1][1],
+            corner[2][0], corner[2][1],
+            corner[2][0], corner[2][1],
+            corner[1][0], corner[1][1],
+            corner[3][0], corner[3][1],
+        };
+        const float tint[4] = { 1.0f, 1.0f, 1.0f, alpha };
+        drawLoadingQuadVerts(pos, s_iconTexture, tint, fw, fh);
+    }
+
+    if (s_fontBitmapBig != nullptr) {
+        const float white[4] = { 1.0f, 1.0f, 1.0f, alpha };
+        drawTouchText("LOADING...", cx - textW * 0.5f,
+            fh * 0.5f - blockH * 0.5f + iconSize + gap, fw, fh, white, true);
+    }
+
+    glDisable(GL_BLEND);
+    if (prevScissor) glEnable(GL_SCISSOR_TEST);
+    if (prevCull) glEnable(GL_CULL_FACE);
+    if (prevDepth) glEnable(GL_DEPTH_TEST);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, prevFbo);
+    glUseProgram(prevProgram);
+}
+
+// one full loading frame with its own buffer swap
+extern "C" void esdroid_render_loading_frame() {
+    if (!esdroid::AndroidBackend::instance().isWindowReady()) return;
+
+    // cap at 60 fps the compile poll loop spins much faster
+    const double now = loadClockSeconds();
+    if (s_loadLastFrame >= 0.0 && now - s_loadLastFrame < 0.016) return;
+    s_loadLastFrame = now;
+
+    loadingDrawContents(1.0f, true);
+    esdroid::AndroidBackend::instance().swapBuffers();
+}
+
+// transparent pass over the engine frame for the fade out
+extern "C" void esdroid_draw_loading_overlay(float alpha) {
+    if (alpha <= 0.0f) return;
+    loadingDrawContents(alpha, false);
+}
+
 namespace esdroid {
 TouchUI::TouchUI() {}
 TouchUI::~TouchUI() {}
 
-// Ink box of a baked string: x from pen start, y relative to the baseline.
-// Silkscreen is not monospace, so strlen * 0.6 * size is only a guess.
+// ink box of a baked string silkscreen is not monospace so this is
+// a guess
 static void bakedTextInk(const char* text, const stbtt_bakedchar* chars,
                           float* advance, float* top, float* bottom) {
     float adv = 0.0f, t = 0.0f, b = 0.0f;
@@ -552,8 +786,8 @@ void TouchUI::drawRect(float x, float y, float w, float h, const float* color) {
     glBindVertexArray(0); glUseProgram(0);
 }
 
-// The SETTINGS button on the info cluster's title box: white on black,
-// the two colors the engine UI itself uses.
+// the settings button on the info clusters title box white on black
+// the two colors the engine ui itself uses
 void TouchUI::drawSettingsButton() {
     auto& backend=AndroidBackend::instance();
     if(!backend.settingsButtonValid()) return;
@@ -564,7 +798,7 @@ void TouchUI::drawSettingsButton() {
     const char* label="SETTINGS";
     float adv,inkTop,inkBot;
     bakedTextInk(label,s_fontChars,&adv,&inkTop,&inkBot);
-    // Center the actual ink box, not a guessed em box.
+    // center the actual ink box not a guessed em box
     const float baseline=r[1]+(r[3]-(inkBot-inkTop))*0.5f-inkTop;
     drawTouchText(label,r[0]+(r[2]-adv)*0.5f,baseline-FONT_SIZE,
         (float)m_screenW,(float)m_screenH,black,false);
@@ -579,8 +813,7 @@ void TouchUI::drawBlurredBackdrop() {
         return;
     }
     glDisable(GL_BLEND);
-    // Capture the finished engine frame. The reversed destination rect
-    // flips it so texture v=0 is the top of the screen, like the UI quads.
+    // capture the frame the reversed rect flips v so v=0 is the top
     glBindFramebuffer(GL_READ_FRAMEBUFFER,0);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER,s_blurFboA);
     glBlitFramebuffer(0,0,m_screenW,m_screenH, 0,s_blurH,s_blurW,0,
@@ -616,7 +849,7 @@ void TouchUI::drawSettingsPanel() {
     };
     border(L.panel,3.0f,black);
 
-    // Header: big title + close button, in the panel's own font colors.
+    // header big title + close button in the panels own font colors
     drawTouchText("SETTINGS",L.panel[0]+22.0f,L.close[1]+(L.close[3]-FONT_SIZE_BIG)*0.5f-2.0f,
         sw,sh,black,true);
     drawRect(L.close[0],L.close[1],L.close[2],L.close[3],white);
@@ -636,7 +869,7 @@ void TouchUI::drawSettingsPanel() {
         drawTouchText(backend.settingLabel(i),L.panel[0]+18.0f,cy-FONT_SIZE*0.5f-1.0f,
             sw,sh,black,false);
 
-        // Slider: black outline, black fill bar, black knob.
+        // slider black outline black fill bar black knob
         border(t,2.0f,black);
         const float tt=backend.settingSliderT(i);
         drawRect(t[0]+2.0f,t[1]+2.0f,(t[2]-4.0f)*tt,t[3]-4.0f,black);
@@ -646,7 +879,7 @@ void TouchUI::drawSettingsPanel() {
         if(kx>t[0]+t[2]-kw) kx=t[0]+t[2]-kw;
         drawRect(kx,cy-kh*0.5f,kw,kh,black);
 
-        // Value box: tappable, opens the system keyboard for typing.
+        // value box tappable opens the system keyboard for typing
         drawRect(v[0],v[1],v[2],v[3],white);
         border(v,2.0f,black);
         char buf[32];
@@ -657,9 +890,9 @@ void TouchUI::drawSettingsPanel() {
     }
 }
 
-// One dropdown: the selector box always, the scrollable entry list below it
-// when open. Entries clip to the list rect through the scissor test, and the
-// selected entry renders inverted.
+// one dropdown the selector box always the scrollable entry list below it
+// when open entries clip to the list rect through the scissor test and the
+// selected entry renders inverted
 void TouchUI::drawDropdown(const float* box,const MrAsset* entries,int count,
         int sel,bool open,float scroll,float listTop,float listH,float rowH) {
     const float sw=(float)m_screenW, sh=(float)m_screenH;
@@ -682,7 +915,7 @@ void TouchUI::drawDropdown(const float* box,const MrAsset* entries,int count,
     const char* label=(sel>=0&&sel<count)?entries[sel].name:"";
     drawRect(box[0],box[1],box[2],box[3],white);
     border(box,2.0f,black);
-    // The label clips to the box so long engine names cannot bleed out.
+    // the label clips to the box so long engine names cannot bleed out
     const float arrowW=26.0f;
     {
         const float textRect[4]={box[0]+4.0f,box[1],box[2]-arrowW-8.0f,box[3]};
@@ -693,7 +926,7 @@ void TouchUI::drawDropdown(const float* box,const MrAsset* entries,int count,
         float adv,inkTop,inkBot;
         bakedTextInk(label,s_fontChars,&adv,&inkTop,&inkBot);
         const float baseline=box[1]+(box[3]-(inkBot-inkTop))*0.5f-inkTop;
-        // Left aligned, unlike the buttons: the widest names would not fit.
+        // left aligned unlike the buttons the widest names would not fit
         drawTouchText(label,box[0]+8.0f,baseline-FONT_SIZE,sw,sh,black,false);
         glDisable(GL_SCISSOR_TEST);
     }
@@ -736,8 +969,8 @@ void TouchUI::drawDropdown(const float* box,const MrAsset* entries,int count,
     glDisable(GL_SCISSOR_TEST);
 }
 
-// The IMPORT overlay: themes on the left half, engines on the right, each
-// with a dropdown, a LOAD button and a custom file IMPORT button.
+// the import overlay themes on the left half engines on the right each
+// with a dropdown a load button and a custom file import button
 void TouchUI::drawImportPanel() {
     auto& backend=AndroidBackend::instance();
     const ImportLayout& L=backend.importLayout();
@@ -772,12 +1005,12 @@ void TouchUI::drawImportPanel() {
     const MrAsset* themes=backend.importThemes(&themeCount);
     const MrAsset* engines=backend.importEngines(&engineCount);
 
-    // Column titles sit above the selector boxes.
+    // column titles sit above the selector boxes
     drawTouchText("THEME",L.themeBox[0],L.themeBox[1]-30.0f,sw,sh,black,false);
     drawTouchText("ENGINE",L.engineBox[0],L.engineBox[1]-30.0f,sw,sh,black,false);
 
-    // Selector boxes first, the buttons, then an open list back on top so
-    // it covers the buttons it overlaps.
+    // selector boxes first the buttons then an open list back on top so
+    // it covers the buttons it overlaps
     drawDropdown(L.themeBox,themes,themeCount,menu.themeSel,
         false,menu.themeScroll,L.listTop,L.listH,L.rowH);
     drawDropdown(L.engineBox,engines,engineCount,menu.engineSel,
@@ -795,7 +1028,7 @@ void TouchUI::drawImportPanel() {
     button(L.engineLoad,"LOAD ENGINE");
     button(L.engineImport,"IMPORT CUSTOM ENGINE");
 
-    // An open list draws again on top of the buttons it overlaps.
+    // an open list draws again on top of the buttons it overlaps
     if(menu.themeListOpen)
         drawDropdown(L.themeBox,themes,themeCount,menu.themeSel,
             true,menu.themeScroll,L.listTop,L.listH,L.rowH);
@@ -822,8 +1055,8 @@ void TouchUI::render() {
     drawTouchIcon((float)m_screenW, (float)m_screenH);
 
     if (AndroidBackend::instance().settingsOpen()) {
-        // Buttons vanish behind the frosted panel; the engine keeps
-        // simulating under the blur.
+        // buttons vanish behind the frosted panel the engine keeps
+        // simulating under the blur
         drawSettingsPanel();
     }
     else if (AndroidBackend::instance().importMenuOpen()) {

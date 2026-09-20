@@ -15,25 +15,25 @@ ysObject::~ysObject() {
     /* void */
 }
 
-//#ifdef _DEBUG
-//void ysObject::RaiseError(bool condition, const char *format, ...)
-//{
+// #ifdef _debug
+// void ysobject::raiseerrorbool condition const char *format
+// {
 //
-//    if (!condition)
-//    {
+// if condition
+// {
 //
-//        va_list argptr;
-//        va_start(argptr, format);
+// va_list argptr
+// va_startargptr format
 //
-//        char intermediateBuffer[1024];
-//        vsprintf_s(intermediateBuffer, 1024, format, argptr);
+// char intermediatebuffer1024
+// vsprintf_sintermediatebuffer 1024 format argptr
 //
-//        char errorBuffer[2048];
-//        sprintf_s(errorBuffer, 2048, "Type: %s\nName: %s\n--------------------\n%s", m_typeID, m_debugName, intermediateBuffer);
+// char errorbuffer2048
+// sprintf_serrorbuffer 2048 type %s\nname %s\n--------------------\n%s m_typeid m_debugname intermediatebuffer
 //
-//        //yds_assert(condition, errorBuffer);
+// //yds_assertcondition errorbuffer
 //
-//    }
+// }
 //
-//}
-//#endif
+// }
+// #endif

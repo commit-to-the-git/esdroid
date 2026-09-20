@@ -17,4 +17,4 @@ protected:
     ID3D11Buffer *m_buffer;
 };
 
-#endif /* YDS_D3D11_GPU_BUFFER_H */
+#endif /* YDS_D3D11_GPU_BUFFER_H  */

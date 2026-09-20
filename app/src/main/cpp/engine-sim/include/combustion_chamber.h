@@ -120,4 +120,4 @@ class CombustionChamber : public atg_scs::ForceGenerator {
         Fuel *m_fuel;
 };
 
-#endif /* ATG_ENGINE_SIM_COMBUSTION_CHAMBER_H */
+#endif /* ATG_ENGINE_SIM_COMBUSTION_CHAMBER_H  */

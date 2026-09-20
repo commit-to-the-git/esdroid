@@ -21,4 +21,4 @@ namespace atg_scs {
     };
 } /* namespace atg_scs */
 
-#endif /* ATG_SIMPLE_2D_CONSTRAINT_ROTATION_FRICTION_CONSTRAINT_H */
+#endif /* ATG_SIMPLE_2D_CONSTRAINT_ROTATION_FRICTION_CONSTRAINT_H  */

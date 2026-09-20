@@ -77,7 +77,7 @@ public:
 
     int GetActiveSegments() const;
 
-    // Testing probes
+    // testing probes
     float ProbeTotalAmplitude() const;
 
     bool HasQueuedSegments() const { return m_actionQueued; }
@@ -118,4 +118,4 @@ protected:
     std::vector<ysAnimationChannel *> m_channels;
 };
 
-#endif /* YDS_ANIMATION_MIXER_H */
+#endif /* YDS_ANIMATION_MIXER_H  */

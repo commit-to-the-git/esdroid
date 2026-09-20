@@ -94,7 +94,7 @@ namespace dphysics {
         bool IsGhost() const;
         bool IsResolvable() const;
 
-        // Get velocity on impact
+        // get velocity on impact
         ysVector GetContactVelocity() const { return m_initialContactVelocity; }
         ysVector GetContactVelocityWorld() const;
 
@@ -118,4 +118,4 @@ namespace dphysics {
 
 } /* namespace dbasic */
 
-#endif /* DELTA_BASIC_COLLISION_PRIMITIVES_H */
+#endif /* DELTA_BASIC_COLLISION_PRIMITIVES_H  */

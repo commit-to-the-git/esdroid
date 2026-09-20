@@ -123,13 +123,13 @@ ysError ysInputSystem::CheckDeviceStatus(ysInputDevice *device) {
 }
 
 ysError ysInputSystem::CheckAllDevices() {
-    // This implementation is slow for most platforms
+    // this implementation is slow for most platforms
     // since the list of devices must be polled for each
-    // game engine device.
+    // game engine device
 
     const int deviceCount = GetDeviceCount();
 
-    // Reverse loop in the case some devices are deleted
+    // reverse loop in the case some devices are deleted
     for (int i = deviceCount - 1; i >= 0; i--) {
         CheckDeviceStatus(m_inputDeviceArray.Get(i));
     }
@@ -157,11 +157,11 @@ void ysInputSystem::UnregisterDevice(ysInputDevice *device) {
 
 void ysInputSystem::DisconnectDevice(ysInputDevice *device) {
     if (device->GetDependencyCount() <= 0) {
-        // Delete device as no one is using it
+        // delete device as no one is using it
         m_inputDeviceArray.Delete(device->GetIndex());
     }
     else {
-        // Can't delete device as it is in use
+        // cant delete device as it is in use
         device->SetConnected(false);
     }
 }
@@ -178,6 +178,6 @@ ysInputDevice *ysInputSystem::FindGenericSlot(ysInputDevice::InputDeviceType typ
         }
     }
 
-    // No generic slot
+    // no generic slot
     return 0;
 }

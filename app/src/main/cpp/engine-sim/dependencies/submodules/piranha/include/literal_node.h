@@ -24,4 +24,4 @@ namespace piranha {
 
 } /* namespace piranha */
 
-#endif /* PIRANHA_LITERAL_NODE_H */
+#endif /* PIRANHA_LITERAL_NODE_H  */

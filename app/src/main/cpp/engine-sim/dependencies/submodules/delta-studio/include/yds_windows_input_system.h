@@ -37,11 +37,11 @@ protected:
     ysWindowsInputDevice *DeviceLookup(HANDLE hDevice);
     ysWindowsInputDevice *SystemNameDeviceLookup(wchar_t *systemName);
 
-    // Translate a windows device type to INPUT_DEVICE_TYPE
+    // translate a windows device type to input_device_type
     static ysInputDevice::InputDeviceType TranslateType(int type);
 
 private:
     std::vector<BYTE> m_rawInputBuffer;
 };
 
-#endif /* YDS_WINDOWS_INPUT_SYSTEM_H */
+#endif /* YDS_WINDOWS_INPUT_SYSTEM_H  */

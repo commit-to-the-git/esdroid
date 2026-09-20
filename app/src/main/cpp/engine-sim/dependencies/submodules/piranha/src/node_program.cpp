@@ -94,7 +94,7 @@ void piranha::NodeProgram::initialize() {
 
     const int nodeCount = m_topLevelContainer.getNodeCount();
 
-    // Initialize all nodes
+    // initialize all nodes
     for (int i = 0; i < nodeCount; i++) {
         Node *node = m_topLevelContainer.getNode(i);
         node->initialize();
@@ -126,12 +126,12 @@ void piranha::NodeProgram::optimize() {
 bool piranha::NodeProgram::execute() {
     const int nodeCount = m_topLevelContainer.getNodeCount();
 
-    // For backward compatibility
+    // for backward compatibility
     initialize();
 
     if (isKilled()) return true;
     
-    // Execute all nodes
+    // execute all nodes
     for (int i = 0; i < nodeCount; i++) {
         Node *node = m_topLevelContainer.getNode(i);
         const bool result = node->evaluate();

@@ -70,4 +70,4 @@ class Gauge : public UiElement {
         std::vector<Band> m_bands;
 };
 
-#endif /* ATG_ENGINE_SIM_GAUGE_H */
+#endif /* ATG_ENGINE_SIM_GAUGE_H  */

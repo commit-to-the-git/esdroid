@@ -41,4 +41,4 @@ namespace piranha {
 
 } /* namespace piranha */
 
-#endif /* PIRANHA_IR_VALUE_H */
+#endif /* PIRANHA_IR_VALUE_H  */

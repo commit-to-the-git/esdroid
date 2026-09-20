@@ -37,8 +37,8 @@ namespace dbasic {
             int m_frame;
             unsigned int m_keyType;
 
-            ysVector4 m_rotationKey;    // Used only if this is a rotation key
-            ysVector3 m_positionKey;    // Used only if this is a location key
+            ysVector4 m_rotationKey;    // used only if this is a rotation key
+            ysVector3 m_positionKey;    // used only if this is a location key
         };
 
     public:
@@ -91,7 +91,7 @@ namespace dbasic {
 
         void Clear();
 
-        // Construction Utilities
+        // construction utilities
 
         ObjectKeyframeDataExport *AddObjectKeyData(char *object);
 
@@ -127,4 +127,4 @@ namespace dbasic {
 
 } /* namespace dbasic */
 
-#endif /* DELTA_BASIC_ANIMATION_EXPORT_DATA_H */
+#endif /* DELTA_BASIC_ANIMATION_EXPORT_DATA_H  */

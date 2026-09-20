@@ -46,4 +46,4 @@ class Function {
         GaussianFilter *m_gaussianFilter;
 };
 
-#endif /* ATG_ENGINE_SIM_FUNCTION_H */
+#endif /* ATG_ENGINE_SIM_FUNCTION_H  */

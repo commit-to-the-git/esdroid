@@ -12,4 +12,4 @@ public:
     ~ysVulkanShaderProgram();
 };
 
-#endif /* YDS_VULKAN_SHADER_PROGRAM_H */
+#endif /* YDS_VULKAN_SHADER_PROGRAM_H  */

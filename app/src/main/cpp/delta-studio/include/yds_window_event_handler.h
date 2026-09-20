@@ -5,7 +5,7 @@
 
 class ysWindow;
 
-// Window Event Handler
+// window event handler
 class ysWindowEventHandler : public ysObject {
     friend class ysWindow;
 
@@ -29,4 +29,4 @@ private:
     ysWindow *m_window;
 };
 
-#endif /* YDS_WINDOW_EVENT_HANDLER_H */
+#endif /* YDS_WINDOW_EVENT_HANDLER_H  */

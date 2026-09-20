@@ -63,7 +63,7 @@ dbasic::DeltaEngine::DeltaEngine() {
     m_clearColor[2] = 0.0F;
     m_clearColor[3] = 1.0F;
 
-    // Input system
+    // input system
     m_mainKeyboard = nullptr;
     m_inputSystem = nullptr;
     m_mainMouse = nullptr;
@@ -114,7 +114,7 @@ dbasic::DeltaEngine::CreateGameWindow(const GameEngineSettings &settings) {
 
     m_eventHandler = settings.eventHandler;
 
-    // Create the window system
+    // create the window system
     #if defined(__ANDROID__)
     YDS_NESTED_ERROR_CALL(ysWindowSystem::CreateWindowSystem(
             &m_windowSystem, ysWindowSystemObject::Platform::Android))
@@ -124,11 +124,11 @@ dbasic::DeltaEngine::CreateGameWindow(const GameEngineSettings &settings) {
 #endif
     m_windowSystem->ConnectInstance(settings.Instance);
 
-    // Find the monitor setup
+    // find the monitor setup
     YDS_NESTED_ERROR_CALL(m_windowSystem->SurveyMonitors());
     ysMonitor *mainMonitor = m_windowSystem->GetMonitor(0);
 
-    // Create the game window
+    // create the game window
     YDS_NESTED_ERROR_CALL(m_windowSystem->NewWindow(&m_gameWindow));
 
     #if defined(__ANDROID__)
@@ -161,11 +161,11 @@ dbasic::DeltaEngine::CreateGameWindow(const GameEngineSettings &settings) {
     m_mainKeyboard = m_inputSystem->GetDefaultKeyboard();
     m_mainMouse = m_inputSystem->GetDefaultMouse();
 
-    // Create the graphics device
+    // create the graphics device
     YDS_NESTED_ERROR_CALL(ysDevice::CreateDevice(&m_device, settings.API));
     YDS_NESTED_ERROR_CALL(m_device->InitializeDevice());
 
-    // Create the audio device
+    // create the audio device
     YDS_NESTED_ERROR_CALL(ysAudioSystem::CreateAudioSystem(
             &m_audioSystem, ysAudioSystem::API::DirectSound8));
     m_audioDevice = nullptr;
@@ -173,31 +173,31 @@ dbasic::DeltaEngine::CreateGameWindow(const GameEngineSettings &settings) {
         m_audioSystem->ConnectDevice(m_gameWindow, &m_audioDevice);
     }
 
-    // Create the rendering context
+    // create the rendering context
     YDS_NESTED_ERROR_CALL(m_device->CreateRenderingContext(&m_renderingContext,
                                                            m_gameWindow));
 
     m_windowHandler.Initialize(m_device, m_renderingContext, this);
 
-    // Main render target
+    // main render target
     YDS_NESTED_ERROR_CALL(m_device->CreateOnScreenRenderTarget(
             &m_mainRenderTarget, m_renderingContext, settings.DepthBuffer));
 
     m_mainRenderTarget->SetDebugName("MAIN_RENDER_TARGET");
 
-    // Initialize Geometry
+    // initialize geometry
     YDS_NESTED_ERROR_CALL(InitializeGeometry());
 
-    // Initialize UI renderer
+    // initialize ui renderer
     m_uiRenderer.SetEngine(this);
     YDS_NESTED_ERROR_CALL(m_uiRenderer.Initialize(32768));
 
-    // Initialize the console
+    // initialize the console
     m_console.SetEngine(this);
     m_console.SetRenderer(&m_uiRenderer);
     YDS_NESTED_ERROR_CALL(m_console.Initialize());
 
-    // Initialize Shaders
+    // initialize shaders
     #if defined(__ANDROID__)
     {std::wstring _wsd, _wscd;
     for(const char *_p=settings.ShaderDirectory;*_p;++_p) _wsd.push_back((wchar_t)(unsigned char)*_p);
@@ -209,7 +209,7 @@ dbasic::DeltaEngine::CreateGameWindow(const GameEngineSettings &settings) {
                                             settings.CompileShaders));
 #endif
 
-    // Timing System
+    // timing system
     m_timingSystem = ysTimingSystem::Get();
     m_timingSystem->Initialize();
 
@@ -240,7 +240,7 @@ ysError dbasic::DeltaEngine::StartFrame() {
     m_windowSystem->ProcessMessages();
     m_timingSystem->Update();
 
-    // TEMP
+    // temp
     if (IsKeyDown(ysKey::Code::B)) {
         m_device->SetDebugFlag(0, true);
     } else {
@@ -571,7 +571,7 @@ dbasic::DeltaEngine::InitializeShaders(const wchar_t *shaderDirectory,
             m_device->AttachShader(m_consoleProgram, m_consolePixelShader));
     YDS_NESTED_ERROR_CALL(m_device->LinkProgram(m_consoleProgram));
 
-    // Create shader controls
+    // create shader controls
     YDS_NESTED_ERROR_CALL(m_device->CreateConstantBuffer(
             &m_consoleShaderObjectVariablesBuffer,
             sizeof(ConsoleShaderObjectVariables), nullptr));
@@ -728,7 +728,7 @@ void dbasic::DeltaEngine::SubmitSkeleton(Skeleton *skeleton) {
 
     for (int i = 0; i < nBones; i++) {
         Bone *bone = skeleton->GetBone(i);
-        //m_shaderSkinningControls.BoneTransforms[i] = ysMath::Transpose(skeleton->GetBone(i)->GetSkinMatrix());
+        // m_shaderskinningcontrols.bonetransformsi = ysmath::transposeskeleton->getbonei->getskinmatrix
     }
 }
 

@@ -68,7 +68,7 @@ ysVulkanDevice::CreateRenderingContext(ysRenderingContext **renderingContext,
 ysError ysVulkanDevice::UpdateRenderingContext(ysRenderingContext *context) {
     YDS_ERROR_DECLARE("UpdateRenderingContext");
 
-    /* TODO */
+    /* todo */
 
     return YDS_ERROR_RETURN(ysError::None);
 }
@@ -327,7 +327,7 @@ ysError ysVulkanDevice::CreateVulkanInstance() {
     appInfo.engineVersion = 1;
     appInfo.apiVersion = VK_API_VERSION_1_0;
 
-    // TODO: enable only for debug builds
+    // todo enable only for debug builds
     const char *layers[] = {"VK_LAYER_KHRONOS_validation"};
 
     VkInstanceCreateInfo instInfo = {};

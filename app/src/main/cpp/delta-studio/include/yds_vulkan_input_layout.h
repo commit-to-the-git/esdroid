@@ -11,4 +11,4 @@ public:
     virtual ~ysVulkanInputLayout();
 };
 
-#endif /* YDS_VULKAN_INPUT_LAYOUT_H */
+#endif /* YDS_VULKAN_INPUT_LAYOUT_H  */

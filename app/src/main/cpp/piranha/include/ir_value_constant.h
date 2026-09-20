@@ -61,7 +61,7 @@ namespace piranha {
                         c = '\n'; break;
                     case 't': c = '\t'; break;
                     default:
-                        // Invalid escape sequence
+                        // invalid escape sequence
                         continue;
                     }
                 }
@@ -99,7 +99,7 @@ namespace piranha {
                 Base::m_rules->resolveLiteralBuiltinType(LiteralTypeLookup<T>());
 
             if (builtinType.empty()) {
-                // TODO: raise error, literal not supported
+                // todo raise error literal not supported
             }
 
             int count = 0;
@@ -107,10 +107,10 @@ namespace piranha {
             IrNodeDefinition *nodeDefinition = parentUnit->resolveBuiltinNodeDefinition(builtinType, &count);
 
             if (nodeDefinition == nullptr) {
-                // TODO: raise error, literal type not defined or not available
+                // todo raise error literal type not defined or not available
             }
 
-            // Generate the expansion
+            // generate the expansion
             IrAttributeList *attributeList = TRACK(new IrAttributeList());
 
             IrLiteralNode<T> *expansion = TRACK(new IrLiteralNode<T>());
@@ -125,7 +125,7 @@ namespace piranha {
             expansion->expand(context);
 
             if (nodeDefinition == nullptr) {
-                // TODO: raise error here
+                // todo raise error here
             }
 
             *Base::m_expansions.newValue(context) = expansion;
@@ -151,7 +151,7 @@ namespace piranha {
         }
     };
 
-    // Specialized type for labels
+    // specialized type for labels
     class IrValueLabel : public IrValueConstant<std::string, IrValue::ValueType::ConstantLabel> {
     public:
         IrValueLabel(const _TokenInfo &value) : IrValueConstant(value) { /* void */ }
@@ -165,15 +165,15 @@ namespace piranha {
             IrParserStructure *reference = resolveName(m_value);
 
             if (reference == nullptr) {
-                // Try searching for a global variable
-                // TODO: if nested node definitions are ever introduced, then some more sophisticated
-                // logic would be needed here to resolve the actual context. For now we can assume
-                // that all global variables are defined at global (root) scope
+                // try searching for a global variable
+                // todo if nested node definitions are ever introduced then some more sophisticated
+                // logic would be needed here to resolve the actual context for now we can assume
+                // that all global variables are defined at global root scope
                 reference = getParentUnit()->resolveLocalName(m_value);
                 IR_INFO_OUT(newContext, query.inputContext->getRoot());
             }
 
-            // Do error checking
+            // do error checking
             if (reference == nullptr) {
                 IR_FAIL();
 
@@ -201,7 +201,7 @@ namespace piranha {
         }
     };
 
-    // Specialized type for node references
+    // specialized type for node references
     class IrValueNodeRef : public IrValueConstant<IrNode *, IrValue::ValueType::NodeReference> {
     public:
         IrValueNodeRef(const _TokenInfo &value) : IrValueConstant(value) {
@@ -239,7 +239,7 @@ namespace piranha {
         }
     };
 
-    // Specialized type for internal structure references (during expansions)
+    // specialized type for internal structure references during expansions
     class IrInternalReference
         : public IrValueConstant<IrParserStructure *, IrValue::ValueType::InternalReference>
     {
@@ -291,4 +291,4 @@ namespace piranha {
 
 } /* namespace piranha */
 
-#endif /* PIRANHA_IR_VALUE_CONSTANT_H */
+#endif /* PIRANHA_IR_VALUE_CONSTANT_H  */

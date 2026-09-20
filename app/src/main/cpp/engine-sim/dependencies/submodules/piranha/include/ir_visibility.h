@@ -11,4 +11,4 @@ namespace piranha {
 
 } /* namespace piranha */
 
-#endif /* PIRANHA_IR_VISIBILITY_H */
+#endif /* PIRANHA_IR_VISIBILITY_H  */

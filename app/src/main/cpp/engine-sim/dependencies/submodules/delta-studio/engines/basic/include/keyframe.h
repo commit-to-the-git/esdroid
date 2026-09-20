@@ -32,4 +32,4 @@ namespace dbasic {
 
 } /* namespace dbasic */
 
-#endif /* DELTA_BASIC_KEYFRAME_H */
+#endif /* DELTA_BASIC_KEYFRAME_H  */

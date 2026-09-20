@@ -28,4 +28,4 @@ class CylinderHeadObject : public SimulationObject {
             GeometryGenerator::GeometryIndices *indices);
 };
 
-#endif /* ATG_ENGINE_SIM_CYLINDER_HEAD_OBJECT_H */
+#endif /* ATG_ENGINE_SIM_CYLINDER_HEAD_OBJECT_H  */

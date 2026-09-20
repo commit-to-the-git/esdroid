@@ -17,4 +17,4 @@ protected:
     double m_volume;
 };
 
-#endif /* ATG_ENGINE_SIM_IMPULSE_RESPONSE_H */
+#endif /* ATG_ENGINE_SIM_IMPULSE_RESPONSE_H  */

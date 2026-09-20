@@ -67,4 +67,4 @@ protected:
     unsigned int m_actionCount;
 };
 
-#endif /* YDS_ANIMATION_INTERCHANGE_FILE_READER_0_1_H */
+#endif /* YDS_ANIMATION_INTERCHANGE_FILE_READER_0_1_H  */

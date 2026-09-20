@@ -76,4 +76,4 @@ protected:
     ysLink *m_head;
 };
 
-#endif /* YDS_LINKED_LIST_H */
+#endif /* YDS_LINKED_LIST_H  */

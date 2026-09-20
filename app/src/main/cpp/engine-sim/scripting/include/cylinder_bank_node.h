@@ -165,7 +165,7 @@ namespace es_script {
         virtual void _evaluate() {
             setOutput(this);
 
-            // Read inputs
+            // read inputs
             readAllInputs();
 
             m_parameters.cylinderCount = 0;
@@ -179,4 +179,4 @@ namespace es_script {
 
 } /* namespace es_script */
 
-#endif /* ATG_ENGINE_SIM_CYLINDER_BANK_NODE_H */
+#endif /* ATG_ENGINE_SIM_CYLINDER_BANK_NODE_H  */

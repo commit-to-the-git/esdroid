@@ -97,4 +97,4 @@ namespace dbasic {
 
 } /* namespace dbasic */
 
-#endif /* DELTA_BASIC_ASSET_MANAGER_H */
+#endif /* DELTA_BASIC_ASSET_MANAGER_H  */

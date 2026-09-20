@@ -49,8 +49,8 @@ void InfoCluster::render() {
     ESLOG_STEP(4);
 
 #if defined(__ANDROID__)
-    // The app icon is drawn over this box by the touch UI overlay, at the
-    // same spot the desktop logo model occupies.
+    // the app icon is drawn over this box by the touch ui overlay at the
+    // same spot the desktop logo model occupies
     {
         const Bounds worldBounds = getRenderBounds(logoBounds);
         const float side = logoBounds.height() * 0.75f;
@@ -69,8 +69,8 @@ void InfoCluster::render() {
     const Bounds titleBounds = grid.get(m_bounds, 1, 0, 5, 2);
     drawFrame(titleBounds, 1.0f, m_app->getForegroundColor(), m_app->getBackgroundColor());
 #if defined(__ANDROID__)
-    // The touch UI draws the SETTINGS button in the bottom-right corner of
-    // this box, so its rect is published every frame like the logo's.
+    // the touch ui draws the settings button in the bottom-right corner of
+    // this box so its rect is published every frame like the logos
     {
         const Bounds worldBounds = getRenderBounds(titleBounds);
         const Point c = worldBounds.getPosition(Bounds::center);

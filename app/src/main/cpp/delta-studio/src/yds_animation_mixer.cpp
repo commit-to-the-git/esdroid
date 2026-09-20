@@ -32,7 +32,7 @@ void ysAnimationChannel::Reset() {
 void ysAnimationChannel::Sample() {
     HandleQueue();
 
-    // Update segment that is fading in first
+    // update segment that is fading in first
     for (int i = 0; i < SegmentStackSize; ++i) {
         if (m_segmentStack[i].IsActive()) {
             if (m_segmentStack[i].Fading) {
@@ -55,7 +55,7 @@ void ysAnimationChannel::Sample() {
         }
     }
 
-    // Update segments that are fading out
+    // update segments that are fading out
     for (int i = 0; i < SegmentStackSize; ++i) {
         if (m_segmentStack[i].IsActive() && m_segmentStack[i].Fading) {
             float d = 0 - m_segmentStack[i].FadeOutT0;

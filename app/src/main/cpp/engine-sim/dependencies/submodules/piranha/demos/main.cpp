@@ -41,7 +41,7 @@ int main() {
                 auto endCompile = std::chrono::high_resolution_clock::now();
 
                 nodeProgram.initialize();
-                //nodeProgram.optimize();
+                // nodeprogram.optimize
                 nodeProgram.execute();
 
                 auto endExecute = std::chrono::high_resolution_clock::now();

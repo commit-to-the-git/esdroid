@@ -39,4 +39,4 @@ IrCompilationUnit *compileToUnit(
     const std::string &filename, const ErrorList **errList = nullptr, 
     LanguageRules **outputRules = nullptr, Compiler **compiler = nullptr);
 
-#endif /* TEST_UTILITIES_H */
+#endif /* TEST_UTILITIES_H  */

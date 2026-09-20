@@ -95,4 +95,4 @@ class CylinderHead : public Part {
         bool m_flipDisplay;
 };
 
-#endif /* ATG_ENGINE_SIM_CYLINDER_HEAD_H */
+#endif /* ATG_ENGINE_SIM_CYLINDER_HEAD_H  */

@@ -49,7 +49,7 @@ void dphysics::GridPartitionSystem::Reset() {
         gridCell = cell.second;
 
         if (gridCell->m_requestCount > 0 && gridCell->m_valid) {
-            // Allow this block to persist
+            // allow this block to persist
             gridCell->m_active = true;
             gridCell->DecrementRequestCount();
         }

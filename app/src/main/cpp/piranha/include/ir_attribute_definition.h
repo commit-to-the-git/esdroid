@@ -70,7 +70,7 @@ namespace piranha {
 
         std::vector<IrInputConnection *> m_impliedMembers;
 
-        // Resolution stage
+        // resolution stage
     protected:
         virtual void _resolveDefinitions();
 
@@ -83,4 +83,4 @@ namespace piranha {
 
 } /* namespace piranha */
 
-#endif /* PIRANHA_IR_ATTRIBUTE_DEFINITION_H */
+#endif /* PIRANHA_IR_ATTRIBUTE_DEFINITION_H  */

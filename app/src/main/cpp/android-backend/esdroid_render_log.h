@@ -17,8 +17,7 @@
 #ifndef ESDROID_RENDER_LOG_H
 #define ESDROID_RENDER_LOG_H
 
-// Render logging is disabled for performance. These macros compile out so
-// the render path does no logging at all.
+// render logging compiles out for performance
 
 #define ESLOG(...) ((void)0)
 #define ESLOG_ENTER() ((void)0)

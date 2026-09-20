@@ -42,4 +42,4 @@ protected:
     HCURSOR m_oldCursor;
 };
 
-#endif /* YDS_WINDOWS_WINDOW_SYSTEM_H */
+#endif /* YDS_WINDOWS_WINDOW_SYSTEM_H  */

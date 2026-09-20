@@ -41,4 +41,4 @@ namespace dphysics {
 
 } /* namespace dbasic */
 
-#endif /* DELTA_BASIC_PARTICLE_H */
+#endif /* DELTA_BASIC_PARTICLE_H  */

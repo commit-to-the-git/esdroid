@@ -74,7 +74,7 @@ public:
 
     void Clear();
 
-    // Header
+    // header
     char m_name[64];
     char m_materialName[64];
 
@@ -100,34 +100,34 @@ public:
         int NumFaces;
     } m_objectStatistics;
 
-    // Vertex Data
+    // vertex data
     ysExpandingArray<ysVector3> m_vertices;
     ysExpandingArray<int> m_materialList;
     ysExpandingArray<BoneWeights> m_boneWeights;
 
-    // UV Data
+    // uv data
     ysExpandingArray<UVChannel> m_channels;
 
-    // Face Data
+    // face data
     ysExpandingArray<IndexSet> m_vertexIndexSet;
     ysExpandingArray<int> m_smoothingGroups;
     ysExpandingArray<int> m_extendedSmoothingGroups;
     int m_numExtendedSmoothingGroups;
     ysExpandingArray<UVCoordinateIndexSet> m_UVIndexSets;
 
-    // Bone Indices
+    // bone indices
     ysExpandingArray<int> m_boneIndices;
 
-    // Animation Data
+    // animation data
     KeySeries m_animationKeySeries[NUM_KEY_TYPES];
 
-    // Calculated Values
+    // calculated values
     ysExpandingArray<ysVector3> m_normals;
     ysExpandingArray<ysVector4> m_tangents;
 
     bool m_flipNormals;
 
-    // Primitive Data
+    // primitive data
     union {
         float m_width;
         float m_radius;
@@ -137,8 +137,8 @@ public:
     float m_length;
 
 public:
-    // DATA CACHE
+    // data cache
     ysVector *m_hardNormalCache;
 };
 
-#endif /* YDS_OBJECT_DATA_H */
+#endif /* YDS_OBJECT_DATA_H  */

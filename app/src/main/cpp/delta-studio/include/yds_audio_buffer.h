@@ -44,4 +44,4 @@ protected:
     SampleOffset m_samples;
 };
 
-#endif /* YDS_AUDIO_BUFFER_H */
+#endif /* YDS_AUDIO_BUFFER_H  */

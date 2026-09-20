@@ -58,7 +58,7 @@ void ysLinkedList::PrependLink(ysLink *link) {
 
 void ysLinkedList::DeleteLink(ysLink* link) {
     if (link->Previous == link) {
-        // Indicates one link in the entire list
+        // indicates one link in the entire list
         m_head = NULL;
     }
     else {

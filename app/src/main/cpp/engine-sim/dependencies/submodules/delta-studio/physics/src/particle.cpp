@@ -18,18 +18,18 @@ dphysics::Particle::~Particle() {
 }
 
 /*
-void dbasic::Particle::Render(DeltaEngine *engine, int layer) {
-    ysVector finalPosition = ysMath::Add(m_position, m_parent->GetPosition());
+void dbasic::particle::renderdeltaengine *engine int layer {
+    ysvector finalposition = ysmath::addm_position m_parent->getposition
 
-    ysMatrix scale = ysMath::ScaleTransform(ysMath::LoadScalar(m_scale));
-    ysMatrix pos = ysMath::TranslationTransform(finalPosition);
-    ysMatrix final = ysMath::MatMult(scale, pos);
+    ysmatrix scale = ysmath::scaletransformysmath::loadscalarm_scale
+    ysmatrix pos = ysmath::translationtransformfinalposition
+    ysmatrix final = ysmath::matmultscale pos
 
-    float inv_density = 1.0f - m_density;
-    engine->SetMultiplyColor(ysVector4(0.5f * inv_density, 0.5f * inv_density, 0.5f * inv_density, (1.0f - (m_age / m_life)) * m_density));
-    engine->SetObjectTransform(final);
-    engine->DrawImage(m_texture, layer);
-    engine->ResetMultiplyColor();
+    float inv_density = 1.0f - m_density
+    engine->setmultiplycolorysvector40.5f * inv_density 0.5f * inv_density 0.5f * inv_density 1.0f - m_age / m_life * m_density
+    engine->setobjecttransformfinal
+    engine->drawimagem_texture layer
+    engine->resetmultiplycolor
 }
 */
 

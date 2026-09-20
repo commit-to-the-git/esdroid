@@ -15,4 +15,4 @@ class UiButton : public UiElement {
         float m_fontSize;
 };
 
-#endif /* ATG_ENGINE_SIM_UI_BUTTON_H */
+#endif /* ATG_ENGINE_SIM_UI_BUTTON_H  */

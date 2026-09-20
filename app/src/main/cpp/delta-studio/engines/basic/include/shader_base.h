@@ -21,4 +21,4 @@ namespace dbasic {
 
 } /* namespace dbasic */
 
-#endif /* DELTA_BASIC_SHADER_BASE_H */
+#endif /* DELTA_BASIC_SHADER_BASE_H  */

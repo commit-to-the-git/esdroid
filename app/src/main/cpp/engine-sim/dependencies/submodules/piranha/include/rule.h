@@ -63,4 +63,4 @@ public:
 
 } /* namespace piranha */
 
-#endif /* PIRANHA_RULE_H */
+#endif /* PIRANHA_RULE_H  */

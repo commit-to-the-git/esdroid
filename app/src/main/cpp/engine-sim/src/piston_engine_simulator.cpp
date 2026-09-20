@@ -33,7 +33,7 @@ PistonEngineSimulator::~PistonEngineSimulator() {
     assert(m_crankshaftFrictionConstraints == nullptr);
     assert(m_exhaustFlowStagingBuffer == nullptr);
     assert(m_delayFilters == nullptr);
-    // m_antialiasingFilters removed in upstream
+    // m_antialiasingfilters removed in upstream
 }
 
 void PistonEngineSimulator::loadSimulation(Engine *engine, Vehicle *vehicle, Transmission *transmission) {
@@ -244,7 +244,7 @@ void PistonEngineSimulator::placeCylinder(int i) {
         rod->getCrankshaft()->getRodJournalPositionGlobal(rod->getJournal(), &p_x, &p_y);
     }
 
-    // (bank->m_x + bank->m_dx * s - p_x)^2 + (bank->m_y + bank->m_dy * s - p_y)^2 = (rod->m_length)^2
+    // bank->m_x + bank->m_dx * s - p_x^2 + bank->m_y + bank->m_dy * s - p_y^2 = rod->m_length^2
     const double a = bank->getDx() * bank->getDx() + bank->getDy() * bank->getDy();
     const double b = -2 * bank->getDx() * (p_x - bank->getX()) - 2 * bank->getDy() * (p_y - bank->getY());
     const double c =

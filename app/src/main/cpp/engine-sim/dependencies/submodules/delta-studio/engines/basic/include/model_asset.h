@@ -56,4 +56,4 @@ namespace dbasic {
 
 } /* namespace dbasic */
 
-#endif /* DELTA_BASIC_MODEL_ASSET_H */
+#endif /* DELTA_BASIC_MODEL_ASSET_H  */

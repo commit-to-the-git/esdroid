@@ -23,4 +23,4 @@ class ConvolutionFilter : public Filter {
         int m_sampleCount;
 };
 
-#endif /* ATG_ENGINE_SIM_CONVOLUTION_FILTER_H */
+#endif /* ATG_ENGINE_SIM_CONVOLUTION_FILTER_H  */

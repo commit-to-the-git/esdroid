@@ -14,14 +14,14 @@ add_compile_options(-Wno-deprecated-declarations -Wno-unused-variable -Wno-unuse
 add_compile_options(-Wno-shift-count-overflow -Wno-shift-op-parentheses)
 add_compile_options(-Wno-inconsistent-missing-override -Wno-delete-abstract-non-virtual-dtor)
 add_compile_options(-Wno-macro-redefined -Wno-unused-private-field -Wno-unused-but-set-variable)
-# Optimized build: -O3 + LTO for maximum performance. No semantic
-# interposition so LTO can inline across the exported symbols too.
+# optimized build -o3 + lto for maximum performance no semantic
+# interposition so lto can inline across the exported symbols too
 add_compile_options(-O3 -flto -ffast-math -fno-math-errno -fno-trapping-math
     -fno-semantic-interposition)
 
 add_compile_definitions(ATG_ANDROID)
 add_compile_definitions($<$<CONFIG:Debug>:ATG_DEBUG>)
-# ATG_ENGINE_SIM_DISCORD_ENABLED not defined (disabled)
+# atg_engine_sim_discord_enabled not defined disabled
 add_compile_definitions(ATG_ENGINE_SIM_PIRANHA_ENABLED=1)
 add_compile_definitions(WINAPI=)
 add_compile_definitions(NDEBUG)
@@ -33,7 +33,7 @@ include_directories(
    piranha/include piranha/src piranha/dependencies/libraries/flex/include csv-io/include scs/include android-backend ${ANDROID_NDK}/sources/android/native_app_glue
 )
 
-# engine-sim core (simulation/synthesis only)
+# engine-sim core simulation/synthesis only
 add_library(es_core STATIC
     engine-sim/src/audio_buffer.cpp
     engine-sim/src/camshaft.cpp
@@ -131,7 +131,7 @@ file(GLOB_RECURSE DELTA_PHYSICS_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/delta-studio/p
 add_library(delta_physics STATIC ${DELTA_PHYSICS_SRCS})
 
 #
-# piranha - includes pre-generated parser/scanner files (flex+bison)
+# piranha - includes pre-generated parser/scanner files flex+bison
 file(GLOB_RECURSE PIRANHA_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/piranha/src/*.cpp")
 add_library(piranha STATIC
     ${PIRANHA_SRCS}
@@ -145,19 +145,19 @@ target_include_directories(piranha PUBLIC
     piranha/dependencies/libraries/flex/include
 )
 
-# csv-io, scs
+# csv-io scs
 file(GLOB_RECURSE CSV_IO_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/csv-io/src/*.cpp")
 add_library(csv_io STATIC ${CSV_IO_SRCS})
 file(GLOB_RECURSE SCS_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/scs/src/*.cpp")
 add_library(scs STATIC ${SCS_SRCS})
 
-# engine-sim scripting (requires piranha)
+# engine-sim scripting requires piranha
 file(GLOB_RECURSE ES_SCRIPT_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/engine-sim/scripting/src/*.cpp")
 add_library(es_script STATIC ${ES_SCRIPT_SRCS})
 target_link_libraries(es_script PUBLIC piranha)
 
-# Android backend
-# Android native_app_glue (local copy with 16MB stack fix)
+# android backend
+# android native_app_glue local copy with 16mb stack fix
 add_library(native_app_glue STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/android_native_app_glue.c
 )
@@ -168,7 +168,7 @@ target_include_directories(native_app_glue PUBLIC
 add_library(android_backend STATIC
     android-backend/android_backend.cpp android-backend/android_shim.cpp android-backend/touch_ui.cpp)
 
-# Main shared library
+# main shared library
 add_library(esdroid SHARED
     android_main.cpp
     engine-sim/src/engine_sim_application.cpp engine-sim/src/geometry_generator.cpp

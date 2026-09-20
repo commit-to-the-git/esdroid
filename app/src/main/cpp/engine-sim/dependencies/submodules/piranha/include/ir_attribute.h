@@ -25,7 +25,7 @@ namespace piranha {
         void setPosition(int position) { m_position = position; }
         int getPosition() const { return m_position; }
 
-        // If no name is specified positional notation is assumed
+        // if no name is specified positional notation is assumed
         bool isPositional() const { return getName() == ""; }
 
         virtual bool isExternalInput() const { return true; }
@@ -38,7 +38,7 @@ namespace piranha {
 
         int m_position;
 
-        // Resolution stage
+        // resolution stage
     public:
         void setAttributeDefinition(IrAttributeDefinition *definition) { 
             m_definition = definition; 
@@ -55,4 +55,4 @@ namespace piranha {
 
 } /* namespace piranha */
 
-#endif /* PIRANHA_IR_ATTRIBUTE_H */
+#endif /* PIRANHA_IR_ATTRIBUTE_H  */

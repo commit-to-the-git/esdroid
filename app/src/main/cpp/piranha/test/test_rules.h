@@ -12,4 +12,4 @@ protected:
     virtual void registerBuiltinNodeTypes();
 };
 
-#endif /* TEST_GENERATOR_H */
+#endif /* TEST_GENERATOR_H  */

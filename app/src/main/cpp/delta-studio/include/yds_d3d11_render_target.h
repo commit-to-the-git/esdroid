@@ -26,4 +26,4 @@ protected:
     ID3D11DepthStencilState *m_depthTestDisabledState;
 };
 
-#endif /* YDS_D3D11_RENDER_TARGET_H */
+#endif /* YDS_D3D11_RENDER_TARGET_H  */

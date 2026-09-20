@@ -20,4 +20,4 @@ protected:
     ID3D11Texture2D *m_textureResource;
 };
 
-#endif /* YDS_D3D11_TEXTURE_H */
+#endif /* YDS_D3D11_TEXTURE_H  */

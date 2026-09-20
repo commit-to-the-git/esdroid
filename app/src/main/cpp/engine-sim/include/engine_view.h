@@ -30,4 +30,4 @@ class EngineView : public UiElement {
         bool m_drawFrame;
 };
 
-#endif /* ATG_ENGINE_SIM_ENGINE_VIEW_H */
+#endif /* ATG_ENGINE_SIM_ENGINE_VIEW_H  */

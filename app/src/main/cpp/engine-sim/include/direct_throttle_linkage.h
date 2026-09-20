@@ -23,4 +23,4 @@ protected:
     double m_throttlePosition;
 };
 
-#endif /* ATG_ENGINE_SIM_DIRECT_THROTTLE_LINKAGE_H */
+#endif /* ATG_ENGINE_SIM_DIRECT_THROTTLE_LINKAGE_H  */

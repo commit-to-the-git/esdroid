@@ -18,10 +18,10 @@ struct BlockLink {
     BlockLink *Previous;
 };
 
-// --
-// Standard allocator for allocating blocks of any 
-// size.
-// --
+//
+// standard allocator for allocating blocks of any
+// size
+//
 class ysDynamicAllocator : public ysMemoryAllocator {
 public:
     ysDynamicAllocator();
@@ -32,66 +32,66 @@ public:
     virtual void Destroy();
 
 public:
-    // --
-    // Returns memory address validity.
     //
-    //   address: Memory address
+    // returns memory address validity
     //
-    // Return:
-    //   0: Valid memory address
-    //   1: Memory address too large
-    //   -1: Memory address too small
-    // --
+    // address memory address
+    //
+    // return
+    // 0 valid memory address
+    // 1 memory address too large
+    // -1 memory address too small
+    //
     int CheckMemoryAddress(void *address);
 
-    // --
-    // Set the allocator's parent. This will cause this allocator
-    // to take control of a segment of the parent's memory.
     //
-    //   parent: Memory allocator parent
-    // 
-    // --
+    // set the allocators parent this will cause this allocator
+    // to take control of a segment of the parents memory
+    //
+    // parent memory allocator parent
+    //
+    //
     void SetParent(ysMemoryAllocator *parent);
 
-    // --
-    // Allocate the buffer to be used by the allocator.
     //
-    //   size: Total size of the buffer (bytes)
+    // allocate the buffer to be used by the allocator
     //
-    // --
+    // size total size of the buffer bytes
+    //
+    //
     void CreateBuffer(int size);
 
-    // --
-    // Initialize the block list to be used by the allocator.
-    // 
-    //   maxBlocks: Number of blocks (ie. maximum number of allocations)
-    // 
-    // --
+    //
+    // initialize the block list to be used by the allocator
+    //
+    // maxblocks number of blocks ie maximum number of allocations
+    //
+    //
     void CreateBlocks(int maxBlocks);
 
 public:
 
-    /* ERROR CHECKING */
+    /* error checking */
 
-    // --
-    // Checks whether all blocks are valid and there
+    //
+    // checks whether all blocks are valid and there
     // are no memory violations within the allocator
-    // structure.
-    // --
+    // structure
+    //
     bool CheckValid();
 
 protected:
 
-    // --
-    // Retrieve the free block with the largest size.
-    // --
+    //
+    // retrieve the free block with the largest size
+    //
     BlockLink *UpdateAllocatorBlock();
 
-    // --
-    // Add a new block the block queue.
     //
-    // Returns a pointer to the new block.
-    // --
+    // add a new block the block queue
+    //
+    // returns a pointer to the new block
+    //
     inline BlockLink *AddBlock() {
         if (m_nBlocks >= m_maxBlocks) return NULL;
 
@@ -102,43 +102,43 @@ protected:
 
     }
 
-    // --
-    // Remove a block from the block queue.
-    // 
-    //   index: Index of the block to remove.
-    // 
-    // --
+    //
+    // remove a block from the block queue
+    //
+    // index index of the block to remove
+    //
+    //
     void RemoveBlock(BlockIndex index);
 
 private:
-    // Buffer from which the allocator allocates data
+    // buffer from which the allocator allocates data
     void *m_data;
 
-    // Main pool of preallocated blocks
+    // main pool of preallocated blocks
     BlockLink *m_blockPool;
 
-    // Table of pointers, to prevent having to reoder full structures
+    // table of pointers to prevent having to reoder full structures
     BlockLink **m_blocks;
 
-    // Current free block to perform allocations with (also usually the largest)
+    // current free block to perform allocations with also usually the largest
     BlockLink *m_allocatorBlock;
 
-    // Current number of blocks in use by the allocator
+    // current number of blocks in use by the allocator
     int m_nBlocks;
 
 
-    // The number of blocks in the allocator pool
+    // the number of blocks in the allocator pool
     int m_maxBlocks;
 
-    // The size of the total allocation pool
+    // the size of the total allocation pool
     int m_maxSize;
 
 
-    // Parent
+    // parent
     ysMemoryAllocator *m_parent;
 
 private:
-    // Total allocation tracking, mainly for debugging purposes
+    // total allocation tracking mainly for debugging purposes
     int m_totalAllocation;
 };
 
@@ -210,4 +210,4 @@ protected:
     int m_numSubdivisions;
 };
 
-#endif /* YDS_DYNAMIC_ALLOCATOR_H */
+#endif /* YDS_DYNAMIC_ALLOCATOR_H  */

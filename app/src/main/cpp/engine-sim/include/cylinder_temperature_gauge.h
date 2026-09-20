@@ -22,4 +22,4 @@ class CylinderTemperatureGauge : public UiElement {
         double m_minTemperature;
 };
 
-#endif /* ATG_ENGINE_SIM_CYLINDER_TEMPERATURE_GAUGE_H */
+#endif /* ATG_ENGINE_SIM_CYLINDER_TEMPERATURE_GAUGE_H  */

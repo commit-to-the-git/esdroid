@@ -13,4 +13,4 @@ extern "C" {
 #include <libswscale/swscale.h>
 }
 
-#endif /* ATG_DIRECT_TO_VIDEO_FFMPEG_H */
+#endif /* ATG_DIRECT_TO_VIDEO_FFMPEG_H  */

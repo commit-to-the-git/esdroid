@@ -17,4 +17,4 @@ protected:
     unsigned int m_vertexArrayHandle;
 };
 
-#endif /* YDS_OPENGL_GPU_BUFFER_H */
+#endif /* YDS_OPENGL_GPU_BUFFER_H  */

@@ -14,4 +14,4 @@ public:
     virtual Camshaft *getActiveExhaustCamshaft() = 0;
 };
 
-#endif /* ATG_ENGINE_SIM_VALVETRAIN_H */
+#endif /* ATG_ENGINE_SIM_VALVETRAIN_H  */

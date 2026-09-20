@@ -3,7 +3,7 @@
 
 #include "yds_device.h"
 
-// DirectX forward declarations
+// directx forward declarations
 struct IDXGIDevice;
 struct ID3D11DeviceContext;
 struct IDXGIFactory1;
@@ -22,16 +22,16 @@ private:
     virtual ~ysD3D11Device();
 
 public:
-    // Setup
+    // setup
     virtual ysError InitializeDevice() override;
     virtual ysError DestroyDevice() override;
     virtual bool CheckSupport() override;
 
-    // State
+    // state
     virtual ysError SetFaceCulling(bool faceCulling) override;
     virtual ysError SetFaceCullingMode(CullMode cullMode) override;
 
-    // Rendering Contexts
+    // rendering contexts
     virtual ysError
     CreateRenderingContext(ysRenderingContext **renderingContext,
                            ysWindow *window) override;
@@ -68,7 +68,7 @@ public:
     virtual ysError ClearBuffers(const float *clearColor) override;
     virtual ysError Present() override;
 
-    // GPU Buffers
+    // gpu buffers
     virtual ysError CreateVertexBuffer(ysGPUBuffer **newBuffer, int size,
                                        char *data,
                                        bool mirrorToRam = false) override;
@@ -89,7 +89,7 @@ public:
     virtual ysError EditBufferData(ysGPUBuffer *buffer, char *data) override;
     virtual ysError DestroyGPUBuffer(ysGPUBuffer *&buffer) override;
 
-    // Shaders
+    // shaders
     virtual ysError CreateVertexShader(ysShader **newShader,
                                        const wchar_t *shaderFilename,
                                        const wchar_t *compiledFilename,
@@ -102,7 +102,7 @@ public:
                                       bool compile) override;
     virtual ysError DestroyShader(ysShader *&shader) override;
 
-    // Shader Programs
+    // shader programs
     virtual ysError CreateShaderProgram(ysShaderProgram **newProgram) override;
     virtual ysError DestroyShaderProgram(ysShaderProgram *&shader,
                                          bool destroyShaders = false) override;
@@ -111,7 +111,7 @@ public:
     virtual ysError LinkProgram(ysShaderProgram *program) override;
     virtual ysError UseShaderProgram(ysShaderProgram *) override;
 
-    // Input Layouts
+    // input layouts
     virtual ysError
     CreateInputLayout(ysInputLayout **newLayout, ysShader *shader,
                       const ysRenderGeometryFormat *format,
@@ -119,7 +119,7 @@ public:
     virtual ysError UseInputLayout(ysInputLayout *layout) override;
     virtual ysError DestroyInputLayout(ysInputLayout *&layout) override;
 
-    // Textures
+    // textures
     virtual ysError CreateTexture(ysTexture **texture,
                                   const wchar_t *fname) override;
     virtual ysError CreateTexture(ysTexture **texture, int width, int height,
@@ -141,7 +141,7 @@ public:
                            int vertexOffset) override;
 
 public:
-    // Non-standard interface
+    // non-standard interface
     __forceinline ID3D11DeviceContext *GetImmediateContext() {
         return m_deviceContext;
     }
@@ -152,7 +152,7 @@ public:
     static DXGI_FORMAT
     ConvertInputLayoutFormat(ysRenderGeometryChannel::ChannelFormat format);
 
-    // TEMP
+    // temp
     struct ID3D11RasterizerState *m_rasterizerState;
     struct ID3D11SamplerState *m_samplerState;
 
@@ -172,7 +172,7 @@ private:
     int m_multisampleQuality;
 
 private:
-    // Platform specific functionality
+    // platform specific functionality
     ysError
     CreateD3D11DepthStencilView(ID3D11DepthStencilView **newDepthStencil,
                                 ID3D11ShaderResourceView **shaderResourceView,
@@ -192,4 +192,4 @@ private:
     ysError DestroyD3D11RenderTarget(ysRenderTarget *target);
 };
 
-#endif /* YDS_D3D11_DEVICE_H */
+#endif /* YDS_D3D11_DEVICE_H  */

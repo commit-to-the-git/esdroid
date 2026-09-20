@@ -14,7 +14,7 @@ dbasic::AnimationObjectController::~AnimationObjectController() {
 }
 
 void dbasic::AnimationObjectController::Update() {
-    // Update rotation
+    // update rotation
     ysQuaternion currentRotation = m_target->GetOrientationParentSpace();
     ysQuaternion targetRotation;
 

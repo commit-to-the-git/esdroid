@@ -17,4 +17,4 @@ protected:
     unsigned int m_handle;
 };
 
-#endif /* YDS_OPENGL_SHADER_PROGRAM_H */
+#endif /* YDS_OPENGL_SHADER_PROGRAM_H  */

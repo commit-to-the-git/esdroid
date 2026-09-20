@@ -61,4 +61,4 @@ protected:
     float m_fps;
 };
 
-#endif /* YS_TIMING_H */
+#endif /* YS_TIMING_H  */

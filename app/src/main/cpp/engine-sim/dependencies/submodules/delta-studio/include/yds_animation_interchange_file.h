@@ -53,5 +53,5 @@ protected:
     bool m_compilationStatus;
 };
 
-#endif /* YDS_ANIMATION_INTERCHANGE_FILE_0_0_H */
+#endif /* YDS_ANIMATION_INTERCHANGE_FILE_0_0_H  */
 

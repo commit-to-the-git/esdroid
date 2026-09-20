@@ -51,7 +51,7 @@ piranha::IrCompilationUnit *piranha::Compiler::analyze(const IrPath &scriptPath)
 
             Path importPath(libName);
             Path fullImportPath = importPath.isAbsolute() 
-                ? importPath // TODO: Warn about use of absolute path
+                ? importPath // todo warn about use of absolute path
                 : rootDir.append(importPath);
 
             if (!fullImportPath.exists()) {
@@ -66,7 +66,7 @@ piranha::IrCompilationUnit *piranha::Compiler::analyze(const IrPath &scriptPath)
                 else fullImportPath = resolvedPath;
             }
 
-            // Recursively build
+            // recursively build
             IrCompilationUnit *importUnit = analyze(fullImportPath.canonicalize());
             s->setUnit(importUnit);
             if (importUnit == nullptr) {
@@ -83,10 +83,10 @@ piranha::IrCompilationUnit *piranha::Compiler::analyze(const IrPath &scriptPath)
 piranha::IrCompilationUnit *piranha::Compiler::compile(const IrPath &scriptPath) {
     IrCompilationUnit *topLevel = analyze(scriptPath);
 
-    // Resolution step
+    // resolution step
     resolve();
 
-    // Validation step
+    // validation step
     validate();
 
     return topLevel;

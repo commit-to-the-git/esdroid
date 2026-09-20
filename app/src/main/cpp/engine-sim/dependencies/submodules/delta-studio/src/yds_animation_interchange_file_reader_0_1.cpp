@@ -11,46 +11,46 @@ ysAnimationInterchangeFileReader_0_1::~ysAnimationInterchangeFileReader_0_1() {
 }
 
 /*
-ysError ysAnimationInterchangeFile0_1::Open(const char *fname) {
+yserror ysanimationinterchangefile0_1::openconst char *fname {
     YDS_ERROR_DECLARE("Open");
 
-    m_file.open(fname, std::ios::binary | std::ios::in | std::ios::out);
-    if (!m_file.is_open()) return YDS_ERROR_RETURN_MSG(ysError::YDS_COULD_NOT_OPEN_FILE, fname);
+    m_file.openfname std::ios::binary | std::ios::in | std::ios::out
+    if m_file.is_open return yds_error_return_msgyserror::yds_could_not_open_file fname
 
-    IdHeader idHeader;
-    m_file.read((char *)&idHeader, sizeof(IdHeader));
+    idheader idheader
+    m_file.readchar *&idheader sizeofidheader
 
-    if (idHeader.MagicNumber != MAGIC_NUMBER) {
+    if idheader.magicnumber != magic_number {
         m_file.close();
-        return YDS_ERROR_RETURN(ysError::YDS_INVALID_FILE_TYPE);
+        return yds_error_returnyserror::yds_invalid_file_type
     }
 
-    if (idHeader.MinorVersion != MINOR_VERSION || idHeader.MajorVersion != MAJOR_VERSION) {
+    if idheader.minorversion != minor_version || idheader.majorversion != major_version {
         m_file.close();
-        return YDS_ERROR_RETURN(ysError::YDS_UNSUPPORTED_FILE_VERSION);
+        return yds_error_returnyserror::yds_unsupported_file_version
     }
 
-    m_compilationStatus = idHeader.CompilationStatus == 0x0;
-    m_toolId = idHeader.EditorId;
+    m_compilationstatus = idheader.compilationstatus == 0x0
+    m_toolid = idheader.editorid
 
-    FileHeader fileHeader;
-    m_file.read((char *)&fileHeader, sizeof(FileHeader));
+    fileheader fileheader
+    m_file.readchar *&fileheader sizeoffileheader
 
-    m_actionCount = fileHeader.ActionCount;
+    m_actioncount = fileheader.actioncount
 
-    return YDS_ERROR_RETURN(ysError::None);
+    return yds_error_returnyserror::none
 }
 
 
-ysError ysAnimationInterchangeFile0_1::Close() {
+yserror ysanimationinterchangefile0_1::close {
     YDS_ERROR_DECLARE("Close");
 
-    if (m_file.is_open()) m_file.close();
+    if m_file.is_open m_file.close
 
-    m_majorVersion = -1;
-    m_minorVersion = -1;
+    m_majorversion = -1
+    m_minorversion = -1
 
-    return YDS_ERROR_RETURN(ysError::None);
+    return yds_error_returnyserror::none
 }*/
 
 ysError ysAnimationInterchangeFileReader_0_1::ReadHeader(std::fstream &f) {

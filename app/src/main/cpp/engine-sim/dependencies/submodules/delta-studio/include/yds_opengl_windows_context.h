@@ -33,4 +33,4 @@ protected:
     void LoadContextCreationExtension();
 };
 
-#endif /* YDS_OPENGL_WINDOWS_CONTEXT_H */
+#endif /* YDS_OPENGL_WINDOWS_CONTEXT_H  */

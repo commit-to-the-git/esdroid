@@ -111,4 +111,4 @@ protected:
     ysAnimationCurve *m_rotationCurves[4];
 };
 
-#endif /* YDS_ANIMATION_TARGET_H */
+#endif /* YDS_ANIMATION_TARGET_H  */

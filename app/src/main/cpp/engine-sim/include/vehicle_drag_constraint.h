@@ -20,4 +20,4 @@ private:
     Vehicle *m_vehicle;
 };
 
-#endif /* ATG_ENGINE_SIM_VEHICLE_DRAG_CONSTRAINT_H */
+#endif /* ATG_ENGINE_SIM_VEHICLE_DRAG_CONSTRAINT_H  */

@@ -72,12 +72,12 @@ public:
             case ChannelFormat::R32G32B32_UINT:
                 return 3;
             case ChannelFormat::R32_UINT:
-                // *** FIX: this is the *component count* (always 1 for R32_UINT),
-                // NOT the byte size. The previous code returned
-                // `1 * sizeof(unsigned int)` = 4, which made
-                // `glVertexAttribIPointer(size=4, ...)` get called for a single
-                // uint attribute, mis-reading 4 consecutive uints per vertex and
-                // scrambling the entire vertex stream. It MUST be 1.
+                // *** fix this is the *component count* always 1 for r32_uint
+                // not the byte size the previous code returned
+                // 1 * sizeofunsigned int = 4 which made
+                // glvertexattribipointersize=4 get called for a single
+                // uint attribute mis-reading 4 consecutive uints per vertex and
+                // scrambling the entire vertex stream it must be 1
                 return 1;
             case ChannelFormat::Undefined:
             default:
@@ -91,4 +91,4 @@ protected:
     ChannelFormat m_format;
 };
 
-#endif /* YDS_RENDER_GEOMETRY_CHANNEL_H */
+#endif /* YDS_RENDER_GEOMETRY_CHANNEL_H  */

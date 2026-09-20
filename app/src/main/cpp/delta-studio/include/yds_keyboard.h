@@ -246,4 +246,4 @@ protected:
     int m_inputBufferOffset;
 };
 
-#endif /* YDS_KEYBOARD_H */
+#endif /* YDS_KEYBOARD_H  */

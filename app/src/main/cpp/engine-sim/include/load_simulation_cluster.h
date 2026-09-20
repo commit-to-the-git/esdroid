@@ -50,4 +50,4 @@ class LoadSimulationCluster : public UiElement {
         Simulator *m_simulator;
 };
 
-#endif /* ATG_ENGINE_SIM_LOAD_SIMULATION_CLUSTER_H */
+#endif /* ATG_ENGINE_SIM_LOAD_SIMULATION_CLUSTER_H  */

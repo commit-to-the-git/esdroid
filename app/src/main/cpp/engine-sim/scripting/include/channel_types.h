@@ -39,7 +39,7 @@ namespace es_script {
         return &ObjectChannel::channel; \
     }
 
-    // Register all types
+    // register all types
     ASSIGN_CHANNEL_TYPE(EngineNode, EngineChannel);
     ASSIGN_CHANNEL_TYPE(CrankshaftNode, CrankshaftChannel);
     ASSIGN_CHANNEL_TYPE(RodJournalNode, RodJournalChannel);
@@ -62,4 +62,4 @@ namespace es_script {
 
 } /* namespace es_script */
 
-#endif /* ATG_ENGINE_SIM_CHANNEL_TYPES_H */
+#endif /* ATG_ENGINE_SIM_CHANNEL_TYPES_H  */

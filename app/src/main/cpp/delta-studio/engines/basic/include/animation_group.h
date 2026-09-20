@@ -12,33 +12,33 @@ namespace dbasic {
         AnimationGroup();
         ~AnimationGroup();
 
-        // Update all the animation controllers
+        // update all the animation controllers
         void Update();
 
-        // Add an animation controller
+        // add an animation controller
         void AddAnimationController(AnimationObjectController *controller);
 
-        // Add a sub-group
+        // add a sub-group
         AnimationGroup *AddAnimationGroup(const char *groupName);
 
-        // Set name
+        // set name
         void SetName(const char *name);
 
-        // Set frame
+        // set frame
         void SetFrame(int frame);
         void SetTimeOffset(float timeOffset);
 
     protected:
-        // The animation group name
+        // the animation group name
         char m_name[64];
 
-        // List of animation controllers that are part of this animation domain
+        // list of animation controllers that are part of this animation domain
         ysExpandingArray<AnimationObjectController *, 16> m_animationControllers;
 
-        // Child animation groups
+        // child animation groups
         ysDynamicArray<AnimationGroup, 16> m_animationGroups;
     };
 
 } /* namespace dbasic */
 
-#endif /* DELTA_BASIC_ANIMATION_GROUP_H */
+#endif /* DELTA_BASIC_ANIMATION_GROUP_H  */

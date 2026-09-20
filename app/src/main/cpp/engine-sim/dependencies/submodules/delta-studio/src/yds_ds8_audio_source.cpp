@@ -196,7 +196,7 @@ ysError ysDS8AudioSource::SetPan(float pan) {
 
     if (FAILED(result)) { return YDS_ERROR_RETURN(ysError::InvalidOperation); }
 
-    // Volume Compensation
+    // volume compensation
     float mag = sqrtf(1.0f + 1.0f / (max(ratio, 1.0f / ratio)));
     m_panVolume = 1 / mag;
     SetVolume(m_volume);

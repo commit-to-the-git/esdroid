@@ -85,4 +85,4 @@ protected:
     ChannelFormat m_format;
 };
 
-#endif /* YDS_RENDER_GEOMETRY_CHANNEL_H */
+#endif /* YDS_RENDER_GEOMETRY_CHANNEL_H  */

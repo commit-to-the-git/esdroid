@@ -81,7 +81,7 @@ void atg_scs::ConjugateGradientSleSolver::multiply(
     Matrix &x,
     Matrix *target)
 {
-    // A = J * W * J_T
+    // a = j * w * j_t
     target->resize(1, x.getHeight());
     J.transposeMultiplyVector(x, &m_mreg0);
     W.componentMultiply(m_mreg0, &m_mreg1);

@@ -12,4 +12,4 @@ inline t clamp(t x, t x0 = static_cast<t>(0.0), t x1 = static_cast<t>(1.0)) {
     else return x;
 }
 
-#endif /* ATG_ENGINE_SIM_UTILITIES_H */
+#endif /* ATG_ENGINE_SIM_UTILITIES_H  */

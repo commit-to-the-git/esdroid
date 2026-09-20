@@ -22,4 +22,4 @@ protected:
     wchar_t m_systemName[256];
 };
 
-#endif /* YDS_WINDOWS_INPUT_DEVICE_H */
+#endif /* YDS_WINDOWS_INPUT_DEVICE_H  */

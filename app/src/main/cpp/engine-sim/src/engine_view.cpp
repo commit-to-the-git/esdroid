@@ -60,8 +60,8 @@ void EngineView::onMouseScroll(int scroll) {
 
 void EngineView::onPinchZoom(int scroll, const Point &mouseLocal) {
     onMouseScroll(scroll);
-    // onMouseScroll keeps the screen center fixed. Shift the pan so the
-    // point under the fingers stays under the fingers instead.
+    // onmousescroll keeps the screen center fixed shift the pan so the
+    // point under the fingers stays under the fingers instead
     const float f = std::powf(2.0, (float)scroll / 500.0f);
     const Point anchor = {
         mouseLocal.x - (m_bounds.m0.x + m_bounds.m1.x) * 0.5f,

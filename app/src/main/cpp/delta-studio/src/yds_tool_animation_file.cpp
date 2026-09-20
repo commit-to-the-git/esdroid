@@ -21,7 +21,7 @@ ysError ysToolAnimationFile::Open(const wchar_t *fname) {
 
     if (!m_file.is_open()) return YDS_ERROR_RETURN(ysError::CouldNotOpenFile);
 
-    // Read magic number
+    // read magic number
     unsigned int magicNumber = 0;
     m_file.read((char *)&magicNumber, sizeof(unsigned int));
 
@@ -30,7 +30,7 @@ ysError ysToolAnimationFile::Open(const wchar_t *fname) {
         return YDS_ERROR_RETURN(ysError::InvalidFileType);
     }
 
-    // Read File Version
+    // read file version
     unsigned int fileVersion = 0;
     m_file.read((char *)&fileVersion, sizeof(unsigned int));
 
@@ -39,7 +39,7 @@ ysError ysToolAnimationFile::Open(const wchar_t *fname) {
         return YDS_ERROR_RETURN(ysError::UnsupportedFileVersion);
     }
 
-    // Read Last Editor
+    // read last editor
     unsigned int lastEditor = 0x0;
     m_file.read((char *)&lastEditor, sizeof(unsigned int));
 
@@ -53,7 +53,7 @@ ysError ysToolAnimationFile::Open(const wchar_t *fname) {
         m_lastEditor = (EditorId)(lastEditor);
     }
 
-    // Read compilation status
+    // read compilation status
     unsigned int compilationStatus = 0x0;
     m_file.read((char *)&compilationStatus, sizeof(unsigned int));
 
@@ -156,7 +156,7 @@ ysError ysToolAnimationFile::ReadObjectAnimationVersion000(ysObjectAnimationData
 
     YDS_NESTED_ERROR_CALL(ReadString(object->m_objectName));
 
-    // Read position keys
+    // read position keys
     m_file.read((char *)&object->m_positionKeys.Type, sizeof(ysObjectAnimationData::ANIMATION_KEY));
     if (!m_file) return YDS_ERROR_RETURN(ysError::CorruptedFile);
 
@@ -170,7 +170,7 @@ ysError ysToolAnimationFile::ReadObjectAnimationVersion000(ysObjectAnimationData
     }
 
 
-    // Read rotation keys
+    // read rotation keys
     m_file.read((char *)&object->m_rotationKeys.Type, sizeof(ysObjectAnimationData::ANIMATION_KEY));
     if (!m_file) return YDS_ERROR_RETURN(ysError::CorruptedFile);
 

@@ -43,4 +43,4 @@ namespace piranha {
 
 } /* namespace piranha */
 
-#endif /* PIRANHA_BOOL_NEGATE_OPERATION_H */
+#endif /* PIRANHA_BOOL_NEGATE_OPERATION_H  */

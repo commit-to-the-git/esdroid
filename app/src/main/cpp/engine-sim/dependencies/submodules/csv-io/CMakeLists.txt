@@ -10,7 +10,7 @@ project("${ProjectName}")
 
 set(CMAKE_CXX_STANDARD 11)
 
-# =========================================================
+#
 # gtest
 
 include(FetchContent)
@@ -28,14 +28,14 @@ set_property(TARGET gmock_main PROPERTY FOLDER "gtest")
 set_property(TARGET gtest PROPERTY FOLDER "gtest")
 set_property(TARGET gtest_main PROPERTY FOLDER "gtest")
 
-# =========================================================
+#
 
 add_library("${ProjectName}" STATIC
-    # Source files
+    # source files
     src/information.cpp
     src/csv_data.cpp
 
-    # Header files
+    # header files
     include/information.h
     include/csv_data.h
 )
@@ -43,10 +43,10 @@ add_library("${ProjectName}" STATIC
 target_compile_definitions("${ProjectName}" PRIVATE PROJECT_NAMESPACE=${ProjectNamespace})
 
 add_executable("${ProjectName}-main"
-    # Source files
+    # source files
     src/main.cpp
 
-    # Header files
+    # header files
 )
 
 target_link_libraries("${ProjectName}-main"
@@ -58,11 +58,11 @@ target_link_libraries("${ProjectName}-main"
 enable_testing()
 
 add_executable("${ProjectName}-test"
-    # Source files
+    # source files
     test/sanity_test.cpp
     test/csv_data_tests.cpp
 
-    # Head files
+    # head files
 )
 
 target_link_libraries("${ProjectName}-test"

@@ -49,7 +49,7 @@ ysAudioFile::Error ysAudioFile::CloseFile() {
 ysAudioFile::Error ysAudioFile::FillBuffer(SampleOffset offset) {
     if (offset > m_sampleCount) return Error::ReadOutOfRange;
 
-    // Use External Buffer
+    // use external buffer
     if (m_externalBuffer != nullptr) {
         if (offset + m_externalBuffer->GetSampleCount() > m_sampleCount) {
             return Error::ReadOutOfRange;
@@ -65,7 +65,7 @@ ysAudioFile::Error ysAudioFile::FillBuffer(SampleOffset offset) {
         m_externalBuffer->EditBuffer(target);
         free(target);
     }
-    // Use Internal Buffer
+    // use internal buffer
     else {
         if (offset + m_maxBufferSamples > m_sampleCount) {
             return Error::ReadOutOfRange;
@@ -100,7 +100,7 @@ ysAudioFile::Error ysAudioFile::InitializeInternalBuffer(SampleOffset samples, b
         if (copySize > 0) memcpy(newBuffer, m_buffer, copySize);
     }
 
-    // Delete original buffer
+    // delete original buffer
     delete[] m_buffer;
 
     m_buffer = newBuffer;

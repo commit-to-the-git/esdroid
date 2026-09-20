@@ -25,4 +25,4 @@ protected:
     wchar_t m_filename[MAX_FILENAME_LENGTH + 1];
 };
 
-#endif /* YDS_TEXTURE_H */
+#endif /* YDS_TEXTURE_H  */

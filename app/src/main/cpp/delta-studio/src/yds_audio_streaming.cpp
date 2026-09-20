@@ -149,8 +149,8 @@ ysError ysStreamingAudio::Update() {
 
     if (readSubdivision != m_currentReadSubdivision) {
         if (readSubdivision != ((m_currentReadSubdivision + 1) % m_subdivisions)) {
-            // TEMP
-            // Weird jump, don't know how to handle this yet
+            // temp
+            // weird jump dont know how to handle this yet
         }
 
         m_currentReadSubdivision = readSubdivision;

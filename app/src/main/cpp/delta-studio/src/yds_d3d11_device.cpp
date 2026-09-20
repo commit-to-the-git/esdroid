@@ -33,7 +33,7 @@
 
 typedef HRESULT(WINAPI *DXGIGetDebugInterface_proc)(const IID &riid,
                                                     void **ppDebug);
-#endif /* _DEBUG */
+#endif /* _DEBUG  */
 
 #pragma warning(pop)
 
@@ -49,7 +49,7 @@ ysD3D11Device::ysD3D11Device() : ysDevice(DeviceAPI::DirectX11) {
     m_multisampleCount = 0;
     m_multisampleQuality = 0;
 
-    // TEMP
+    // temp
     m_rasterizerState = nullptr;
 
     m_depthStencilDisabledState = nullptr;
@@ -120,7 +120,7 @@ ysError ysD3D11Device::InitializeDevice() {
     UINT deviceCreationFlags = 0;
 #ifdef _DEBUG
     deviceCreationFlags |= D3D11_CREATE_DEVICE_DEBUG;
-#endif /* _DEBUG */
+#endif /* _DEBUG  */
 
     const D3D_FEATURE_LEVEL featureLevels[] = {
             D3D_FEATURE_LEVEL_11_1,
@@ -136,8 +136,8 @@ ysError ysD3D11Device::InitializeDevice() {
             &m_deviceContext);
 
     if (result == E_INVALIDARG) {
-        // This is needed because D3D11CreateDevice will fail if on a
-        // 11_0 device since D3D_FEATURE_LEVEL_11_1 won't be recongized
+        // this is needed because d3d11createdevice will fail if on a
+        // 11_0 device since d3d_feature_level_11_1 wont be recongized
         result = D3D11CreateDevice(
                 nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, deviceCreationFlags,
                 &featureLevels[1],
@@ -231,8 +231,8 @@ ysError ysD3D11Device::InitializeDevice() {
         return YDS_ERROR_RETURN(ysError::CouldNotCreateGraphicsDevice);
     }
 
-    // TEMP
-    // Temporary location for this initialization
+    // temp
+    // temporary location for this initialization
     GetImmediateContext()->IASetPrimitiveTopology(
             D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     InitializeTextureSlots(D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT);
@@ -276,13 +276,13 @@ ysError ysD3D11Device::DestroyDevice() {
         HRESULT r = proc(IID_PPV_ARGS(dxgiDebug.GetAddressOf()));
         dxgiDebug.Get()->ReportLiveObjects(pD, DXGI_DEBUG_RLO_DETAIL);
     }
-#endif /* _DEBUG */
+#endif /* _DEBUG  */
 
     return YDS_ERROR_RETURN(ysError::None);
 }
 
 bool ysD3D11Device::CheckSupport() {
-    // TEMP
+    // temp
     return true;
 }
 
@@ -314,7 +314,7 @@ ysError ysD3D11Device::CreateRenderingContext(ysRenderingContext **context,
     const int width = std::max(1, window->GetGameWidth());
     const int height = std::max(1, window->GetGameHeight());
 
-    // Get max MSAA quality
+    // get max msaa quality
     UINT multisamplesPerPixel = 1;
     UINT maxQuality;
     DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -421,7 +421,7 @@ ysError ysD3D11Device::CreateRenderingContext(ysRenderingContext **context,
 
     *context = static_cast<ysRenderingContext *>(newContext);
 
-    // TEMP
+    // temp
     if (m_rasterizerState == nullptr) {
         D3D11_RASTERIZER_DESC rasterizerDescription;
         ZeroMemory(&rasterizerDescription, sizeof(D3D11_RASTERIZER_DESC));
@@ -442,7 +442,7 @@ ysError ysD3D11Device::CreateRenderingContext(ysRenderingContext **context,
 
         D3D11SetDebugName(m_rasterizerState, "RASTERIZER_STATE");
 
-        // TEMPORARY ALPHA ENABLING
+        // temporary alpha enabling
         D3D11_BLEND_DESC BlendState;
         ZeroMemory(&BlendState, sizeof(D3D11_BLEND_DESC));
         BlendState.RenderTarget[0].BlendEnable = TRUE;
@@ -464,38 +464,38 @@ ysError ysD3D11Device::CreateRenderingContext(ysRenderingContext **context,
         GetImmediateContext()->OMSetBlendState(m_blendState, blendFactor,
                                                sampleMask);
 
-        // END TEMPORARY ALPHA BLENDING
+        // end temporary alpha blending
     }
 
-    // END TEMP
+    // end temp
 
-    // Create standard depth stencil states
+    // create standard depth stencil states
     D3D11_DEPTH_STENCIL_DESC dsDesc;
 
-    // Depth test parameters
+    // depth test parameters
     dsDesc.DepthEnable = true;
     dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
     dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
 
-    // Stencil test parameters
+    // stencil test parameters
     dsDesc.StencilEnable = true;
     dsDesc.StencilReadMask = 0xFF;
     dsDesc.StencilWriteMask = 0xFF;
 
-    // Stencil operations if pixel is front-facing
+    // stencil operations if pixel is front-facing
     dsDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
     dsDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
     dsDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
     dsDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
 
-    // Stencil operations if pixel is back-facing
+    // stencil operations if pixel is back-facing
     dsDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
     dsDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
     dsDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
     dsDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
 
     if (m_depthStencilEnabledState == nullptr) {
-        // Create depth stencil state
+        // create depth stencil state
         m_device->CreateDepthStencilState(&dsDesc, &m_depthStencilEnabledState);
     }
 
@@ -514,7 +514,7 @@ ysError ysD3D11Device::UpdateRenderingContext(ysRenderingContext *context) {
     if (context == nullptr) return YDS_ERROR_RETURN(ysError::InvalidParameter);
     if (m_device == nullptr) return YDS_ERROR_RETURN(ysError::NoDevice);
 
-    // Check the window
+    // check the window
     if (!context->GetWindow()->IsVisible()) {
         return YDS_ERROR_RETURN(ysError::None);
     }
@@ -528,11 +528,11 @@ ysError ysD3D11Device::UpdateRenderingContext(ysRenderingContext *context) {
             context->GetAttachedRenderTarget());
 
     if (width == 0 || height == 0) {
-        // Don't do anything in this case
+        // dont do anything in this case
         return YDS_ERROR_RETURN(ysError::None);
     }
 
-    // Destroy render target first
+    // destroy render target first
     if (attachedTarget != nullptr) {
 #if YDS_D3D11_USE_FLIP_MODEL
         YDS_NESTED_ERROR_CALL(
@@ -859,7 +859,7 @@ ysError ysD3D11Device::ResizeRenderTarget(ysRenderTarget *target, int width,
         prevTargets[i] = m_activeRenderTarget[i];
     }
 
-    // Disable the target if it is active
+    // disable the target if it is active
     for (int i = 0; i < MaxRenderTargets; ++i) {
         if (target == prevTargets[i]) { SetRenderTarget(nullptr, i); }
     }
@@ -873,10 +873,10 @@ ysError ysD3D11Device::ResizeRenderTarget(ysRenderTarget *target, int width,
                 target, width, height, target->GetFormat(), target->GetMsaa(),
                 target->HasColorData(), target->HasDepthBuffer()));
     } else if (target->GetType() == ysRenderTarget::Type::Subdivision) {
-        // Nothing needs to be done
+        // nothing needs to be done
     }
 
-    // Re-enable the target if it was active
+    // re-enable the target if it was active
     for (int i = 0; i < MaxRenderTargets; ++i) {
         if (target == prevTargets[i]) { SetRenderTarget(target, i); }
     }
@@ -965,7 +965,7 @@ ysError ysD3D11Device::Present() {
     return YDS_ERROR_RETURN(ysError::None);
 }
 
-// Vertex Buffers
+// vertex buffers
 
 ysError ysD3D11Device::CreateVertexBuffer(ysGPUBuffer **newBuffer, int size,
                                           char *data, bool mirrorToRam) {
@@ -1332,7 +1332,7 @@ ysError ysD3D11Device::DestroyGPUBuffer(ysGPUBuffer *&buffer) {
     return YDS_ERROR_RETURN(ysError::None);
 }
 
-// Shaders
+// shaders
 ysError ysD3D11Device::CreateVertexShader(ysShader **newShader,
                                           const wchar_t *shaderFilename,
                                           const wchar_t *compiledFilename,
@@ -1541,11 +1541,11 @@ ysError ysD3D11Device::CreatePixelShader(ysShader **newShader,
 
     D3D11SetDebugName(newD3D11Shader->m_pixelShader, "FRAGMENT_SHADER");
 
-    // TEMP ----------------------------------------------------
+    // temp ----------------------------------------------------
     GetImmediateContext()->PSSetShader(pixelShader, 0, 0);
 
     if (m_samplerState == nullptr) {
-        // Create a sampler state (testing purposes)
+        // create a sampler state testing purposes
         D3D11_SAMPLER_DESC desc;
         ZeroMemory(&desc, sizeof(D3D11_SAMPLER_DESC));
         desc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
@@ -1565,7 +1565,7 @@ ysError ysD3D11Device::CreatePixelShader(ysShader **newShader,
         GetImmediateContext()->PSSetSamplers(0, 1, &m_samplerState);
     }
 
-    // END TEMP ----------------------------------------------------
+    // end temp ----------------------------------------------------
 
     return YDS_ERROR_RETURN(ysError::None);
 }
@@ -1804,7 +1804,7 @@ ysError ysD3D11Device::DestroyInputLayout(ysInputLayout *&layout) {
     return YDS_ERROR_RETURN(ysError::None);
 }
 
-// Textures
+// textures
 ysError ysD3D11Device::CreateTexture(ysTexture **newTexture,
                                      const wchar_t *fname) {
     YDS_ERROR_DECLARE("CreateTexture");
@@ -2104,7 +2104,7 @@ void ysD3D11Device::DrawLines(int numIndices, int indexOffset,
     GetImmediateContext()->DrawIndexed(numIndices, indexOffset, vertexOffset);
 }
 
-// Non-standard interface
+// non-standard interface
 DXGI_FORMAT ysD3D11Device::ConvertInputLayoutFormat(
         ysRenderGeometryChannel::ChannelFormat format) {
     switch (format) {
@@ -2232,7 +2232,7 @@ ysD3D11Device::CreateD3D11OnScreenRenderTarget(ysRenderTarget *newTarget,
         return YDS_ERROR_RETURN(ysError::CouldNotCreateRenderTarget);
     }
 
-    // Create Depth Buffer
+    // create depth buffer
     if (depthBuffer) {
         ysError depthResult = CreateD3D11DepthStencilView(
                 &newDepthStencilView, nullptr,
@@ -2288,7 +2288,7 @@ ysError ysD3D11Device::CreateD3D11OffScreenRenderTarget(
     ID3D11DepthStencilView *newDepthStencil = nullptr;
 
     if (colorData) {
-        // Create the texture
+        // create the texture
         D3D11_TEXTURE2D_DESC descBuffer;
         ZeroMemory(&descBuffer, sizeof(descBuffer));
         descBuffer.Width = width;
@@ -2324,7 +2324,7 @@ ysError ysD3D11Device::CreateD3D11OffScreenRenderTarget(
             return YDS_ERROR_RETURN(ysError::CouldNotCreateRenderTarget);
         }
 
-        // Create the render target view
+        // create the render target view
         D3D11_RENDER_TARGET_VIEW_DESC rtDesc;
         ZeroMemory(&rtDesc, sizeof(rtDesc));
         rtDesc.Format = descBuffer.Format;
@@ -2339,7 +2339,7 @@ ysError ysD3D11Device::CreateD3D11OffScreenRenderTarget(
             return YDS_ERROR_RETURN(ysError::CouldNotCreateRenderTarget);
         }
 
-        // Create the shader resource view
+        // create the shader resource view
         D3D11_SHADER_RESOURCE_VIEW_DESC srDesc;
         ZeroMemory(&srDesc, sizeof(srDesc));
         srDesc.Format = descBuffer.Format;
@@ -2356,7 +2356,7 @@ ysError ysD3D11Device::CreateD3D11OffScreenRenderTarget(
         }
     }
 
-    // Create Depth Buffer
+    // create depth buffer
     if (depthBuffer) {
         ysError depthResult;
         if (!colorData) {
@@ -2376,7 +2376,7 @@ ysError ysD3D11Device::CreateD3D11OffScreenRenderTarget(
         }
     }
 
-    // Create the render target
+    // create the render target
 
     ysD3D11RenderTarget *newRenderTarget =
             static_cast<ysD3D11RenderTarget *>(target);

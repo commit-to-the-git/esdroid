@@ -22,7 +22,7 @@ ysError ysToolGeometryFile::Open(const wchar_t *fname) {
     }
     if (!m_file.is_open()) return YDS_ERROR_RETURN(ysError::CouldNotOpenFile);
 
-    // Read Magic Number
+    // read magic number
     unsigned int magicNumber = 0;
     m_file.read((char *)&magicNumber, sizeof(unsigned int));
 
@@ -31,7 +31,7 @@ ysError ysToolGeometryFile::Open(const wchar_t *fname) {
         return YDS_ERROR_RETURN(ysError::InvalidFileType);
     }
 
-    // Read File Version
+    // read file version
     int fileVersion = -1;
 
     m_file.read((char *)&fileVersion, sizeof(int));
@@ -41,7 +41,7 @@ ysError ysToolGeometryFile::Open(const wchar_t *fname) {
         return YDS_ERROR_RETURN(ysError::UnsupportedFileVersion);
     }
 
-    // Read Last Editor
+    // read last editor
     if (fileVersion >= 3 && fileVersion <= 5) {
         unsigned int lastEditor = 0x0;
         m_file.read((char *)&lastEditor, sizeof(unsigned int));
@@ -60,7 +60,7 @@ ysError ysToolGeometryFile::Open(const wchar_t *fname) {
         m_lastEditor = EditorId::Undefined;
     }
 
-    // Read compilation status
+    // read compilation status
     if (fileVersion >= 3 && fileVersion <= 5) {
         unsigned int compilationStatus = 0x0;
         m_file.read((char *)&compilationStatus, sizeof(unsigned int));
@@ -241,11 +241,11 @@ ysError ysToolGeometryFile::ReadObjectDataVersion000_005(ysObjectData *object) {
         m_file.read((char *)&object->m_width, sizeof(float));
     }
     else if (object->m_objectInformation.ObjectType == ysObjectData::ObjectType::Geometry) {
-        // ====================================================
-        // Read In Vertex Data
-        // ====================================================
+        //
+        // read in vertex data
+        //
 
-        // Allocate Data
+        // allocate data
 
         int maxNumberOfBonesPerVertex = 3;
         for (int i = 0; i < object->m_objectStatistics.NumVertices; i++) {
@@ -262,7 +262,7 @@ ysError ysToolGeometryFile::ReadObjectDataVersion000_005(ysObjectData *object) {
         if (object->m_objectInformation.UsesBones != 0) {
             object->m_boneWeights.Allocate(object->m_objectStatistics.NumVertices);
             for (int i = 0; i < object->m_objectStatistics.NumVertices; i++) {
-                // Bone Data
+                // bone data
                 int nBones = 0;
                 m_file.read((char *)&nBones, sizeof(int));
 
@@ -279,9 +279,9 @@ ysError ysToolGeometryFile::ReadObjectDataVersion000_005(ysObjectData *object) {
             }
         }
 
-        // ====================================================
-        // Read In UV Coordinate Data
-        // ====================================================
+        //
+        // read in uv coordinate data
+        //
         if (object->m_objectStatistics.NumUVChannels > 0) {
             object->m_channels.Allocate(object->m_objectStatistics.NumUVChannels);
 
@@ -297,9 +297,9 @@ ysError ysToolGeometryFile::ReadObjectDataVersion000_005(ysObjectData *object) {
             }
         }
 
-        // ====================================================
-        // Read In Face Data
-        // ====================================================
+        //
+        // read in face data
+        //
         object->m_vertexIndexSet.Allocate(object->m_objectStatistics.NumFaces);
 
         if (SmoothingData()) object->m_smoothingGroups.Allocate(object->m_objectStatistics.NumFaces);
@@ -329,9 +329,9 @@ ysError ysToolGeometryFile::ReadObjectDataVersion000_005(ysObjectData *object) {
             }
         }
 
-        // ====================================================
-        // Read In Bone Indices
-        // ====================================================
+        //
+        // read in bone indices
+        //
         if (object->m_objectInformation.UsesBones) {
             int nBones;
             m_file.read((char *)&nBones, sizeof(int));
@@ -379,7 +379,7 @@ ysError ysToolGeometryFile::ReadObjectVersion000(ysObjectData *object) {
     object->m_objectStatistics.NumUVChannels = objectStatistics.NumUVChannels;
     object->m_objectStatistics.NumVertices = objectStatistics.NumVertices;
 
-    // Version > 0x1
+    // version > 0x1
     object->m_flipNormals = false;
     object->m_objectInformation.ParentInstance = -1;
 
@@ -421,7 +421,7 @@ ysError ysToolGeometryFile::ReadObjectVersion001(ysObjectData *object) {
     object->m_objectStatistics.NumUVChannels = objectStatistics.NumUVChannels;
     object->m_objectStatistics.NumVertices = objectStatistics.NumVertices;
 
-    // ONLY ADDITION
+    // only addition
     int flipNormals;
     m_file.read((char *)&flipNormals, sizeof(int));
     if (!m_file) return YDS_ERROR_RETURN(ysError::CorruptedFile);
@@ -449,7 +449,7 @@ ysError ysToolGeometryFile::ReadObjectVersion002(ysObjectData *object) {
     object->m_objectInformation.SkeletonIndex = -1;
 
     YDS_NESTED_ERROR_CALL(ReadString(object->m_name));
-    YDS_NESTED_ERROR_CALL(ReadString(object->m_materialName)); // ONLY ADDITION
+    YDS_NESTED_ERROR_CALL(ReadString(object->m_materialName)); // only addition
 
     ObjectTransformation_000_003 objectTransformation;
     m_file.read((char *)&objectTransformation, sizeof(ObjectTransformation_000_003));

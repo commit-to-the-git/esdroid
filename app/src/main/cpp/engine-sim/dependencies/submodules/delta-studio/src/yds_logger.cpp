@@ -34,7 +34,7 @@ void ysLogger::AddMessageLevel(int level, const char *name) {
 }
 
 void ysLogger::Initialize() {
-    // Add default levels
+    // add default levels
     AddMessageLevel(0,    "DEBUG");
     AddMessageLevel(10, "INFO");
     AddMessageLevel(20, "WARNING");

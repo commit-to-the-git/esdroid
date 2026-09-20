@@ -1,6 +1,6 @@
 #include "int_conversions.h"
 
-// CONVERSION =============================================
+// conversion =============================================
 // string -> int
 piranha::StringToIntConversion::StringToIntConversion() {
     /* void */

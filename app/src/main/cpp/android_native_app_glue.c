@@ -28,7 +28,7 @@
 #define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "threaded_app", __VA_ARGS__))
 #define LOGE(...) ((void)__android_log_print(ANDROID_LOG_ERROR, "threaded_app", __VA_ARGS__))
 
-/* For debug builds, always enable the debug traces in this library */
+/* for debug builds always enable the debug traces in this library */
 #ifndef NDEBUG
 #  define LOGV(...)  ((void)__android_log_print(ANDROID_LOG_VERBOSE, "threaded_app", __VA_ARGS__))
 #else
@@ -175,7 +175,7 @@ static void android_app_destroy(struct android_app* android_app) {
     android_app->destroyed = 1;
     pthread_cond_broadcast(&android_app->cond);
     pthread_mutex_unlock(&android_app->mutex);
-    // Can't touch android_app object after this.
+    // cant touch android_app object after this
 }
 
 static void process_input(struct android_app* app, struct android_poll_source* source) {
@@ -229,9 +229,9 @@ static void* android_app_entry(void* param) {
     return NULL;
 }
 
-// --------------------------------------------------------------------
-// Native activity interaction (called from main thread)
-// --------------------------------------------------------------------
+//
+// native activity interaction called from main thread
+//
 
 static struct android_app* android_app_create(ANativeActivity* activity,
                                               void* savedState, size_t savedStateSize) {
@@ -258,12 +258,12 @@ static struct android_app* android_app_create(ANativeActivity* activity,
     pthread_attr_t attr;
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-    /* 16MB stack: the engine-sim UI render tree recurses deep and overflows
-     * the default 1MB stack, corrupting the heap below it. */
+    /* 16mb stack the engine-sim ui render tree recurses deep and overflows
+     * the default 1mb stack corrupting the heap below it */
     pthread_attr_setstacksize(&attr, 16 * 1024 * 1024);
     pthread_create(&android_app->thread, &attr, android_app_entry, android_app);
 
-    // Wait for thread to start.
+    // wait for thread to start
     pthread_mutex_lock(&android_app->mutex);
     while (!android_app->running) {
         pthread_cond_wait(&android_app->cond, &android_app->mutex);

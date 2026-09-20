@@ -40,8 +40,8 @@ double Vehicle::getSpeed() const {
 
     return vehicleSpeed;
 
-    // E_r = 0.5 * I * v_theta^2
-    // E_k = 0.5 * m * v^2
+    // e_r = 0.5 * i * v_theta^2
+    // e_k = 0.5 * m * v^2
 }
 
 double Vehicle::linearForceToVirtualTorque(double force) const {

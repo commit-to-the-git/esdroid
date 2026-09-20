@@ -75,7 +75,7 @@ namespace piranha {
         };
 
     public:
-        // Standard metadata flags
+        // standard metadata flags
         static constexpr const char *META_CONSTANT = "!!PIRANHA::CONSTANT";
         static constexpr const char *META_ACTIONLESS = "!!PIRANHA::ACTIONLESS";
 
@@ -221,9 +221,9 @@ namespace piranha {
         Node *m_enableInputDependency;
 
     private:
-        // State variables
+        // state variables
 
-        // Initialization status
+        // initialization status
         bool m_initialized;
         bool m_evaluating;
         std::atomic<bool> m_evaluated;
@@ -232,18 +232,18 @@ namespace piranha {
         bool m_enabled;
 
     protected:
-        // Context
+        // context
         NodeProgram *m_program;
         NodeContainer *m_container;
 
         std::vector<Node *> m_dependencyChain;
 
     protected:
-        // Run-time
+        // run-time
         bool m_runtimeError;
 
     protected:
-        // Automatic optimization
+        // automatic optimization
         virtual Node *_optimize(NodeAllocator *allocator);
 
         Node *m_optimizedNode;
@@ -255,10 +255,10 @@ namespace piranha {
         MemorySpace m_memorySpace;
 
     protected:
-        // Metadata flags
+        // metadata flags
         std::vector<MetaFlag> m_flags;
     };
 
 } /* namespace piranha */
 
-#endif /* PIRANHA_NODE_H */
+#endif /* PIRANHA_NODE_H  */

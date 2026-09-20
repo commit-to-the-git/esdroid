@@ -13,12 +13,12 @@ public:
     ysVulkanDevice();
     ~ysVulkanDevice();
 
-    // Setup
+    // setup
     virtual ysError InitializeDevice() override;
     virtual ysError DestroyDevice() override;
     virtual bool CheckSupport() override;
 
-    // Rendering Contexts
+    // rendering contexts
     virtual ysError
     CreateRenderingContext(ysRenderingContext **renderingContext,
                            ysWindow *window) override;
@@ -48,11 +48,11 @@ public:
     virtual ysError ClearBuffers(const float *clearColor) override;
     virtual ysError Present() override;
 
-    // State
+    // state
     virtual ysError SetFaceCulling(bool faceCulling) override;
     virtual ysError SetFaceCullingMode(CullMode cullMode) override;
 
-    // GPU Buffers
+    // gpu buffers
     virtual ysError CreateVertexBuffer(ysGPUBuffer **newBuffer, int size,
                                        char *data, bool mirrorToRam = false) override;
     virtual ysError CreateIndexBuffer(ysGPUBuffer **newBuffer, int size,
@@ -68,7 +68,7 @@ public:
     virtual ysError EditBufferData(ysGPUBuffer *buffer, char *data) override;
     virtual ysError DestroyGPUBuffer(ysGPUBuffer *&buffer) override;
 
-    // Shaders
+    // shaders
     virtual ysError CreateVertexShader(ysShader **newShader,
                                        const wchar_t *shaderFilename,
                                        const wchar_t *compiledFilename,
@@ -81,7 +81,7 @@ public:
                                       bool compile) override;
     virtual ysError DestroyShader(ysShader *&shader);
 
-    // Shader Programs
+    // shader programs
     virtual ysError CreateShaderProgram(ysShaderProgram **newProgram);
     virtual ysError DestroyShaderProgram(ysShaderProgram *&shader,
                                          bool destroyShaders = false) override;
@@ -90,7 +90,7 @@ public:
     virtual ysError LinkProgram(ysShaderProgram *program) override;
     virtual ysError UseShaderProgram(ysShaderProgram *) override;
 
-    // Input Layouts
+    // input layouts
     virtual ysError
     CreateInputLayout(ysInputLayout **newLayout, ysShader *shader,
                       const ysRenderGeometryFormat *format,
@@ -98,7 +98,7 @@ public:
     virtual ysError UseInputLayout(ysInputLayout *layout) override;
     virtual ysError DestroyInputLayout(ysInputLayout *&layout) override;
 
-    // Textures
+    // textures
     virtual ysError CreateTexture(ysTexture **texture, const wchar_t *fname);
     virtual ysError CreateTexture(ysTexture **texture, int width, int height,
                                   const unsigned char *buffer) override;
@@ -124,4 +124,4 @@ protected:
     VkDevice m_device;
 };
 
-#endif /* YDS_VULKAN_DEVICE_H */
+#endif /* YDS_VULKAN_DEVICE_H  */

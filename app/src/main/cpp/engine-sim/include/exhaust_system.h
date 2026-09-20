@@ -60,4 +60,4 @@ class ExhaustSystem : public Part {
         double m_flow;
 };
 
-#endif /* ATG_ENGINE_SIM_EXHAUST_SYSTEM_H */
+#endif /* ATG_ENGINE_SIM_EXHAUST_SYSTEM_H  */

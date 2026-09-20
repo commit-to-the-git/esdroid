@@ -27,4 +27,4 @@ namespace piranha {
 
 } /* namespace piranha */
 
-#endif /* PIRANHA_IR_STRUCTURE_LIST_H */
+#endif /* PIRANHA_IR_STRUCTURE_LIST_H  */

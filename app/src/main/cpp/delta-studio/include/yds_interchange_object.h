@@ -84,4 +84,4 @@ public:
     void UniformScale(float scale);
 };
 
-#endif /* YDS_INTERCHANGE_OBJECT_H */
+#endif /* YDS_INTERCHANGE_OBJECT_H  */

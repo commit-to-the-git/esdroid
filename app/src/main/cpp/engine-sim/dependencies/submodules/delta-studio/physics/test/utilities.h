@@ -12,4 +12,4 @@ inline void VecEq(const ysVector &a, const ysVector &b) {
     EXPECT_NEAR(ysMath::GetW(a), ysMath::GetW(b), 0.0001f);
 }
 
-#endif /* DELTA_PHYSICS_TEST_UTILITIES_H */
+#endif /* DELTA_PHYSICS_TEST_UTILITIES_H  */

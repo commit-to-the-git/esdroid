@@ -54,4 +54,4 @@ protected:
     bool m_available;
 };
 
-#endif /* YDS_AUDIO_DEVICE_H */
+#endif /* YDS_AUDIO_DEVICE_H  */

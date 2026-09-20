@@ -1,38 +1,38 @@
-// A Bison parser, made by GNU Bison 3.8.2.
+// a bison parser made by gnu bison 3.8.2
 
-// Skeleton implementation for Bison LALR(1) parsers in C++
+// skeleton implementation for bison lalr1 parsers in c++
 
 // Copyright (C) 2002-2015, 2018-2021 Free Software Foundation, Inc.
 
-// This program is free software: you can redistribute it and/or modify
+// this program is free software you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
+// the free software foundation either version 3 of the license or
+// at your option any later version
 
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// this program is distributed in the hope that it will be useful
+// but without any warranty without even the implied warranty of
+// merchantability or fitness for a particular purpose see the
 // GNU General Public License for more details.
 
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// As a special exception, you may create a larger work that contains
-// part or all of the Bison parser skeleton and distribute that work
-// under terms of your choice, so long as that work isn't itself a
+// as a special exception you may create a larger work that contains
+// part or all of the bison parser skeleton and distribute that work
+// under terms of your choice so long as that work isnt itself a
 // parser generator using the skeleton or a modified version thereof
-// as a parser skeleton.  Alternatively, if you modify or redistribute
-// the parser skeleton itself, you may (at your option) remove this
-// special exception, which will cause the skeleton and the resulting
+// as a parser skeleton alternatively if you modify or redistribute
+// the parser skeleton itself you may at your option remove this
+// special exception which will cause the skeleton and the resulting
 // Bison output files to be licensed under the GNU General Public
-// License without this special exception.
+// license without this special exception
 
-// This special exception was added by the Free Software Foundation in
-// version 2.2 of Bison.
+// this special exception was added by the free software foundation in
+// version 2.2 of bison
 
-// DO NOT RELY ON FEATURES THAT ARE NOT DOCUMENTED in the manual,
-// especially those whose name start with YY_ or yy_.  They are
-// private implementation details that can be changed or removed.
+// do not rely on features that are not documented in the manual
+// especially those whose name start with yy_ or yy_ they are
+// private implementation details that can be changed or removed
 
 
 
@@ -41,7 +41,7 @@
 #include "parser.auto.h"
 
 
-// Unqualified %code blocks.
+// unqualified %code blocks
 #line 63 "flex-bison/specification.y"
 
   #include <iostream>
@@ -60,7 +60,7 @@
 #ifndef YY_
 # if defined YYENABLE_NLS && YYENABLE_NLS
 #  if ENABLE_NLS
-#   include <libintl.h> // FIXME: INFRINGES ON USER NAME SPACE.
+#   include <libintl.h> // fixme infringes on user name space
 #   define YY_(msgid) dgettext ("bison-runtime", msgid)
 #  endif
 # endif
@@ -70,7 +70,7 @@
 #endif
 
 
-// Whether we are compiled with exception support.
+// whether we are compiled with exception support
 #ifndef YY_EXCEPTIONS
 # if defined __GNUC__ && !defined __EXCEPTIONS
 #  define YY_EXCEPTIONS 0
@@ -80,9 +80,9 @@
 #endif
 
 #define YYRHSLOC(Rhs, K) ((Rhs)[K].location)
-/* YYLLOC_DEFAULT -- Set CURRENT to span from RHS[1] to RHS[N].
-   If N is 0, then set CURRENT to the empty location which ends
-   the previous symbol: RHS[0] (always defined).  */
+/* yylloc_default -- set current to span from rhs1 to rhsn
+   if n is 0 then set current to the empty location which ends
+   the previous symbol rhs0 always defined */
 
 # ifndef YYLLOC_DEFAULT
 #  define YYLLOC_DEFAULT(Current, Rhs, N)                               \
@@ -100,10 +100,10 @@
 # endif
 
 
-// Enable debugging if requested.
+// enable debugging if requested
 #if YYDEBUG
 
-// A pseudo ostream that takes yydebug_ into account.
+// a pseudo ostream that takes yydebug_ into account
 # define YYCDEBUG if (yydebug_) (*yycdebug_)
 
 # define YY_SYMBOL_PRINT(Title, Symbol)         \
@@ -128,14 +128,14 @@
       yy_stack_print_ ();                \
   } while (false)
 
-#else // !YYDEBUG
+#else // yydebug
 
 # define YYCDEBUG if (false) std::cerr
 # define YY_SYMBOL_PRINT(Title, Symbol)  YY_USE (Symbol)
 # define YY_REDUCE_PRINT(Rule)           static_cast<void> (0)
 # define YY_STACK_PRINT()                static_cast<void> (0)
 
-#endif // !YYDEBUG
+#endif // yydebug
 
 #define yyerrok         (yyerrstatus_ = 0)
 #define yyclearin       (yyla.clear ())
@@ -149,7 +149,7 @@
 namespace piranha {
 #line 151 "parser.auto.cpp"
 
-  /// Build a parser object.
+  // / build a parser object
   Parser::Parser (Scanner &scanner_yyarg, IrCompilationUnit &driver_yyarg)
 #if YYDEBUG
     : yydebug_ (false),
@@ -167,11 +167,11 @@ namespace piranha {
   Parser::syntax_error::~syntax_error () YY_NOEXCEPT YY_NOTHROW
   {}
 
-  /*---------.
-  | symbol.  |
-  `---------*/
+  /*
+  | symbol |
+  */
 
-  // basic_symbol.
+  //  basic_symbol.
   template <typename Base>
   Parser::basic_symbol<Base>::basic_symbol (const basic_symbol& that)
     : Base (that)
@@ -184,118 +184,118 @@ namespace piranha {
         value.copy< piranha::IrAttribute * > (YY_MOVE (that.value));
         break;
 
-      case symbol_kind::S_port_declaration: // port_declaration
-      case symbol_kind::S_port_status: // port_status
-      case symbol_kind::S_port_value: // port_value
-      case symbol_kind::S_port_connection: // port_connection
-      case symbol_kind::S_documented_port_definition: // documented_port_definition
+      case symbol_kind::S_port_declaration: //  port_declaration
+      case symbol_kind::S_port_status: //  port_status
+      case symbol_kind::S_port_value: //  port_value
+      case symbol_kind::S_port_connection: //  port_connection
+      case symbol_kind::S_documented_port_definition: //  documented_port_definition
         value.copy< piranha::IrAttributeDefinition * > (YY_MOVE (that.value));
         break;
 
-      case symbol_kind::S_port_definitions: // port_definitions
+      case symbol_kind::S_port_definitions: //  port_definitions
         value.copy< piranha::IrAttributeDefinitionList * > (YY_MOVE (that.value));
         break;
 
-      case symbol_kind::S_connection_block: // connection_block
-      case symbol_kind::S_attribute_list: // attribute_list
+      case symbol_kind::S_connection_block: //  connection_block
+      case symbol_kind::S_attribute_list: //  attribute_list
         value.copy< piranha::IrAttributeList * > (YY_MOVE (that.value));
         break;
 
-      case symbol_kind::S_import_statement: // import_statement
-      case symbol_kind::S_import_statement_visibility: // import_statement_visibility
-      case symbol_kind::S_import_statement_short_name: // import_statement_short_name
+      case symbol_kind::S_import_statement: //  import_statement
+      case symbol_kind::S_import_statement_visibility: //  import_statement_visibility
+      case symbol_kind::S_import_statement_short_name: //  import_statement_short_name
         value.copy< piranha::IrImportStatement * > (YY_MOVE (that.value));
         break;
 
       case symbol_kind::S_node: // node
-      case symbol_kind::S_node_member: // node_member
-      case symbol_kind::S_inline_node_member: // inline_node_member
-      case symbol_kind::S_inline_node: // inline_node
+      case symbol_kind::S_node_member: //  node_member
+      case symbol_kind::S_inline_node_member: //  inline_node_member
+      case symbol_kind::S_inline_node: //  inline_node
         value.copy< piranha::IrNode * > (YY_MOVE (that.value));
         break;
 
-      case symbol_kind::S_node_name: // node_name
-      case symbol_kind::S_node_inline: // node_inline
-      case symbol_kind::S_node_shadow: // node_shadow
-      case symbol_kind::S_node_definition: // node_definition
-      case symbol_kind::S_specific_node_definition: // specific_node_definition
-      case symbol_kind::S_immediate_node_definition: // immediate_node_definition
-      case symbol_kind::S_node_decorator: // node_decorator
+      case symbol_kind::S_node_name: //  node_name
+      case symbol_kind::S_node_inline: //  node_inline
+      case symbol_kind::S_node_shadow: //  node_shadow
+      case symbol_kind::S_node_definition: //  node_definition
+      case symbol_kind::S_specific_node_definition: //  specific_node_definition
+      case symbol_kind::S_immediate_node_definition: //  immediate_node_definition
+      case symbol_kind::S_node_decorator: //  node_decorator
         value.copy< piranha::IrNodeDefinition * > (YY_MOVE (that.value));
         break;
 
-      case symbol_kind::S_node_list: // node_list
+      case symbol_kind::S_node_list: //  node_list
         value.copy< piranha::IrNodeList * > (YY_MOVE (that.value));
         break;
 
-      case symbol_kind::S_type_name_namespace: // type_name_namespace
+      case symbol_kind::S_type_name_namespace: //  type_name_namespace
         value.copy< piranha::IrTokenInfoSet<std::string, 2> > (YY_MOVE (that.value));
         break;
 
-      case symbol_kind::S_BOOL: // BOOL
+      case symbol_kind::S_BOOL: // bool
         value.copy< piranha::IrTokenInfo_bool > (YY_MOVE (that.value));
         break;
 
-      case symbol_kind::S_FLOAT: // FLOAT
+      case symbol_kind::S_FLOAT: // float
         value.copy< piranha::IrTokenInfo_float > (YY_MOVE (that.value));
         break;
 
-      case symbol_kind::S_INT: // INT
+      case symbol_kind::S_INT: // int
         value.copy< piranha::IrTokenInfo_int > (YY_MOVE (that.value));
         break;
 
-      case symbol_kind::S_CHAR: // CHAR
-      case symbol_kind::S_IMPORT: // IMPORT
-      case symbol_kind::S_AS: // AS
-      case symbol_kind::S_NODE: // NODE
-      case symbol_kind::S_INLINE: // INLINE
-      case symbol_kind::S_ALIAS: // ALIAS
-      case symbol_kind::S_INPUT: // INPUT
-      case symbol_kind::S_OUTPUT: // OUTPUT
-      case symbol_kind::S_MODIFY: // MODIFY
-      case symbol_kind::S_TOGGLE: // TOGGLE
-      case symbol_kind::S_LABEL: // LABEL
-      case symbol_kind::S_STRING: // STRING
-      case symbol_kind::S_DECORATOR: // DECORATOR
-      case symbol_kind::S_PUBLIC: // PUBLIC
-      case symbol_kind::S_PRIVATE: // PRIVATE
-      case symbol_kind::S_BUILTIN_POINTER: // BUILTIN_POINTER
-      case symbol_kind::S_NAMESPACE_POINTER: // NAMESPACE_POINTER
-      case symbol_kind::S_UNRECOGNIZED: // UNRECOGNIZED
-      case symbol_kind::S_OPERATOR: // OPERATOR
-      case symbol_kind::S_MODULE: // MODULE
-      case symbol_kind::S_AUTO: // AUTO
-      case symbol_kind::S_27_: // '='
-      case symbol_kind::S_28_: // '+'
-      case symbol_kind::S_29_: // '-'
-      case symbol_kind::S_30_: // '/'
-      case symbol_kind::S_31_: // '*'
-      case symbol_kind::S_32_: // '('
-      case symbol_kind::S_33_: // ')'
-      case symbol_kind::S_34_: // '{'
-      case symbol_kind::S_35_: // '}'
-      case symbol_kind::S_36_: // '['
-      case symbol_kind::S_37_: // ']'
-      case symbol_kind::S_38_: // ':'
-      case symbol_kind::S_39_: // ';'
-      case symbol_kind::S_40_: // ','
-      case symbol_kind::S_41_: // '.'
-      case symbol_kind::S_42_: // '^'
-      case symbol_kind::S_type_name: // type_name
-      case symbol_kind::S_standard_operator: // standard_operator
+      case symbol_kind::S_CHAR: // char
+      case symbol_kind::S_IMPORT: // import
+      case symbol_kind::S_AS: // as
+      case symbol_kind::S_NODE: // node
+      case symbol_kind::S_INLINE: // inline
+      case symbol_kind::S_ALIAS: // alias
+      case symbol_kind::S_INPUT: // input
+      case symbol_kind::S_OUTPUT: // output
+      case symbol_kind::S_MODIFY: // modify
+      case symbol_kind::S_TOGGLE: // toggle
+      case symbol_kind::S_LABEL: // label
+      case symbol_kind::S_STRING: // string
+      case symbol_kind::S_DECORATOR: // decorator
+      case symbol_kind::S_PUBLIC: // public
+      case symbol_kind::S_PRIVATE: // private
+      case symbol_kind::S_BUILTIN_POINTER: //  BUILTIN_POINTER
+      case symbol_kind::S_NAMESPACE_POINTER: //  NAMESPACE_POINTER
+      case symbol_kind::S_UNRECOGNIZED: // unrecognized
+      case symbol_kind::S_OPERATOR: // operator
+      case symbol_kind::S_MODULE: // module
+      case symbol_kind::S_AUTO: // auto
+      case symbol_kind::S_27_: //
+      case symbol_kind::S_28_: // +
+      case symbol_kind::S_29_: //
+      case symbol_kind::S_30_: // /
+      case symbol_kind::S_31_: //
+      case symbol_kind::S_32_: //
+      case symbol_kind::S_33_: //
+      case symbol_kind::S_34_: // {
+      case symbol_kind::S_35_: // }
+      case symbol_kind::S_36_: //
+      case symbol_kind::S_37_: //
+      case symbol_kind::S_38_: //
+      case symbol_kind::S_39_: //
+      case symbol_kind::S_40_: //
+      case symbol_kind::S_41_: //
+      case symbol_kind::S_42_: // ^
+      case symbol_kind::S_type_name: //  type_name
+      case symbol_kind::S_standard_operator: //  standard_operator
       case symbol_kind::S_string: // string
         value.copy< piranha::IrTokenInfo_string > (YY_MOVE (that.value));
         break;
 
-      case symbol_kind::S_label_value: // label_value
+      case symbol_kind::S_label_value: //  label_value
       case symbol_kind::S_value: // value
       case symbol_kind::S_constant: // constant
-      case symbol_kind::S_atomic_value: // atomic_value
-      case symbol_kind::S_primary_exp: // primary_exp
-      case symbol_kind::S_data_access: // data_access
-      case symbol_kind::S_unary_exp: // unary_exp
-      case symbol_kind::S_mul_exp: // mul_exp
-      case symbol_kind::S_add_exp: // add_exp
+      case symbol_kind::S_atomic_value: //  atomic_value
+      case symbol_kind::S_primary_exp: //  primary_exp
+      case symbol_kind::S_data_access: //  data_access
+      case symbol_kind::S_unary_exp: //  unary_exp
+      case symbol_kind::S_mul_exp: //  mul_exp
+      case symbol_kind::S_add_exp: //  add_exp
         value.copy< piranha::IrValue * > (YY_MOVE (that.value));
         break;
 
@@ -334,118 +334,118 @@ namespace piranha {
         value.move< piranha::IrAttribute * > (YY_MOVE (s.value));
         break;
 
-      case symbol_kind::S_port_declaration: // port_declaration
-      case symbol_kind::S_port_status: // port_status
-      case symbol_kind::S_port_value: // port_value
-      case symbol_kind::S_port_connection: // port_connection
-      case symbol_kind::S_documented_port_definition: // documented_port_definition
+      case symbol_kind::S_port_declaration: //  port_declaration
+      case symbol_kind::S_port_status: //  port_status
+      case symbol_kind::S_port_value: //  port_value
+      case symbol_kind::S_port_connection: //  port_connection
+      case symbol_kind::S_documented_port_definition: //  documented_port_definition
         value.move< piranha::IrAttributeDefinition * > (YY_MOVE (s.value));
         break;
 
-      case symbol_kind::S_port_definitions: // port_definitions
+      case symbol_kind::S_port_definitions: //  port_definitions
         value.move< piranha::IrAttributeDefinitionList * > (YY_MOVE (s.value));
         break;
 
-      case symbol_kind::S_connection_block: // connection_block
-      case symbol_kind::S_attribute_list: // attribute_list
+      case symbol_kind::S_connection_block: //  connection_block
+      case symbol_kind::S_attribute_list: //  attribute_list
         value.move< piranha::IrAttributeList * > (YY_MOVE (s.value));
         break;
 
-      case symbol_kind::S_import_statement: // import_statement
-      case symbol_kind::S_import_statement_visibility: // import_statement_visibility
-      case symbol_kind::S_import_statement_short_name: // import_statement_short_name
+      case symbol_kind::S_import_statement: //  import_statement
+      case symbol_kind::S_import_statement_visibility: //  import_statement_visibility
+      case symbol_kind::S_import_statement_short_name: //  import_statement_short_name
         value.move< piranha::IrImportStatement * > (YY_MOVE (s.value));
         break;
 
       case symbol_kind::S_node: // node
-      case symbol_kind::S_node_member: // node_member
-      case symbol_kind::S_inline_node_member: // inline_node_member
-      case symbol_kind::S_inline_node: // inline_node
+      case symbol_kind::S_node_member: //  node_member
+      case symbol_kind::S_inline_node_member: //  inline_node_member
+      case symbol_kind::S_inline_node: //  inline_node
         value.move< piranha::IrNode * > (YY_MOVE (s.value));
         break;
 
-      case symbol_kind::S_node_name: // node_name
-      case symbol_kind::S_node_inline: // node_inline
-      case symbol_kind::S_node_shadow: // node_shadow
-      case symbol_kind::S_node_definition: // node_definition
-      case symbol_kind::S_specific_node_definition: // specific_node_definition
-      case symbol_kind::S_immediate_node_definition: // immediate_node_definition
-      case symbol_kind::S_node_decorator: // node_decorator
+      case symbol_kind::S_node_name: //  node_name
+      case symbol_kind::S_node_inline: //  node_inline
+      case symbol_kind::S_node_shadow: //  node_shadow
+      case symbol_kind::S_node_definition: //  node_definition
+      case symbol_kind::S_specific_node_definition: //  specific_node_definition
+      case symbol_kind::S_immediate_node_definition: //  immediate_node_definition
+      case symbol_kind::S_node_decorator: //  node_decorator
         value.move< piranha::IrNodeDefinition * > (YY_MOVE (s.value));
         break;
 
-      case symbol_kind::S_node_list: // node_list
+      case symbol_kind::S_node_list: //  node_list
         value.move< piranha::IrNodeList * > (YY_MOVE (s.value));
         break;
 
-      case symbol_kind::S_type_name_namespace: // type_name_namespace
+      case symbol_kind::S_type_name_namespace: //  type_name_namespace
         value.move< piranha::IrTokenInfoSet<std::string, 2> > (YY_MOVE (s.value));
         break;
 
-      case symbol_kind::S_BOOL: // BOOL
+      case symbol_kind::S_BOOL: // bool
         value.move< piranha::IrTokenInfo_bool > (YY_MOVE (s.value));
         break;
 
-      case symbol_kind::S_FLOAT: // FLOAT
+      case symbol_kind::S_FLOAT: // float
         value.move< piranha::IrTokenInfo_float > (YY_MOVE (s.value));
         break;
 
-      case symbol_kind::S_INT: // INT
+      case symbol_kind::S_INT: // int
         value.move< piranha::IrTokenInfo_int > (YY_MOVE (s.value));
         break;
 
-      case symbol_kind::S_CHAR: // CHAR
-      case symbol_kind::S_IMPORT: // IMPORT
-      case symbol_kind::S_AS: // AS
-      case symbol_kind::S_NODE: // NODE
-      case symbol_kind::S_INLINE: // INLINE
-      case symbol_kind::S_ALIAS: // ALIAS
-      case symbol_kind::S_INPUT: // INPUT
-      case symbol_kind::S_OUTPUT: // OUTPUT
-      case symbol_kind::S_MODIFY: // MODIFY
-      case symbol_kind::S_TOGGLE: // TOGGLE
-      case symbol_kind::S_LABEL: // LABEL
-      case symbol_kind::S_STRING: // STRING
-      case symbol_kind::S_DECORATOR: // DECORATOR
-      case symbol_kind::S_PUBLIC: // PUBLIC
-      case symbol_kind::S_PRIVATE: // PRIVATE
-      case symbol_kind::S_BUILTIN_POINTER: // BUILTIN_POINTER
-      case symbol_kind::S_NAMESPACE_POINTER: // NAMESPACE_POINTER
-      case symbol_kind::S_UNRECOGNIZED: // UNRECOGNIZED
-      case symbol_kind::S_OPERATOR: // OPERATOR
-      case symbol_kind::S_MODULE: // MODULE
-      case symbol_kind::S_AUTO: // AUTO
-      case symbol_kind::S_27_: // '='
-      case symbol_kind::S_28_: // '+'
-      case symbol_kind::S_29_: // '-'
-      case symbol_kind::S_30_: // '/'
-      case symbol_kind::S_31_: // '*'
-      case symbol_kind::S_32_: // '('
-      case symbol_kind::S_33_: // ')'
-      case symbol_kind::S_34_: // '{'
-      case symbol_kind::S_35_: // '}'
-      case symbol_kind::S_36_: // '['
-      case symbol_kind::S_37_: // ']'
-      case symbol_kind::S_38_: // ':'
-      case symbol_kind::S_39_: // ';'
-      case symbol_kind::S_40_: // ','
-      case symbol_kind::S_41_: // '.'
-      case symbol_kind::S_42_: // '^'
-      case symbol_kind::S_type_name: // type_name
-      case symbol_kind::S_standard_operator: // standard_operator
+      case symbol_kind::S_CHAR: // char
+      case symbol_kind::S_IMPORT: // import
+      case symbol_kind::S_AS: // as
+      case symbol_kind::S_NODE: // node
+      case symbol_kind::S_INLINE: // inline
+      case symbol_kind::S_ALIAS: // alias
+      case symbol_kind::S_INPUT: // input
+      case symbol_kind::S_OUTPUT: // output
+      case symbol_kind::S_MODIFY: // modify
+      case symbol_kind::S_TOGGLE: // toggle
+      case symbol_kind::S_LABEL: // label
+      case symbol_kind::S_STRING: // string
+      case symbol_kind::S_DECORATOR: // decorator
+      case symbol_kind::S_PUBLIC: // public
+      case symbol_kind::S_PRIVATE: // private
+      case symbol_kind::S_BUILTIN_POINTER: //  BUILTIN_POINTER
+      case symbol_kind::S_NAMESPACE_POINTER: //  NAMESPACE_POINTER
+      case symbol_kind::S_UNRECOGNIZED: // unrecognized
+      case symbol_kind::S_OPERATOR: // operator
+      case symbol_kind::S_MODULE: // module
+      case symbol_kind::S_AUTO: // auto
+      case symbol_kind::S_27_: //
+      case symbol_kind::S_28_: // +
+      case symbol_kind::S_29_: //
+      case symbol_kind::S_30_: // /
+      case symbol_kind::S_31_: //
+      case symbol_kind::S_32_: //
+      case symbol_kind::S_33_: //
+      case symbol_kind::S_34_: // {
+      case symbol_kind::S_35_: // }
+      case symbol_kind::S_36_: //
+      case symbol_kind::S_37_: //
+      case symbol_kind::S_38_: //
+      case symbol_kind::S_39_: //
+      case symbol_kind::S_40_: //
+      case symbol_kind::S_41_: //
+      case symbol_kind::S_42_: // ^
+      case symbol_kind::S_type_name: //  type_name
+      case symbol_kind::S_standard_operator: //  standard_operator
       case symbol_kind::S_string: // string
         value.move< piranha::IrTokenInfo_string > (YY_MOVE (s.value));
         break;
 
-      case symbol_kind::S_label_value: // label_value
+      case symbol_kind::S_label_value: //  label_value
       case symbol_kind::S_value: // value
       case symbol_kind::S_constant: // constant
-      case symbol_kind::S_atomic_value: // atomic_value
-      case symbol_kind::S_primary_exp: // primary_exp
-      case symbol_kind::S_data_access: // data_access
-      case symbol_kind::S_unary_exp: // unary_exp
-      case symbol_kind::S_mul_exp: // mul_exp
-      case symbol_kind::S_add_exp: // add_exp
+      case symbol_kind::S_atomic_value: //  atomic_value
+      case symbol_kind::S_primary_exp: //  primary_exp
+      case symbol_kind::S_data_access: //  data_access
+      case symbol_kind::S_unary_exp: //  unary_exp
+      case symbol_kind::S_mul_exp: //  mul_exp
+      case symbol_kind::S_add_exp: //  add_exp
         value.move< piranha::IrValue * > (YY_MOVE (s.value));
         break;
 
@@ -456,7 +456,7 @@ namespace piranha {
     location = YY_MOVE (s.location);
   }
 
-  // by_kind.
+  //  by_kind.
   Parser::by_kind::by_kind () YY_NOEXCEPT
     : kind_ (symbol_kind::S_YYEMPTY)
   {}
@@ -507,7 +507,7 @@ namespace piranha {
 
 
 
-  // by_state.
+  //  by_state.
   Parser::by_state::by_state () YY_NOEXCEPT
     : state (empty_state)
   {}
@@ -554,118 +554,118 @@ namespace piranha {
         value.YY_MOVE_OR_COPY< piranha::IrAttribute * > (YY_MOVE (that.value));
         break;
 
-      case symbol_kind::S_port_declaration: // port_declaration
-      case symbol_kind::S_port_status: // port_status
-      case symbol_kind::S_port_value: // port_value
-      case symbol_kind::S_port_connection: // port_connection
-      case symbol_kind::S_documented_port_definition: // documented_port_definition
+      case symbol_kind::S_port_declaration: //  port_declaration
+      case symbol_kind::S_port_status: //  port_status
+      case symbol_kind::S_port_value: //  port_value
+      case symbol_kind::S_port_connection: //  port_connection
+      case symbol_kind::S_documented_port_definition: //  documented_port_definition
         value.YY_MOVE_OR_COPY< piranha::IrAttributeDefinition * > (YY_MOVE (that.value));
         break;
 
-      case symbol_kind::S_port_definitions: // port_definitions
+      case symbol_kind::S_port_definitions: //  port_definitions
         value.YY_MOVE_OR_COPY< piranha::IrAttributeDefinitionList * > (YY_MOVE (that.value));
         break;
 
-      case symbol_kind::S_connection_block: // connection_block
-      case symbol_kind::S_attribute_list: // attribute_list
+      case symbol_kind::S_connection_block: //  connection_block
+      case symbol_kind::S_attribute_list: //  attribute_list
         value.YY_MOVE_OR_COPY< piranha::IrAttributeList * > (YY_MOVE (that.value));
         break;
 
-      case symbol_kind::S_import_statement: // import_statement
-      case symbol_kind::S_import_statement_visibility: // import_statement_visibility
-      case symbol_kind::S_import_statement_short_name: // import_statement_short_name
+      case symbol_kind::S_import_statement: //  import_statement
+      case symbol_kind::S_import_statement_visibility: //  import_statement_visibility
+      case symbol_kind::S_import_statement_short_name: //  import_statement_short_name
         value.YY_MOVE_OR_COPY< piranha::IrImportStatement * > (YY_MOVE (that.value));
         break;
 
       case symbol_kind::S_node: // node
-      case symbol_kind::S_node_member: // node_member
-      case symbol_kind::S_inline_node_member: // inline_node_member
-      case symbol_kind::S_inline_node: // inline_node
+      case symbol_kind::S_node_member: //  node_member
+      case symbol_kind::S_inline_node_member: //  inline_node_member
+      case symbol_kind::S_inline_node: //  inline_node
         value.YY_MOVE_OR_COPY< piranha::IrNode * > (YY_MOVE (that.value));
         break;
 
-      case symbol_kind::S_node_name: // node_name
-      case symbol_kind::S_node_inline: // node_inline
-      case symbol_kind::S_node_shadow: // node_shadow
-      case symbol_kind::S_node_definition: // node_definition
-      case symbol_kind::S_specific_node_definition: // specific_node_definition
-      case symbol_kind::S_immediate_node_definition: // immediate_node_definition
-      case symbol_kind::S_node_decorator: // node_decorator
+      case symbol_kind::S_node_name: //  node_name
+      case symbol_kind::S_node_inline: //  node_inline
+      case symbol_kind::S_node_shadow: //  node_shadow
+      case symbol_kind::S_node_definition: //  node_definition
+      case symbol_kind::S_specific_node_definition: //  specific_node_definition
+      case symbol_kind::S_immediate_node_definition: //  immediate_node_definition
+      case symbol_kind::S_node_decorator: //  node_decorator
         value.YY_MOVE_OR_COPY< piranha::IrNodeDefinition * > (YY_MOVE (that.value));
         break;
 
-      case symbol_kind::S_node_list: // node_list
+      case symbol_kind::S_node_list: //  node_list
         value.YY_MOVE_OR_COPY< piranha::IrNodeList * > (YY_MOVE (that.value));
         break;
 
-      case symbol_kind::S_type_name_namespace: // type_name_namespace
+      case symbol_kind::S_type_name_namespace: //  type_name_namespace
         value.YY_MOVE_OR_COPY< piranha::IrTokenInfoSet<std::string, 2> > (YY_MOVE (that.value));
         break;
 
-      case symbol_kind::S_BOOL: // BOOL
+      case symbol_kind::S_BOOL: // bool
         value.YY_MOVE_OR_COPY< piranha::IrTokenInfo_bool > (YY_MOVE (that.value));
         break;
 
-      case symbol_kind::S_FLOAT: // FLOAT
+      case symbol_kind::S_FLOAT: // float
         value.YY_MOVE_OR_COPY< piranha::IrTokenInfo_float > (YY_MOVE (that.value));
         break;
 
-      case symbol_kind::S_INT: // INT
+      case symbol_kind::S_INT: // int
         value.YY_MOVE_OR_COPY< piranha::IrTokenInfo_int > (YY_MOVE (that.value));
         break;
 
-      case symbol_kind::S_CHAR: // CHAR
-      case symbol_kind::S_IMPORT: // IMPORT
-      case symbol_kind::S_AS: // AS
-      case symbol_kind::S_NODE: // NODE
-      case symbol_kind::S_INLINE: // INLINE
-      case symbol_kind::S_ALIAS: // ALIAS
-      case symbol_kind::S_INPUT: // INPUT
-      case symbol_kind::S_OUTPUT: // OUTPUT
-      case symbol_kind::S_MODIFY: // MODIFY
-      case symbol_kind::S_TOGGLE: // TOGGLE
-      case symbol_kind::S_LABEL: // LABEL
-      case symbol_kind::S_STRING: // STRING
-      case symbol_kind::S_DECORATOR: // DECORATOR
-      case symbol_kind::S_PUBLIC: // PUBLIC
-      case symbol_kind::S_PRIVATE: // PRIVATE
-      case symbol_kind::S_BUILTIN_POINTER: // BUILTIN_POINTER
-      case symbol_kind::S_NAMESPACE_POINTER: // NAMESPACE_POINTER
-      case symbol_kind::S_UNRECOGNIZED: // UNRECOGNIZED
-      case symbol_kind::S_OPERATOR: // OPERATOR
-      case symbol_kind::S_MODULE: // MODULE
-      case symbol_kind::S_AUTO: // AUTO
-      case symbol_kind::S_27_: // '='
-      case symbol_kind::S_28_: // '+'
-      case symbol_kind::S_29_: // '-'
-      case symbol_kind::S_30_: // '/'
-      case symbol_kind::S_31_: // '*'
-      case symbol_kind::S_32_: // '('
-      case symbol_kind::S_33_: // ')'
-      case symbol_kind::S_34_: // '{'
-      case symbol_kind::S_35_: // '}'
-      case symbol_kind::S_36_: // '['
-      case symbol_kind::S_37_: // ']'
-      case symbol_kind::S_38_: // ':'
-      case symbol_kind::S_39_: // ';'
-      case symbol_kind::S_40_: // ','
-      case symbol_kind::S_41_: // '.'
-      case symbol_kind::S_42_: // '^'
-      case symbol_kind::S_type_name: // type_name
-      case symbol_kind::S_standard_operator: // standard_operator
+      case symbol_kind::S_CHAR: // char
+      case symbol_kind::S_IMPORT: // import
+      case symbol_kind::S_AS: // as
+      case symbol_kind::S_NODE: // node
+      case symbol_kind::S_INLINE: // inline
+      case symbol_kind::S_ALIAS: // alias
+      case symbol_kind::S_INPUT: // input
+      case symbol_kind::S_OUTPUT: // output
+      case symbol_kind::S_MODIFY: // modify
+      case symbol_kind::S_TOGGLE: // toggle
+      case symbol_kind::S_LABEL: // label
+      case symbol_kind::S_STRING: // string
+      case symbol_kind::S_DECORATOR: // decorator
+      case symbol_kind::S_PUBLIC: // public
+      case symbol_kind::S_PRIVATE: // private
+      case symbol_kind::S_BUILTIN_POINTER: //  BUILTIN_POINTER
+      case symbol_kind::S_NAMESPACE_POINTER: //  NAMESPACE_POINTER
+      case symbol_kind::S_UNRECOGNIZED: // unrecognized
+      case symbol_kind::S_OPERATOR: // operator
+      case symbol_kind::S_MODULE: // module
+      case symbol_kind::S_AUTO: // auto
+      case symbol_kind::S_27_: //
+      case symbol_kind::S_28_: // +
+      case symbol_kind::S_29_: //
+      case symbol_kind::S_30_: // /
+      case symbol_kind::S_31_: //
+      case symbol_kind::S_32_: //
+      case symbol_kind::S_33_: //
+      case symbol_kind::S_34_: // {
+      case symbol_kind::S_35_: // }
+      case symbol_kind::S_36_: //
+      case symbol_kind::S_37_: //
+      case symbol_kind::S_38_: //
+      case symbol_kind::S_39_: //
+      case symbol_kind::S_40_: //
+      case symbol_kind::S_41_: //
+      case symbol_kind::S_42_: // ^
+      case symbol_kind::S_type_name: //  type_name
+      case symbol_kind::S_standard_operator: //  standard_operator
       case symbol_kind::S_string: // string
         value.YY_MOVE_OR_COPY< piranha::IrTokenInfo_string > (YY_MOVE (that.value));
         break;
 
-      case symbol_kind::S_label_value: // label_value
+      case symbol_kind::S_label_value: //  label_value
       case symbol_kind::S_value: // value
       case symbol_kind::S_constant: // constant
-      case symbol_kind::S_atomic_value: // atomic_value
-      case symbol_kind::S_primary_exp: // primary_exp
-      case symbol_kind::S_data_access: // data_access
-      case symbol_kind::S_unary_exp: // unary_exp
-      case symbol_kind::S_mul_exp: // mul_exp
-      case symbol_kind::S_add_exp: // add_exp
+      case symbol_kind::S_atomic_value: //  atomic_value
+      case symbol_kind::S_primary_exp: //  primary_exp
+      case symbol_kind::S_data_access: //  data_access
+      case symbol_kind::S_unary_exp: //  unary_exp
+      case symbol_kind::S_mul_exp: //  mul_exp
+      case symbol_kind::S_add_exp: //  add_exp
         value.YY_MOVE_OR_COPY< piranha::IrValue * > (YY_MOVE (that.value));
         break;
 
@@ -674,7 +674,7 @@ namespace piranha {
     }
 
 #if 201103L <= YY_CPLUSPLUS
-    // that is emptied.
+    // that is emptied
     that.state = empty_state;
 #endif
   }
@@ -688,118 +688,118 @@ namespace piranha {
         value.move< piranha::IrAttribute * > (YY_MOVE (that.value));
         break;
 
-      case symbol_kind::S_port_declaration: // port_declaration
-      case symbol_kind::S_port_status: // port_status
-      case symbol_kind::S_port_value: // port_value
-      case symbol_kind::S_port_connection: // port_connection
-      case symbol_kind::S_documented_port_definition: // documented_port_definition
+      case symbol_kind::S_port_declaration: //  port_declaration
+      case symbol_kind::S_port_status: //  port_status
+      case symbol_kind::S_port_value: //  port_value
+      case symbol_kind::S_port_connection: //  port_connection
+      case symbol_kind::S_documented_port_definition: //  documented_port_definition
         value.move< piranha::IrAttributeDefinition * > (YY_MOVE (that.value));
         break;
 
-      case symbol_kind::S_port_definitions: // port_definitions
+      case symbol_kind::S_port_definitions: //  port_definitions
         value.move< piranha::IrAttributeDefinitionList * > (YY_MOVE (that.value));
         break;
 
-      case symbol_kind::S_connection_block: // connection_block
-      case symbol_kind::S_attribute_list: // attribute_list
+      case symbol_kind::S_connection_block: //  connection_block
+      case symbol_kind::S_attribute_list: //  attribute_list
         value.move< piranha::IrAttributeList * > (YY_MOVE (that.value));
         break;
 
-      case symbol_kind::S_import_statement: // import_statement
-      case symbol_kind::S_import_statement_visibility: // import_statement_visibility
-      case symbol_kind::S_import_statement_short_name: // import_statement_short_name
+      case symbol_kind::S_import_statement: //  import_statement
+      case symbol_kind::S_import_statement_visibility: //  import_statement_visibility
+      case symbol_kind::S_import_statement_short_name: //  import_statement_short_name
         value.move< piranha::IrImportStatement * > (YY_MOVE (that.value));
         break;
 
       case symbol_kind::S_node: // node
-      case symbol_kind::S_node_member: // node_member
-      case symbol_kind::S_inline_node_member: // inline_node_member
-      case symbol_kind::S_inline_node: // inline_node
+      case symbol_kind::S_node_member: //  node_member
+      case symbol_kind::S_inline_node_member: //  inline_node_member
+      case symbol_kind::S_inline_node: //  inline_node
         value.move< piranha::IrNode * > (YY_MOVE (that.value));
         break;
 
-      case symbol_kind::S_node_name: // node_name
-      case symbol_kind::S_node_inline: // node_inline
-      case symbol_kind::S_node_shadow: // node_shadow
-      case symbol_kind::S_node_definition: // node_definition
-      case symbol_kind::S_specific_node_definition: // specific_node_definition
-      case symbol_kind::S_immediate_node_definition: // immediate_node_definition
-      case symbol_kind::S_node_decorator: // node_decorator
+      case symbol_kind::S_node_name: //  node_name
+      case symbol_kind::S_node_inline: //  node_inline
+      case symbol_kind::S_node_shadow: //  node_shadow
+      case symbol_kind::S_node_definition: //  node_definition
+      case symbol_kind::S_specific_node_definition: //  specific_node_definition
+      case symbol_kind::S_immediate_node_definition: //  immediate_node_definition
+      case symbol_kind::S_node_decorator: //  node_decorator
         value.move< piranha::IrNodeDefinition * > (YY_MOVE (that.value));
         break;
 
-      case symbol_kind::S_node_list: // node_list
+      case symbol_kind::S_node_list: //  node_list
         value.move< piranha::IrNodeList * > (YY_MOVE (that.value));
         break;
 
-      case symbol_kind::S_type_name_namespace: // type_name_namespace
+      case symbol_kind::S_type_name_namespace: //  type_name_namespace
         value.move< piranha::IrTokenInfoSet<std::string, 2> > (YY_MOVE (that.value));
         break;
 
-      case symbol_kind::S_BOOL: // BOOL
+      case symbol_kind::S_BOOL: // bool
         value.move< piranha::IrTokenInfo_bool > (YY_MOVE (that.value));
         break;
 
-      case symbol_kind::S_FLOAT: // FLOAT
+      case symbol_kind::S_FLOAT: // float
         value.move< piranha::IrTokenInfo_float > (YY_MOVE (that.value));
         break;
 
-      case symbol_kind::S_INT: // INT
+      case symbol_kind::S_INT: // int
         value.move< piranha::IrTokenInfo_int > (YY_MOVE (that.value));
         break;
 
-      case symbol_kind::S_CHAR: // CHAR
-      case symbol_kind::S_IMPORT: // IMPORT
-      case symbol_kind::S_AS: // AS
-      case symbol_kind::S_NODE: // NODE
-      case symbol_kind::S_INLINE: // INLINE
-      case symbol_kind::S_ALIAS: // ALIAS
-      case symbol_kind::S_INPUT: // INPUT
-      case symbol_kind::S_OUTPUT: // OUTPUT
-      case symbol_kind::S_MODIFY: // MODIFY
-      case symbol_kind::S_TOGGLE: // TOGGLE
-      case symbol_kind::S_LABEL: // LABEL
-      case symbol_kind::S_STRING: // STRING
-      case symbol_kind::S_DECORATOR: // DECORATOR
-      case symbol_kind::S_PUBLIC: // PUBLIC
-      case symbol_kind::S_PRIVATE: // PRIVATE
-      case symbol_kind::S_BUILTIN_POINTER: // BUILTIN_POINTER
-      case symbol_kind::S_NAMESPACE_POINTER: // NAMESPACE_POINTER
-      case symbol_kind::S_UNRECOGNIZED: // UNRECOGNIZED
-      case symbol_kind::S_OPERATOR: // OPERATOR
-      case symbol_kind::S_MODULE: // MODULE
-      case symbol_kind::S_AUTO: // AUTO
-      case symbol_kind::S_27_: // '='
-      case symbol_kind::S_28_: // '+'
-      case symbol_kind::S_29_: // '-'
-      case symbol_kind::S_30_: // '/'
-      case symbol_kind::S_31_: // '*'
-      case symbol_kind::S_32_: // '('
-      case symbol_kind::S_33_: // ')'
-      case symbol_kind::S_34_: // '{'
-      case symbol_kind::S_35_: // '}'
-      case symbol_kind::S_36_: // '['
-      case symbol_kind::S_37_: // ']'
-      case symbol_kind::S_38_: // ':'
-      case symbol_kind::S_39_: // ';'
-      case symbol_kind::S_40_: // ','
-      case symbol_kind::S_41_: // '.'
-      case symbol_kind::S_42_: // '^'
-      case symbol_kind::S_type_name: // type_name
-      case symbol_kind::S_standard_operator: // standard_operator
+      case symbol_kind::S_CHAR: // char
+      case symbol_kind::S_IMPORT: // import
+      case symbol_kind::S_AS: // as
+      case symbol_kind::S_NODE: // node
+      case symbol_kind::S_INLINE: // inline
+      case symbol_kind::S_ALIAS: // alias
+      case symbol_kind::S_INPUT: // input
+      case symbol_kind::S_OUTPUT: // output
+      case symbol_kind::S_MODIFY: // modify
+      case symbol_kind::S_TOGGLE: // toggle
+      case symbol_kind::S_LABEL: // label
+      case symbol_kind::S_STRING: // string
+      case symbol_kind::S_DECORATOR: // decorator
+      case symbol_kind::S_PUBLIC: // public
+      case symbol_kind::S_PRIVATE: // private
+      case symbol_kind::S_BUILTIN_POINTER: //  BUILTIN_POINTER
+      case symbol_kind::S_NAMESPACE_POINTER: //  NAMESPACE_POINTER
+      case symbol_kind::S_UNRECOGNIZED: // unrecognized
+      case symbol_kind::S_OPERATOR: // operator
+      case symbol_kind::S_MODULE: // module
+      case symbol_kind::S_AUTO: // auto
+      case symbol_kind::S_27_: //
+      case symbol_kind::S_28_: // +
+      case symbol_kind::S_29_: //
+      case symbol_kind::S_30_: // /
+      case symbol_kind::S_31_: //
+      case symbol_kind::S_32_: //
+      case symbol_kind::S_33_: //
+      case symbol_kind::S_34_: // {
+      case symbol_kind::S_35_: // }
+      case symbol_kind::S_36_: //
+      case symbol_kind::S_37_: //
+      case symbol_kind::S_38_: //
+      case symbol_kind::S_39_: //
+      case symbol_kind::S_40_: //
+      case symbol_kind::S_41_: //
+      case symbol_kind::S_42_: // ^
+      case symbol_kind::S_type_name: //  type_name
+      case symbol_kind::S_standard_operator: //  standard_operator
       case symbol_kind::S_string: // string
         value.move< piranha::IrTokenInfo_string > (YY_MOVE (that.value));
         break;
 
-      case symbol_kind::S_label_value: // label_value
+      case symbol_kind::S_label_value: //  label_value
       case symbol_kind::S_value: // value
       case symbol_kind::S_constant: // constant
-      case symbol_kind::S_atomic_value: // atomic_value
-      case symbol_kind::S_primary_exp: // primary_exp
-      case symbol_kind::S_data_access: // data_access
-      case symbol_kind::S_unary_exp: // unary_exp
-      case symbol_kind::S_mul_exp: // mul_exp
-      case symbol_kind::S_add_exp: // add_exp
+      case symbol_kind::S_atomic_value: //  atomic_value
+      case symbol_kind::S_primary_exp: //  primary_exp
+      case symbol_kind::S_data_access: //  data_access
+      case symbol_kind::S_unary_exp: //  unary_exp
+      case symbol_kind::S_mul_exp: //  mul_exp
+      case symbol_kind::S_add_exp: //  add_exp
         value.move< piranha::IrValue * > (YY_MOVE (that.value));
         break;
 
@@ -807,7 +807,7 @@ namespace piranha {
         break;
     }
 
-    // that is emptied.
+    // that is emptied
     that.kind_ = symbol_kind::S_YYEMPTY;
   }
 
@@ -822,118 +822,118 @@ namespace piranha {
         value.copy< piranha::IrAttribute * > (that.value);
         break;
 
-      case symbol_kind::S_port_declaration: // port_declaration
-      case symbol_kind::S_port_status: // port_status
-      case symbol_kind::S_port_value: // port_value
-      case symbol_kind::S_port_connection: // port_connection
-      case symbol_kind::S_documented_port_definition: // documented_port_definition
+      case symbol_kind::S_port_declaration: //  port_declaration
+      case symbol_kind::S_port_status: //  port_status
+      case symbol_kind::S_port_value: //  port_value
+      case symbol_kind::S_port_connection: //  port_connection
+      case symbol_kind::S_documented_port_definition: //  documented_port_definition
         value.copy< piranha::IrAttributeDefinition * > (that.value);
         break;
 
-      case symbol_kind::S_port_definitions: // port_definitions
+      case symbol_kind::S_port_definitions: //  port_definitions
         value.copy< piranha::IrAttributeDefinitionList * > (that.value);
         break;
 
-      case symbol_kind::S_connection_block: // connection_block
-      case symbol_kind::S_attribute_list: // attribute_list
+      case symbol_kind::S_connection_block: //  connection_block
+      case symbol_kind::S_attribute_list: //  attribute_list
         value.copy< piranha::IrAttributeList * > (that.value);
         break;
 
-      case symbol_kind::S_import_statement: // import_statement
-      case symbol_kind::S_import_statement_visibility: // import_statement_visibility
-      case symbol_kind::S_import_statement_short_name: // import_statement_short_name
+      case symbol_kind::S_import_statement: //  import_statement
+      case symbol_kind::S_import_statement_visibility: //  import_statement_visibility
+      case symbol_kind::S_import_statement_short_name: //  import_statement_short_name
         value.copy< piranha::IrImportStatement * > (that.value);
         break;
 
       case symbol_kind::S_node: // node
-      case symbol_kind::S_node_member: // node_member
-      case symbol_kind::S_inline_node_member: // inline_node_member
-      case symbol_kind::S_inline_node: // inline_node
+      case symbol_kind::S_node_member: //  node_member
+      case symbol_kind::S_inline_node_member: //  inline_node_member
+      case symbol_kind::S_inline_node: //  inline_node
         value.copy< piranha::IrNode * > (that.value);
         break;
 
-      case symbol_kind::S_node_name: // node_name
-      case symbol_kind::S_node_inline: // node_inline
-      case symbol_kind::S_node_shadow: // node_shadow
-      case symbol_kind::S_node_definition: // node_definition
-      case symbol_kind::S_specific_node_definition: // specific_node_definition
-      case symbol_kind::S_immediate_node_definition: // immediate_node_definition
-      case symbol_kind::S_node_decorator: // node_decorator
+      case symbol_kind::S_node_name: //  node_name
+      case symbol_kind::S_node_inline: //  node_inline
+      case symbol_kind::S_node_shadow: //  node_shadow
+      case symbol_kind::S_node_definition: //  node_definition
+      case symbol_kind::S_specific_node_definition: //  specific_node_definition
+      case symbol_kind::S_immediate_node_definition: //  immediate_node_definition
+      case symbol_kind::S_node_decorator: //  node_decorator
         value.copy< piranha::IrNodeDefinition * > (that.value);
         break;
 
-      case symbol_kind::S_node_list: // node_list
+      case symbol_kind::S_node_list: //  node_list
         value.copy< piranha::IrNodeList * > (that.value);
         break;
 
-      case symbol_kind::S_type_name_namespace: // type_name_namespace
+      case symbol_kind::S_type_name_namespace: //  type_name_namespace
         value.copy< piranha::IrTokenInfoSet<std::string, 2> > (that.value);
         break;
 
-      case symbol_kind::S_BOOL: // BOOL
+      case symbol_kind::S_BOOL: // bool
         value.copy< piranha::IrTokenInfo_bool > (that.value);
         break;
 
-      case symbol_kind::S_FLOAT: // FLOAT
+      case symbol_kind::S_FLOAT: // float
         value.copy< piranha::IrTokenInfo_float > (that.value);
         break;
 
-      case symbol_kind::S_INT: // INT
+      case symbol_kind::S_INT: // int
         value.copy< piranha::IrTokenInfo_int > (that.value);
         break;
 
-      case symbol_kind::S_CHAR: // CHAR
-      case symbol_kind::S_IMPORT: // IMPORT
-      case symbol_kind::S_AS: // AS
-      case symbol_kind::S_NODE: // NODE
-      case symbol_kind::S_INLINE: // INLINE
-      case symbol_kind::S_ALIAS: // ALIAS
-      case symbol_kind::S_INPUT: // INPUT
-      case symbol_kind::S_OUTPUT: // OUTPUT
-      case symbol_kind::S_MODIFY: // MODIFY
-      case symbol_kind::S_TOGGLE: // TOGGLE
-      case symbol_kind::S_LABEL: // LABEL
-      case symbol_kind::S_STRING: // STRING
-      case symbol_kind::S_DECORATOR: // DECORATOR
-      case symbol_kind::S_PUBLIC: // PUBLIC
-      case symbol_kind::S_PRIVATE: // PRIVATE
-      case symbol_kind::S_BUILTIN_POINTER: // BUILTIN_POINTER
-      case symbol_kind::S_NAMESPACE_POINTER: // NAMESPACE_POINTER
-      case symbol_kind::S_UNRECOGNIZED: // UNRECOGNIZED
-      case symbol_kind::S_OPERATOR: // OPERATOR
-      case symbol_kind::S_MODULE: // MODULE
-      case symbol_kind::S_AUTO: // AUTO
-      case symbol_kind::S_27_: // '='
-      case symbol_kind::S_28_: // '+'
-      case symbol_kind::S_29_: // '-'
-      case symbol_kind::S_30_: // '/'
-      case symbol_kind::S_31_: // '*'
-      case symbol_kind::S_32_: // '('
-      case symbol_kind::S_33_: // ')'
-      case symbol_kind::S_34_: // '{'
-      case symbol_kind::S_35_: // '}'
-      case symbol_kind::S_36_: // '['
-      case symbol_kind::S_37_: // ']'
-      case symbol_kind::S_38_: // ':'
-      case symbol_kind::S_39_: // ';'
-      case symbol_kind::S_40_: // ','
-      case symbol_kind::S_41_: // '.'
-      case symbol_kind::S_42_: // '^'
-      case symbol_kind::S_type_name: // type_name
-      case symbol_kind::S_standard_operator: // standard_operator
+      case symbol_kind::S_CHAR: // char
+      case symbol_kind::S_IMPORT: // import
+      case symbol_kind::S_AS: // as
+      case symbol_kind::S_NODE: // node
+      case symbol_kind::S_INLINE: // inline
+      case symbol_kind::S_ALIAS: // alias
+      case symbol_kind::S_INPUT: // input
+      case symbol_kind::S_OUTPUT: // output
+      case symbol_kind::S_MODIFY: // modify
+      case symbol_kind::S_TOGGLE: // toggle
+      case symbol_kind::S_LABEL: // label
+      case symbol_kind::S_STRING: // string
+      case symbol_kind::S_DECORATOR: // decorator
+      case symbol_kind::S_PUBLIC: // public
+      case symbol_kind::S_PRIVATE: // private
+      case symbol_kind::S_BUILTIN_POINTER: //  BUILTIN_POINTER
+      case symbol_kind::S_NAMESPACE_POINTER: //  NAMESPACE_POINTER
+      case symbol_kind::S_UNRECOGNIZED: // unrecognized
+      case symbol_kind::S_OPERATOR: // operator
+      case symbol_kind::S_MODULE: // module
+      case symbol_kind::S_AUTO: // auto
+      case symbol_kind::S_27_: //
+      case symbol_kind::S_28_: // +
+      case symbol_kind::S_29_: //
+      case symbol_kind::S_30_: // /
+      case symbol_kind::S_31_: //
+      case symbol_kind::S_32_: //
+      case symbol_kind::S_33_: //
+      case symbol_kind::S_34_: // {
+      case symbol_kind::S_35_: // }
+      case symbol_kind::S_36_: //
+      case symbol_kind::S_37_: //
+      case symbol_kind::S_38_: //
+      case symbol_kind::S_39_: //
+      case symbol_kind::S_40_: //
+      case symbol_kind::S_41_: //
+      case symbol_kind::S_42_: // ^
+      case symbol_kind::S_type_name: //  type_name
+      case symbol_kind::S_standard_operator: //  standard_operator
       case symbol_kind::S_string: // string
         value.copy< piranha::IrTokenInfo_string > (that.value);
         break;
 
-      case symbol_kind::S_label_value: // label_value
+      case symbol_kind::S_label_value: //  label_value
       case symbol_kind::S_value: // value
       case symbol_kind::S_constant: // constant
-      case symbol_kind::S_atomic_value: // atomic_value
-      case symbol_kind::S_primary_exp: // primary_exp
-      case symbol_kind::S_data_access: // data_access
-      case symbol_kind::S_unary_exp: // unary_exp
-      case symbol_kind::S_mul_exp: // mul_exp
-      case symbol_kind::S_add_exp: // add_exp
+      case symbol_kind::S_atomic_value: //  atomic_value
+      case symbol_kind::S_primary_exp: //  primary_exp
+      case symbol_kind::S_data_access: //  data_access
+      case symbol_kind::S_unary_exp: //  unary_exp
+      case symbol_kind::S_mul_exp: //  mul_exp
+      case symbol_kind::S_add_exp: //  add_exp
         value.copy< piranha::IrValue * > (that.value);
         break;
 
@@ -955,118 +955,118 @@ namespace piranha {
         value.move< piranha::IrAttribute * > (that.value);
         break;
 
-      case symbol_kind::S_port_declaration: // port_declaration
-      case symbol_kind::S_port_status: // port_status
-      case symbol_kind::S_port_value: // port_value
-      case symbol_kind::S_port_connection: // port_connection
-      case symbol_kind::S_documented_port_definition: // documented_port_definition
+      case symbol_kind::S_port_declaration: //  port_declaration
+      case symbol_kind::S_port_status: //  port_status
+      case symbol_kind::S_port_value: //  port_value
+      case symbol_kind::S_port_connection: //  port_connection
+      case symbol_kind::S_documented_port_definition: //  documented_port_definition
         value.move< piranha::IrAttributeDefinition * > (that.value);
         break;
 
-      case symbol_kind::S_port_definitions: // port_definitions
+      case symbol_kind::S_port_definitions: //  port_definitions
         value.move< piranha::IrAttributeDefinitionList * > (that.value);
         break;
 
-      case symbol_kind::S_connection_block: // connection_block
-      case symbol_kind::S_attribute_list: // attribute_list
+      case symbol_kind::S_connection_block: //  connection_block
+      case symbol_kind::S_attribute_list: //  attribute_list
         value.move< piranha::IrAttributeList * > (that.value);
         break;
 
-      case symbol_kind::S_import_statement: // import_statement
-      case symbol_kind::S_import_statement_visibility: // import_statement_visibility
-      case symbol_kind::S_import_statement_short_name: // import_statement_short_name
+      case symbol_kind::S_import_statement: //  import_statement
+      case symbol_kind::S_import_statement_visibility: //  import_statement_visibility
+      case symbol_kind::S_import_statement_short_name: //  import_statement_short_name
         value.move< piranha::IrImportStatement * > (that.value);
         break;
 
       case symbol_kind::S_node: // node
-      case symbol_kind::S_node_member: // node_member
-      case symbol_kind::S_inline_node_member: // inline_node_member
-      case symbol_kind::S_inline_node: // inline_node
+      case symbol_kind::S_node_member: //  node_member
+      case symbol_kind::S_inline_node_member: //  inline_node_member
+      case symbol_kind::S_inline_node: //  inline_node
         value.move< piranha::IrNode * > (that.value);
         break;
 
-      case symbol_kind::S_node_name: // node_name
-      case symbol_kind::S_node_inline: // node_inline
-      case symbol_kind::S_node_shadow: // node_shadow
-      case symbol_kind::S_node_definition: // node_definition
-      case symbol_kind::S_specific_node_definition: // specific_node_definition
-      case symbol_kind::S_immediate_node_definition: // immediate_node_definition
-      case symbol_kind::S_node_decorator: // node_decorator
+      case symbol_kind::S_node_name: //  node_name
+      case symbol_kind::S_node_inline: //  node_inline
+      case symbol_kind::S_node_shadow: //  node_shadow
+      case symbol_kind::S_node_definition: //  node_definition
+      case symbol_kind::S_specific_node_definition: //  specific_node_definition
+      case symbol_kind::S_immediate_node_definition: //  immediate_node_definition
+      case symbol_kind::S_node_decorator: //  node_decorator
         value.move< piranha::IrNodeDefinition * > (that.value);
         break;
 
-      case symbol_kind::S_node_list: // node_list
+      case symbol_kind::S_node_list: //  node_list
         value.move< piranha::IrNodeList * > (that.value);
         break;
 
-      case symbol_kind::S_type_name_namespace: // type_name_namespace
+      case symbol_kind::S_type_name_namespace: //  type_name_namespace
         value.move< piranha::IrTokenInfoSet<std::string, 2> > (that.value);
         break;
 
-      case symbol_kind::S_BOOL: // BOOL
+      case symbol_kind::S_BOOL: // bool
         value.move< piranha::IrTokenInfo_bool > (that.value);
         break;
 
-      case symbol_kind::S_FLOAT: // FLOAT
+      case symbol_kind::S_FLOAT: // float
         value.move< piranha::IrTokenInfo_float > (that.value);
         break;
 
-      case symbol_kind::S_INT: // INT
+      case symbol_kind::S_INT: // int
         value.move< piranha::IrTokenInfo_int > (that.value);
         break;
 
-      case symbol_kind::S_CHAR: // CHAR
-      case symbol_kind::S_IMPORT: // IMPORT
-      case symbol_kind::S_AS: // AS
-      case symbol_kind::S_NODE: // NODE
-      case symbol_kind::S_INLINE: // INLINE
-      case symbol_kind::S_ALIAS: // ALIAS
-      case symbol_kind::S_INPUT: // INPUT
-      case symbol_kind::S_OUTPUT: // OUTPUT
-      case symbol_kind::S_MODIFY: // MODIFY
-      case symbol_kind::S_TOGGLE: // TOGGLE
-      case symbol_kind::S_LABEL: // LABEL
-      case symbol_kind::S_STRING: // STRING
-      case symbol_kind::S_DECORATOR: // DECORATOR
-      case symbol_kind::S_PUBLIC: // PUBLIC
-      case symbol_kind::S_PRIVATE: // PRIVATE
-      case symbol_kind::S_BUILTIN_POINTER: // BUILTIN_POINTER
-      case symbol_kind::S_NAMESPACE_POINTER: // NAMESPACE_POINTER
-      case symbol_kind::S_UNRECOGNIZED: // UNRECOGNIZED
-      case symbol_kind::S_OPERATOR: // OPERATOR
-      case symbol_kind::S_MODULE: // MODULE
-      case symbol_kind::S_AUTO: // AUTO
-      case symbol_kind::S_27_: // '='
-      case symbol_kind::S_28_: // '+'
-      case symbol_kind::S_29_: // '-'
-      case symbol_kind::S_30_: // '/'
-      case symbol_kind::S_31_: // '*'
-      case symbol_kind::S_32_: // '('
-      case symbol_kind::S_33_: // ')'
-      case symbol_kind::S_34_: // '{'
-      case symbol_kind::S_35_: // '}'
-      case symbol_kind::S_36_: // '['
-      case symbol_kind::S_37_: // ']'
-      case symbol_kind::S_38_: // ':'
-      case symbol_kind::S_39_: // ';'
-      case symbol_kind::S_40_: // ','
-      case symbol_kind::S_41_: // '.'
-      case symbol_kind::S_42_: // '^'
-      case symbol_kind::S_type_name: // type_name
-      case symbol_kind::S_standard_operator: // standard_operator
+      case symbol_kind::S_CHAR: // char
+      case symbol_kind::S_IMPORT: // import
+      case symbol_kind::S_AS: // as
+      case symbol_kind::S_NODE: // node
+      case symbol_kind::S_INLINE: // inline
+      case symbol_kind::S_ALIAS: // alias
+      case symbol_kind::S_INPUT: // input
+      case symbol_kind::S_OUTPUT: // output
+      case symbol_kind::S_MODIFY: // modify
+      case symbol_kind::S_TOGGLE: // toggle
+      case symbol_kind::S_LABEL: // label
+      case symbol_kind::S_STRING: // string
+      case symbol_kind::S_DECORATOR: // decorator
+      case symbol_kind::S_PUBLIC: // public
+      case symbol_kind::S_PRIVATE: // private
+      case symbol_kind::S_BUILTIN_POINTER: //  BUILTIN_POINTER
+      case symbol_kind::S_NAMESPACE_POINTER: //  NAMESPACE_POINTER
+      case symbol_kind::S_UNRECOGNIZED: // unrecognized
+      case symbol_kind::S_OPERATOR: // operator
+      case symbol_kind::S_MODULE: // module
+      case symbol_kind::S_AUTO: // auto
+      case symbol_kind::S_27_: //
+      case symbol_kind::S_28_: // +
+      case symbol_kind::S_29_: //
+      case symbol_kind::S_30_: // /
+      case symbol_kind::S_31_: //
+      case symbol_kind::S_32_: //
+      case symbol_kind::S_33_: //
+      case symbol_kind::S_34_: // {
+      case symbol_kind::S_35_: // }
+      case symbol_kind::S_36_: //
+      case symbol_kind::S_37_: //
+      case symbol_kind::S_38_: //
+      case symbol_kind::S_39_: //
+      case symbol_kind::S_40_: //
+      case symbol_kind::S_41_: //
+      case symbol_kind::S_42_: // ^
+      case symbol_kind::S_type_name: //  type_name
+      case symbol_kind::S_standard_operator: //  standard_operator
       case symbol_kind::S_string: // string
         value.move< piranha::IrTokenInfo_string > (that.value);
         break;
 
-      case symbol_kind::S_label_value: // label_value
+      case symbol_kind::S_label_value: //  label_value
       case symbol_kind::S_value: // value
       case symbol_kind::S_constant: // constant
-      case symbol_kind::S_atomic_value: // atomic_value
-      case symbol_kind::S_primary_exp: // primary_exp
-      case symbol_kind::S_data_access: // data_access
-      case symbol_kind::S_unary_exp: // unary_exp
-      case symbol_kind::S_mul_exp: // mul_exp
-      case symbol_kind::S_add_exp: // add_exp
+      case symbol_kind::S_atomic_value: //  atomic_value
+      case symbol_kind::S_primary_exp: //  primary_exp
+      case symbol_kind::S_data_access: //  data_access
+      case symbol_kind::S_unary_exp: //  unary_exp
+      case symbol_kind::S_mul_exp: //  mul_exp
+      case symbol_kind::S_add_exp: //  add_exp
         value.move< piranha::IrValue * > (that.value);
         break;
 
@@ -1075,7 +1075,7 @@ namespace piranha {
     }
 
     location = that.location;
-    // that is emptied.
+    // that is emptied
     that.state = empty_state;
     return *this;
   }
@@ -1160,7 +1160,7 @@ namespace piranha {
   {
     yydebug_ = l;
   }
-#endif // YYDEBUG
+#endif // yydebug
 
   Parser::state_type
   Parser::yy_lr_goto_state_ (state_type yystate, int yysym)
@@ -1194,66 +1194,66 @@ namespace piranha {
   Parser::parse ()
   {
     int yyn;
-    /// Length of the RHS of the rule being reduced.
+    // / length of the rhs of the rule being reduced
     int yylen = 0;
 
-    // Error handling.
+    // error handling
     int yynerrs_ = 0;
     int yyerrstatus_ = 0;
 
-    /// The lookahead symbol.
+    // / the lookahead symbol
     symbol_type yyla;
 
-    /// The locations where the error started and ended.
+    // / the locations where the error started and ended
     stack_symbol_type yyerror_range[3];
 
-    /// The return value of parse ().
+    // / the return value of parse
     int yyresult;
 
 #if YY_EXCEPTIONS
     try
-#endif // YY_EXCEPTIONS
+#endif //  YY_EXCEPTIONS
       {
     YYCDEBUG << "Starting parse\n";
 
 
-    /* Initialize the stack.  The initial state will be set in
-       yynewstate, since the latter expects the semantical and the
-       location values to have been already stored, initialize these
-       stacks with a primary value.  */
+    /* initialize the stack the initial state will be set in
+       yynewstate since the latter expects the semantical and the
+       location values to have been already stored initialize these
+       stacks with a primary value */
     yystack_.clear ();
     yypush_ (YY_NULLPTR, 0, YY_MOVE (yyla));
 
-  /*-----------------------------------------------.
-  | yynewstate -- push a new symbol on the stack.  |
-  `-----------------------------------------------*/
+  /*
+  | yynewstate -- push a new symbol on the stack |
+  */
   yynewstate:
     YYCDEBUG << "Entering state " << int (yystack_[0].state) << '\n';
     YY_STACK_PRINT ();
 
-    // Accept?
+    // accept
     if (yystack_[0].state == yyfinal_)
       YYACCEPT;
 
     goto yybackup;
 
 
-  /*-----------.
-  | yybackup.  |
-  `-----------*/
+  /*
+  | yybackup |
+  */
   yybackup:
-    // Try to take a decision without lookahead.
+    // try to take a decision without lookahead
     yyn = yypact_[+yystack_[0].state];
     if (yy_pact_value_is_default_ (yyn))
       goto yydefault;
 
-    // Read a lookahead token.
+    // read a lookahead token
     if (yyla.empty ())
       {
         YYCDEBUG << "Reading a token\n";
 #if YY_EXCEPTIONS
         try
-#endif // YY_EXCEPTIONS
+#endif //  YY_EXCEPTIONS
           {
             yyla.kind_ = yytranslate_ (yylex (&yyla.value, &yyla.location));
           }
@@ -1264,29 +1264,29 @@ namespace piranha {
             error (yyexc);
             goto yyerrlab1;
           }
-#endif // YY_EXCEPTIONS
+#endif //  YY_EXCEPTIONS
       }
     YY_SYMBOL_PRINT ("Next token is", yyla);
 
     if (yyla.kind () == symbol_kind::S_YYerror)
     {
-      // The scanner already issued an error message, process directly
-      // to error recovery.  But do not keep the error token as
-      // lookahead, it is too special and may lead us to an endless
-      // loop in error recovery. */
+      // the scanner already issued an error message process directly
+      // to error recovery but do not keep the error token as
+      // lookahead it is too special and may lead us to an endless
+      // loop in error recovery */
       yyla.kind_ = symbol_kind::S_YYUNDEF;
       goto yyerrlab1;
     }
 
-    /* If the proper action on seeing token YYLA.TYPE is to reduce or
-       to detect an error, take that action.  */
+    /* if the proper action on seeing token yyla.type is to reduce or
+       to detect an error take that action */
     yyn += yyla.kind ();
     if (yyn < 0 || yylast_ < yyn || yycheck_[yyn] != yyla.kind ())
       {
         goto yydefault;
       }
 
-    // Reduce or error.
+    // reduce or error
     yyn = yytable_[yyn];
     if (yyn <= 0)
       {
@@ -1296,18 +1296,18 @@ namespace piranha {
         goto yyreduce;
       }
 
-    // Count tokens shifted since error; after three, turn off error status.
+    // count tokens shifted since error after three turn off error status
     if (yyerrstatus_)
       --yyerrstatus_;
 
-    // Shift the lookahead token.
+    // shift the lookahead token
     yypush_ ("Shifting", state_type (yyn), YY_MOVE (yyla));
     goto yynewstate;
 
 
-  /*-----------------------------------------------------------.
-  | yydefault -- do the default action for the current state.  |
-  `-----------------------------------------------------------*/
+  /*
+  | yydefault -- do the default action for the current state |
+  */
   yydefault:
     yyn = yydefact_[+yystack_[0].state];
     if (yyn == 0)
@@ -1315,135 +1315,135 @@ namespace piranha {
     goto yyreduce;
 
 
-  /*-----------------------------.
-  | yyreduce -- do a reduction.  |
-  `-----------------------------*/
+  /*
+  | yyreduce -- do a reduction |
+  */
   yyreduce:
     yylen = yyr2_[yyn];
     {
       stack_symbol_type yylhs;
       yylhs.state = yy_lr_goto_state_ (yystack_[yylen].state, yyr1_[yyn]);
-      /* Variants are always initialized to an empty instance of the
-         correct type. The default '$$ = $1' action is NOT applied
-         when using variants.  */
+      /* variants are always initialized to an empty instance of the
+         correct type the default $$ = $1 action is not applied
+         when using variants */
       switch (yyr1_[yyn])
     {
       case symbol_kind::S_attribute: // attribute
         yylhs.value.emplace< piranha::IrAttribute * > ();
         break;
 
-      case symbol_kind::S_port_declaration: // port_declaration
-      case symbol_kind::S_port_status: // port_status
-      case symbol_kind::S_port_value: // port_value
-      case symbol_kind::S_port_connection: // port_connection
-      case symbol_kind::S_documented_port_definition: // documented_port_definition
+      case symbol_kind::S_port_declaration: //  port_declaration
+      case symbol_kind::S_port_status: //  port_status
+      case symbol_kind::S_port_value: //  port_value
+      case symbol_kind::S_port_connection: //  port_connection
+      case symbol_kind::S_documented_port_definition: //  documented_port_definition
         yylhs.value.emplace< piranha::IrAttributeDefinition * > ();
         break;
 
-      case symbol_kind::S_port_definitions: // port_definitions
+      case symbol_kind::S_port_definitions: //  port_definitions
         yylhs.value.emplace< piranha::IrAttributeDefinitionList * > ();
         break;
 
-      case symbol_kind::S_connection_block: // connection_block
-      case symbol_kind::S_attribute_list: // attribute_list
+      case symbol_kind::S_connection_block: //  connection_block
+      case symbol_kind::S_attribute_list: //  attribute_list
         yylhs.value.emplace< piranha::IrAttributeList * > ();
         break;
 
-      case symbol_kind::S_import_statement: // import_statement
-      case symbol_kind::S_import_statement_visibility: // import_statement_visibility
-      case symbol_kind::S_import_statement_short_name: // import_statement_short_name
+      case symbol_kind::S_import_statement: //  import_statement
+      case symbol_kind::S_import_statement_visibility: //  import_statement_visibility
+      case symbol_kind::S_import_statement_short_name: //  import_statement_short_name
         yylhs.value.emplace< piranha::IrImportStatement * > ();
         break;
 
       case symbol_kind::S_node: // node
-      case symbol_kind::S_node_member: // node_member
-      case symbol_kind::S_inline_node_member: // inline_node_member
-      case symbol_kind::S_inline_node: // inline_node
+      case symbol_kind::S_node_member: //  node_member
+      case symbol_kind::S_inline_node_member: //  inline_node_member
+      case symbol_kind::S_inline_node: //  inline_node
         yylhs.value.emplace< piranha::IrNode * > ();
         break;
 
-      case symbol_kind::S_node_name: // node_name
-      case symbol_kind::S_node_inline: // node_inline
-      case symbol_kind::S_node_shadow: // node_shadow
-      case symbol_kind::S_node_definition: // node_definition
-      case symbol_kind::S_specific_node_definition: // specific_node_definition
-      case symbol_kind::S_immediate_node_definition: // immediate_node_definition
-      case symbol_kind::S_node_decorator: // node_decorator
+      case symbol_kind::S_node_name: //  node_name
+      case symbol_kind::S_node_inline: //  node_inline
+      case symbol_kind::S_node_shadow: //  node_shadow
+      case symbol_kind::S_node_definition: //  node_definition
+      case symbol_kind::S_specific_node_definition: //  specific_node_definition
+      case symbol_kind::S_immediate_node_definition: //  immediate_node_definition
+      case symbol_kind::S_node_decorator: //  node_decorator
         yylhs.value.emplace< piranha::IrNodeDefinition * > ();
         break;
 
-      case symbol_kind::S_node_list: // node_list
+      case symbol_kind::S_node_list: //  node_list
         yylhs.value.emplace< piranha::IrNodeList * > ();
         break;
 
-      case symbol_kind::S_type_name_namespace: // type_name_namespace
+      case symbol_kind::S_type_name_namespace: //  type_name_namespace
         yylhs.value.emplace< piranha::IrTokenInfoSet<std::string, 2> > ();
         break;
 
-      case symbol_kind::S_BOOL: // BOOL
+      case symbol_kind::S_BOOL: // bool
         yylhs.value.emplace< piranha::IrTokenInfo_bool > ();
         break;
 
-      case symbol_kind::S_FLOAT: // FLOAT
+      case symbol_kind::S_FLOAT: // float
         yylhs.value.emplace< piranha::IrTokenInfo_float > ();
         break;
 
-      case symbol_kind::S_INT: // INT
+      case symbol_kind::S_INT: // int
         yylhs.value.emplace< piranha::IrTokenInfo_int > ();
         break;
 
-      case symbol_kind::S_CHAR: // CHAR
-      case symbol_kind::S_IMPORT: // IMPORT
-      case symbol_kind::S_AS: // AS
-      case symbol_kind::S_NODE: // NODE
-      case symbol_kind::S_INLINE: // INLINE
-      case symbol_kind::S_ALIAS: // ALIAS
-      case symbol_kind::S_INPUT: // INPUT
-      case symbol_kind::S_OUTPUT: // OUTPUT
-      case symbol_kind::S_MODIFY: // MODIFY
-      case symbol_kind::S_TOGGLE: // TOGGLE
-      case symbol_kind::S_LABEL: // LABEL
-      case symbol_kind::S_STRING: // STRING
-      case symbol_kind::S_DECORATOR: // DECORATOR
-      case symbol_kind::S_PUBLIC: // PUBLIC
-      case symbol_kind::S_PRIVATE: // PRIVATE
-      case symbol_kind::S_BUILTIN_POINTER: // BUILTIN_POINTER
-      case symbol_kind::S_NAMESPACE_POINTER: // NAMESPACE_POINTER
-      case symbol_kind::S_UNRECOGNIZED: // UNRECOGNIZED
-      case symbol_kind::S_OPERATOR: // OPERATOR
-      case symbol_kind::S_MODULE: // MODULE
-      case symbol_kind::S_AUTO: // AUTO
-      case symbol_kind::S_27_: // '='
-      case symbol_kind::S_28_: // '+'
-      case symbol_kind::S_29_: // '-'
-      case symbol_kind::S_30_: // '/'
-      case symbol_kind::S_31_: // '*'
-      case symbol_kind::S_32_: // '('
-      case symbol_kind::S_33_: // ')'
-      case symbol_kind::S_34_: // '{'
-      case symbol_kind::S_35_: // '}'
-      case symbol_kind::S_36_: // '['
-      case symbol_kind::S_37_: // ']'
-      case symbol_kind::S_38_: // ':'
-      case symbol_kind::S_39_: // ';'
-      case symbol_kind::S_40_: // ','
-      case symbol_kind::S_41_: // '.'
-      case symbol_kind::S_42_: // '^'
-      case symbol_kind::S_type_name: // type_name
-      case symbol_kind::S_standard_operator: // standard_operator
+      case symbol_kind::S_CHAR: // char
+      case symbol_kind::S_IMPORT: // import
+      case symbol_kind::S_AS: // as
+      case symbol_kind::S_NODE: // node
+      case symbol_kind::S_INLINE: // inline
+      case symbol_kind::S_ALIAS: // alias
+      case symbol_kind::S_INPUT: // input
+      case symbol_kind::S_OUTPUT: // output
+      case symbol_kind::S_MODIFY: // modify
+      case symbol_kind::S_TOGGLE: // toggle
+      case symbol_kind::S_LABEL: // label
+      case symbol_kind::S_STRING: // string
+      case symbol_kind::S_DECORATOR: // decorator
+      case symbol_kind::S_PUBLIC: // public
+      case symbol_kind::S_PRIVATE: // private
+      case symbol_kind::S_BUILTIN_POINTER: //  BUILTIN_POINTER
+      case symbol_kind::S_NAMESPACE_POINTER: //  NAMESPACE_POINTER
+      case symbol_kind::S_UNRECOGNIZED: // unrecognized
+      case symbol_kind::S_OPERATOR: // operator
+      case symbol_kind::S_MODULE: // module
+      case symbol_kind::S_AUTO: // auto
+      case symbol_kind::S_27_: //
+      case symbol_kind::S_28_: // +
+      case symbol_kind::S_29_: //
+      case symbol_kind::S_30_: // /
+      case symbol_kind::S_31_: //
+      case symbol_kind::S_32_: //
+      case symbol_kind::S_33_: //
+      case symbol_kind::S_34_: // {
+      case symbol_kind::S_35_: // }
+      case symbol_kind::S_36_: //
+      case symbol_kind::S_37_: //
+      case symbol_kind::S_38_: //
+      case symbol_kind::S_39_: //
+      case symbol_kind::S_40_: //
+      case symbol_kind::S_41_: //
+      case symbol_kind::S_42_: // ^
+      case symbol_kind::S_type_name: //  type_name
+      case symbol_kind::S_standard_operator: //  standard_operator
       case symbol_kind::S_string: // string
         yylhs.value.emplace< piranha::IrTokenInfo_string > ();
         break;
 
-      case symbol_kind::S_label_value: // label_value
+      case symbol_kind::S_label_value: //  label_value
       case symbol_kind::S_value: // value
       case symbol_kind::S_constant: // constant
-      case symbol_kind::S_atomic_value: // atomic_value
-      case symbol_kind::S_primary_exp: // primary_exp
-      case symbol_kind::S_data_access: // data_access
-      case symbol_kind::S_unary_exp: // unary_exp
-      case symbol_kind::S_mul_exp: // mul_exp
-      case symbol_kind::S_add_exp: // add_exp
+      case symbol_kind::S_atomic_value: //  atomic_value
+      case symbol_kind::S_primary_exp: //  primary_exp
+      case symbol_kind::S_data_access: //  data_access
+      case symbol_kind::S_unary_exp: //  unary_exp
+      case symbol_kind::S_mul_exp: //  mul_exp
+      case symbol_kind::S_add_exp: //  add_exp
         yylhs.value.emplace< piranha::IrValue * > ();
         break;
 
@@ -1452,135 +1452,135 @@ namespace piranha {
     }
 
 
-      // Default location.
+      // default location
       {
         stack_type::slice range (yystack_, yylen);
         YYLLOC_DEFAULT (yylhs.location, range, yylen);
         yyerror_range[1].location = yylhs.location;
       }
 
-      // Perform the reduction.
+      // perform the reduction
       YY_REDUCE_PRINT (yyn);
 #if YY_EXCEPTIONS
       try
-#endif // YY_EXCEPTIONS
+#endif //  YY_EXCEPTIONS
         {
           switch (yyn)
             {
-  case 4: // decorator: DECORATOR LABEL ':' string
+  case 4: // decorator decorator label string
 #line 173 "flex-bison/specification.y"
                                         { /* void */ }
 #line 1474 "parser.auto.cpp"
     break;
 
-  case 5: // decorator_list: decorator
+  case 5: // decorator_list decorator
 #line 177 "flex-bison/specification.y"
                                         { /* void */ }
 #line 1480 "parser.auto.cpp"
     break;
 
-  case 6: // decorator_list: decorator_list decorator
+  case 6: // decorator_list decorator_list decorator
 #line 178 "flex-bison/specification.y"
                                         { /* void */ }
 #line 1486 "parser.auto.cpp"
     break;
 
-  case 7: // statement: node_member
+  case 7: // statement node_member
 #line 182 "flex-bison/specification.y"
                                         { driver.addNode(yystack_[0].value.as < piranha::IrNode * > ()); }
 #line 1492 "parser.auto.cpp"
     break;
 
-  case 8: // statement: import_statement_short_name
+  case 8: // statement import_statement_short_name
 #line 183 "flex-bison/specification.y"
                                         { driver.addImportStatement(yystack_[0].value.as < piranha::IrImportStatement * > ()); }
 #line 1498 "parser.auto.cpp"
     break;
 
-  case 9: // statement: node_decorator
+  case 9: // statement node_decorator
 #line 184 "flex-bison/specification.y"
                                         { driver.addNodeDefinition(yystack_[0].value.as < piranha::IrNodeDefinition * > ()); }
 #line 1504 "parser.auto.cpp"
     break;
 
-  case 10: // statement: MODULE '{' decorator_list '}'
+  case 10: // statement module { decorator_list }
 #line 185 "flex-bison/specification.y"
                                         { /* void */ }
 #line 1510 "parser.auto.cpp"
     break;
 
-  case 11: // statement_list: statement
+  case 11: // statement_list statement
 #line 189 "flex-bison/specification.y"
                                         { /* void */ }
 #line 1516 "parser.auto.cpp"
     break;
 
-  case 12: // statement_list: statement_list statement
+  case 12: // statement_list statement_list statement
 #line 190 "flex-bison/specification.y"
                                         { /* void */ }
 #line 1522 "parser.auto.cpp"
     break;
 
-  case 13: // statement_list: statement_list error
+  case 13: // statement_list statement_list error
 #line 191 "flex-bison/specification.y"
                                         { /* void */ }
 #line 1528 "parser.auto.cpp"
     break;
 
-  case 14: // import_statement: IMPORT string
+  case 14: // import_statement import string
 #line 195 "flex-bison/specification.y"
                                         { yylhs.value.as < piranha::IrImportStatement * > () = TRACK(new IrImportStatement(yystack_[0].value.as < piranha::IrTokenInfo_string > ())); }
 #line 1534 "parser.auto.cpp"
     break;
 
-  case 15: // import_statement: IMPORT LABEL
+  case 15: // import_statement import label
 #line 196 "flex-bison/specification.y"
                                         { 
                                             yylhs.value.as < piranha::IrImportStatement * > () = TRACK(new IrImportStatement(yystack_[0].value.as < piranha::IrTokenInfo_string > ()));
 
-                                            /* The name is a valid label so it can be used as a short name */
+                                            /* the name is a valid label so it can be used as a short name */
                                             yylhs.value.as < piranha::IrImportStatement * > ()->setShortName(yystack_[0].value.as < piranha::IrTokenInfo_string > ()); 
                                         }
 #line 1545 "parser.auto.cpp"
     break;
 
-  case 16: // import_statement_visibility: PUBLIC import_statement
+  case 16: // import_statement_visibility public import_statement
 #line 205 "flex-bison/specification.y"
                                         { yylhs.value.as < piranha::IrImportStatement * > () = yystack_[0].value.as < piranha::IrImportStatement * > (); yylhs.value.as < piranha::IrImportStatement * > ()->setVisibility(IrVisibility::Public); }
 #line 1551 "parser.auto.cpp"
     break;
 
-  case 17: // import_statement_visibility: PRIVATE import_statement
+  case 17: // import_statement_visibility private import_statement
 #line 206 "flex-bison/specification.y"
                                         { yylhs.value.as < piranha::IrImportStatement * > () = yystack_[0].value.as < piranha::IrImportStatement * > (); yylhs.value.as < piranha::IrImportStatement * > ()->setVisibility(IrVisibility::Private); }
 #line 1557 "parser.auto.cpp"
     break;
 
-  case 18: // import_statement_visibility: import_statement
+  case 18: // import_statement_visibility import_statement
 #line 207 "flex-bison/specification.y"
                                         { yylhs.value.as < piranha::IrImportStatement * > () = yystack_[0].value.as < piranha::IrImportStatement * > (); yylhs.value.as < piranha::IrImportStatement * > ()->setVisibility(IrVisibility::Default); }
 #line 1563 "parser.auto.cpp"
     break;
 
-  case 19: // import_statement_short_name: import_statement_visibility AS LABEL
+  case 19: // import_statement_short_name import_statement_visibility as label
 #line 211 "flex-bison/specification.y"
                                                 { yylhs.value.as < piranha::IrImportStatement * > () = yystack_[2].value.as < piranha::IrImportStatement * > (); yylhs.value.as < piranha::IrImportStatement * > ()->setShortName(yystack_[0].value.as < piranha::IrTokenInfo_string > ()); }
 #line 1569 "parser.auto.cpp"
     break;
 
-  case 20: // import_statement_short_name: import_statement_visibility
+  case 20: // import_statement_short_name import_statement_visibility
 #line 212 "flex-bison/specification.y"
                                                 { yylhs.value.as < piranha::IrImportStatement * > () = yystack_[0].value.as < piranha::IrImportStatement * > (); }
 #line 1575 "parser.auto.cpp"
     break;
 
-  case 21: // type_name: LABEL
+  case 21: // type_name label
 #line 216 "flex-bison/specification.y"
                                         { yylhs.value.as < piranha::IrTokenInfo_string > () = yystack_[0].value.as < piranha::IrTokenInfo_string > (); }
 #line 1581 "parser.auto.cpp"
     break;
 
-  case 22: // type_name: OPERATOR standard_operator
+  case 22: // type_name operator standard_operator
 #line 217 "flex-bison/specification.y"
                                         {
                                             IrTokenInfo_string info = yystack_[1].value.as < piranha::IrTokenInfo_string > ();
@@ -1591,7 +1591,7 @@ namespace piranha {
 #line 1592 "parser.auto.cpp"
     break;
 
-  case 23: // type_name_namespace: type_name
+  case 23: // type_name_namespace type_name
 #line 226 "flex-bison/specification.y"
                                         { 
                                             IrTokenInfoSet<std::string, 2> set; 
@@ -1601,7 +1601,7 @@ namespace piranha {
 #line 1602 "parser.auto.cpp"
     break;
 
-  case 24: // type_name_namespace: LABEL NAMESPACE_POINTER type_name
+  case 24: // type_name_namespace label namespace_pointer type_name
 #line 231 "flex-bison/specification.y"
                                         { 
                                             IrTokenInfoSet<std::string, 2> set; 
@@ -1612,7 +1612,7 @@ namespace piranha {
 #line 1613 "parser.auto.cpp"
     break;
 
-  case 25: // type_name_namespace: NAMESPACE_POINTER type_name
+  case 25: // type_name_namespace namespace_pointer type_name
 #line 237 "flex-bison/specification.y"
                                         { 
                                             IrTokenInfoSet<std::string, 2> set; 
@@ -1623,13 +1623,13 @@ namespace piranha {
 #line 1624 "parser.auto.cpp"
     break;
 
-  case 26: // node: type_name_namespace LABEL connection_block
+  case 26: // node type_name_namespace label connection_block
 #line 246 "flex-bison/specification.y"
                                                         { yylhs.value.as < piranha::IrNode * > () = TRACK(new IrNode(yystack_[2].value.as < piranha::IrTokenInfoSet<std::string, 2> > ().data[1], yystack_[1].value.as < piranha::IrTokenInfo_string > (), yystack_[0].value.as < piranha::IrAttributeList * > (), yystack_[2].value.as < piranha::IrTokenInfoSet<std::string, 2> > ().data[0])); }
 #line 1630 "parser.auto.cpp"
     break;
 
-  case 27: // node: type_name_namespace connection_block
+  case 27: // node type_name_namespace connection_block
 #line 247 "flex-bison/specification.y"
                                                         {
                                                             IrTokenInfo_string name;
@@ -1641,13 +1641,13 @@ namespace piranha {
 #line 1642 "parser.auto.cpp"
     break;
 
-  case 28: // node_member: node
+  case 28: // node_member node
 #line 257 "flex-bison/specification.y"
                                                         { yylhs.value.as < piranha::IrNode * > () = yystack_[0].value.as < piranha::IrNode * > (); }
 #line 1648 "parser.auto.cpp"
     break;
 
-  case 29: // node_member: data_access '.' node
+  case 29: // node_member data_access node
 #line 258 "flex-bison/specification.y"
                                                         {
                                                             yylhs.value.as < piranha::IrNode * > () = yystack_[0].value.as < piranha::IrNode * > ();
@@ -1656,7 +1656,7 @@ namespace piranha {
 #line 1657 "parser.auto.cpp"
     break;
 
-  case 30: // node_list: node_member
+  case 30: // node_list node_member
 #line 265 "flex-bison/specification.y"
                                                         {
                                                             yylhs.value.as < piranha::IrNodeList * > () = TRACK(new IrNodeList());
@@ -1665,7 +1665,7 @@ namespace piranha {
 #line 1666 "parser.auto.cpp"
     break;
 
-  case 31: // node_list: node_list node_member
+  case 31: // node_list node_list node_member
 #line 269 "flex-bison/specification.y"
                                                         { 
                                                             yylhs.value.as < piranha::IrNodeList * > () = yystack_[1].value.as < piranha::IrNodeList * > ();
@@ -1674,43 +1674,43 @@ namespace piranha {
 #line 1675 "parser.auto.cpp"
     break;
 
-  case 32: // node_list: node_list error
+  case 32: // node_list node_list error
 #line 273 "flex-bison/specification.y"
                                                         { yylhs.value.as < piranha::IrNodeList * > () = yystack_[1].value.as < piranha::IrNodeList * > (); }
 #line 1681 "parser.auto.cpp"
     break;
 
-  case 33: // standard_operator: '-'
+  case 33: // standard_operator -
 #line 277 "flex-bison/specification.y"
                                                         { yylhs.value.as < piranha::IrTokenInfo_string > () = yystack_[0].value.as < piranha::IrTokenInfo_string > (); }
 #line 1687 "parser.auto.cpp"
     break;
 
-  case 34: // standard_operator: '+'
+  case 34: // standard_operator +
 #line 278 "flex-bison/specification.y"
                                                         { yylhs.value.as < piranha::IrTokenInfo_string > () = yystack_[0].value.as < piranha::IrTokenInfo_string > (); }
 #line 1693 "parser.auto.cpp"
     break;
 
-  case 35: // standard_operator: '/'
+  case 35: // standard_operator /
 #line 279 "flex-bison/specification.y"
                                                         { yylhs.value.as < piranha::IrTokenInfo_string > () = yystack_[0].value.as < piranha::IrTokenInfo_string > (); }
 #line 1699 "parser.auto.cpp"
     break;
 
-  case 36: // standard_operator: '*'
+  case 36: // standard_operator *
 #line 280 "flex-bison/specification.y"
                                                         { yylhs.value.as < piranha::IrTokenInfo_string > () = yystack_[0].value.as < piranha::IrTokenInfo_string > (); }
 #line 1705 "parser.auto.cpp"
     break;
 
-  case 37: // node_name: NODE LABEL
+  case 37: // node_name node label
 #line 284 "flex-bison/specification.y"
                                                         { yylhs.value.as < piranha::IrNodeDefinition * > () = TRACK(new IrNodeDefinition(yystack_[0].value.as < piranha::IrTokenInfo_string > ())); }
 #line 1711 "parser.auto.cpp"
     break;
 
-  case 38: // node_name: NODE OPERATOR standard_operator
+  case 38: // node_name node operator standard_operator
 #line 285 "flex-bison/specification.y"
                                                         {
                                                             IrTokenInfo_string info = yystack_[1].value.as < piranha::IrTokenInfo_string > ();
@@ -1721,73 +1721,73 @@ namespace piranha {
 #line 1722 "parser.auto.cpp"
     break;
 
-  case 39: // node_inline: INLINE node_name
+  case 39: // node_inline inline node_name
 #line 294 "flex-bison/specification.y"
                                                         { yylhs.value.as < piranha::IrNodeDefinition * > () = yystack_[0].value.as < piranha::IrNodeDefinition * > (); yylhs.value.as < piranha::IrNodeDefinition * > ()->setIsInline(true); }
 #line 1728 "parser.auto.cpp"
     break;
 
-  case 40: // node_inline: node_name
+  case 40: // node_inline node_name
 #line 295 "flex-bison/specification.y"
                                                         { yylhs.value.as < piranha::IrNodeDefinition * > () = yystack_[0].value.as < piranha::IrNodeDefinition * > (); yylhs.value.as < piranha::IrNodeDefinition * > ()->setIsInline(false); }
 #line 1734 "parser.auto.cpp"
     break;
 
-  case 41: // node_shadow: node_inline BUILTIN_POINTER LABEL
+  case 41: // node_shadow node_inline builtin_pointer label
 #line 299 "flex-bison/specification.y"
                                                         { yylhs.value.as < piranha::IrNodeDefinition * > () = yystack_[2].value.as < piranha::IrNodeDefinition * > (); yylhs.value.as < piranha::IrNodeDefinition * > ()->setBuiltinName(yystack_[0].value.as < piranha::IrTokenInfo_string > ()); yylhs.value.as < piranha::IrNodeDefinition * > ()->setDefinesBuiltin(true); }
 #line 1740 "parser.auto.cpp"
     break;
 
-  case 42: // node_shadow: node_inline
+  case 42: // node_shadow node_inline
 #line 300 "flex-bison/specification.y"
                                                         { yylhs.value.as < piranha::IrNodeDefinition * > () = yystack_[0].value.as < piranha::IrNodeDefinition * > (); yylhs.value.as < piranha::IrNodeDefinition * > ()->setDefinesBuiltin(false); }
 #line 1746 "parser.auto.cpp"
     break;
 
-  case 43: // node_definition: node_shadow port_definitions '}'
+  case 43: // node_definition node_shadow port_definitions }
 #line 304 "flex-bison/specification.y"
                                                         { yylhs.value.as < piranha::IrNodeDefinition * > () = yystack_[2].value.as < piranha::IrNodeDefinition * > (); yylhs.value.as < piranha::IrNodeDefinition * > ()->setAttributeDefinitionList(yystack_[1].value.as < piranha::IrAttributeDefinitionList * > ()); yylhs.value.as < piranha::IrNodeDefinition * > ()->setBody(nullptr); }
 #line 1752 "parser.auto.cpp"
     break;
 
-  case 44: // node_definition: node_shadow port_definitions node_list '}'
+  case 44: // node_definition node_shadow port_definitions node_list }
 #line 305 "flex-bison/specification.y"
                                                         { yylhs.value.as < piranha::IrNodeDefinition * > () = yystack_[3].value.as < piranha::IrNodeDefinition * > (); yylhs.value.as < piranha::IrNodeDefinition * > ()->setAttributeDefinitionList(yystack_[2].value.as < piranha::IrAttributeDefinitionList * > ()); yylhs.value.as < piranha::IrNodeDefinition * > ()->setBody(yystack_[1].value.as < piranha::IrNodeList * > ()); }
 #line 1758 "parser.auto.cpp"
     break;
 
-  case 45: // node_definition: node_shadow error port_definitions '}'
+  case 45: // node_definition node_shadow error port_definitions }
 #line 306 "flex-bison/specification.y"
                                                         { yylhs.value.as < piranha::IrNodeDefinition * > () = yystack_[3].value.as < piranha::IrNodeDefinition * > (); yylhs.value.as < piranha::IrNodeDefinition * > ()->setAttributeDefinitionList(yystack_[1].value.as < piranha::IrAttributeDefinitionList * > ()); yylhs.value.as < piranha::IrNodeDefinition * > ()->setBody(nullptr); }
 #line 1764 "parser.auto.cpp"
     break;
 
-  case 46: // node_definition: node_shadow error port_definitions node_list '}'
+  case 46: // node_definition node_shadow error port_definitions node_list }
 #line 307 "flex-bison/specification.y"
                                                         { yylhs.value.as < piranha::IrNodeDefinition * > () = yystack_[4].value.as < piranha::IrNodeDefinition * > (); yylhs.value.as < piranha::IrNodeDefinition * > ()->setAttributeDefinitionList(yystack_[2].value.as < piranha::IrAttributeDefinitionList * > ()); yylhs.value.as < piranha::IrNodeDefinition * > ()->setBody(yystack_[1].value.as < piranha::IrNodeList * > ()); }
 #line 1770 "parser.auto.cpp"
     break;
 
-  case 47: // node_definition: error port_definitions '}'
+  case 47: // node_definition error port_definitions }
 #line 308 "flex-bison/specification.y"
                                                         { yylhs.value.as < piranha::IrNodeDefinition * > () = nullptr; yyerrok; }
 #line 1776 "parser.auto.cpp"
     break;
 
-  case 48: // node_definition: error port_definitions node_list '}'
+  case 48: // node_definition error port_definitions node_list }
 #line 309 "flex-bison/specification.y"
                                                         { yylhs.value.as < piranha::IrNodeDefinition * > () = nullptr; yyerrok; }
 #line 1782 "parser.auto.cpp"
     break;
 
-  case 49: // specific_node_definition: node_definition
+  case 49: // specific_node_definition node_definition
 #line 313 "flex-bison/specification.y"
                                                         { yylhs.value.as < piranha::IrNodeDefinition * > () = yystack_[0].value.as < piranha::IrNodeDefinition * > (); }
 #line 1788 "parser.auto.cpp"
     break;
 
-  case 50: // specific_node_definition: PRIVATE node_definition
+  case 50: // specific_node_definition private node_definition
 #line 314 "flex-bison/specification.y"
                                                         { 
                                                             if (yystack_[0].value.as < piranha::IrNodeDefinition * > () != nullptr) {
@@ -1800,7 +1800,7 @@ namespace piranha {
 #line 1801 "parser.auto.cpp"
     break;
 
-  case 51: // specific_node_definition: PUBLIC node_definition
+  case 51: // specific_node_definition public node_definition
 #line 322 "flex-bison/specification.y"
                                                         { 
                                                             if (yystack_[0].value.as < piranha::IrNodeDefinition * > () != nullptr) {
@@ -1813,7 +1813,7 @@ namespace piranha {
 #line 1814 "parser.auto.cpp"
     break;
 
-  case 52: // immediate_node_definition: AUTO specific_node_definition
+  case 52: // immediate_node_definition auto specific_node_definition
 #line 333 "flex-bison/specification.y"
                                                         {   
                                                             yylhs.value.as < piranha::IrNodeDefinition * > () = yystack_[0].value.as < piranha::IrNodeDefinition * > ();
@@ -1825,127 +1825,127 @@ namespace piranha {
 #line 1826 "parser.auto.cpp"
     break;
 
-  case 53: // immediate_node_definition: specific_node_definition
+  case 53: // immediate_node_definition specific_node_definition
 #line 340 "flex-bison/specification.y"
                                                         { yylhs.value.as < piranha::IrNodeDefinition * > () = yystack_[0].value.as < piranha::IrNodeDefinition * > (); }
 #line 1832 "parser.auto.cpp"
     break;
 
-  case 54: // node_decorator: decorator_list immediate_node_definition
+  case 54: // node_decorator decorator_list immediate_node_definition
 #line 344 "flex-bison/specification.y"
                                                         { yylhs.value.as < piranha::IrNodeDefinition * > () = yystack_[0].value.as < piranha::IrNodeDefinition * > (); }
 #line 1838 "parser.auto.cpp"
     break;
 
-  case 55: // node_decorator: immediate_node_definition
+  case 55: // node_decorator immediate_node_definition
 #line 345 "flex-bison/specification.y"
                                                         { yylhs.value.as < piranha::IrNodeDefinition * > () = yystack_[0].value.as < piranha::IrNodeDefinition * > (); }
 #line 1844 "parser.auto.cpp"
     break;
 
-  case 56: // port_definitions: '{'
+  case 56: // port_definitions {
 #line 349 "flex-bison/specification.y"
                                                         { yylhs.value.as < piranha::IrAttributeDefinitionList * > () = TRACK(new IrAttributeDefinitionList()); }
 #line 1850 "parser.auto.cpp"
     break;
 
-  case 57: // port_definitions: port_definitions documented_port_definition ';'
+  case 57: // port_definitions port_definitions documented_port_definition
 #line 350 "flex-bison/specification.y"
                                                         { yylhs.value.as < piranha::IrAttributeDefinitionList * > () = yystack_[2].value.as < piranha::IrAttributeDefinitionList * > (); yylhs.value.as < piranha::IrAttributeDefinitionList * > ()->addDefinition(yystack_[1].value.as < piranha::IrAttributeDefinition * > ()); }
 #line 1856 "parser.auto.cpp"
     break;
 
-  case 58: // port_definitions: port_definitions documented_port_definition error
+  case 58: // port_definitions port_definitions documented_port_definition error
 #line 351 "flex-bison/specification.y"
                                                         { yylhs.value.as < piranha::IrAttributeDefinitionList * > () = yystack_[2].value.as < piranha::IrAttributeDefinitionList * > (); yylhs.value.as < piranha::IrAttributeDefinitionList * > ()->addDefinition(yystack_[1].value.as < piranha::IrAttributeDefinition * > ()); }
 #line 1862 "parser.auto.cpp"
     break;
 
-  case 59: // port_definitions: port_definitions error ';'
+  case 59: // port_definitions port_definitions error
 #line 352 "flex-bison/specification.y"
                                                         { yylhs.value.as < piranha::IrAttributeDefinitionList * > () = yystack_[2].value.as < piranha::IrAttributeDefinitionList * > (); }
 #line 1868 "parser.auto.cpp"
     break;
 
-  case 60: // port_declaration: INPUT LABEL
+  case 60: // port_declaration input label
 #line 356 "flex-bison/specification.y"
                                                         { yylhs.value.as < piranha::IrAttributeDefinition * > () = TRACK(new IrAttributeDefinition(yystack_[1].value.as < piranha::IrTokenInfo_string > (), yystack_[0].value.as < piranha::IrTokenInfo_string > (), IrAttributeDefinition::Direction::Input)); }
 #line 1874 "parser.auto.cpp"
     break;
 
-  case 61: // port_declaration: OUTPUT LABEL
+  case 61: // port_declaration output label
 #line 357 "flex-bison/specification.y"
                                                         { yylhs.value.as < piranha::IrAttributeDefinition * > () = TRACK(new IrAttributeDefinition(yystack_[1].value.as < piranha::IrTokenInfo_string > (), yystack_[0].value.as < piranha::IrTokenInfo_string > (), IrAttributeDefinition::Direction::Output)); }
 #line 1880 "parser.auto.cpp"
     break;
 
-  case 62: // port_declaration: MODIFY LABEL
+  case 62: // port_declaration modify label
 #line 358 "flex-bison/specification.y"
                                                         { yylhs.value.as < piranha::IrAttributeDefinition * > () = TRACK(new IrAttributeDefinition(yystack_[1].value.as < piranha::IrTokenInfo_string > (), yystack_[0].value.as < piranha::IrTokenInfo_string > (), IrAttributeDefinition::Direction::Modify)); }
 #line 1886 "parser.auto.cpp"
     break;
 
-  case 63: // port_declaration: TOGGLE LABEL
+  case 63: // port_declaration toggle label
 #line 359 "flex-bison/specification.y"
                                                         { yylhs.value.as < piranha::IrAttributeDefinition * > () = TRACK(new IrAttributeDefinition(yystack_[1].value.as < piranha::IrTokenInfo_string > (), yystack_[0].value.as < piranha::IrTokenInfo_string > (), IrAttributeDefinition::Direction::Toggle)); }
 #line 1892 "parser.auto.cpp"
     break;
 
-  case 64: // port_status: ALIAS port_declaration
+  case 64: // port_status alias port_declaration
 #line 363 "flex-bison/specification.y"
                                         { yylhs.value.as < piranha::IrAttributeDefinition * > () = yystack_[0].value.as < piranha::IrAttributeDefinition * > (); yylhs.value.as < piranha::IrAttributeDefinition * > ()->setAlias(true); yylhs.value.as < piranha::IrAttributeDefinition * > ()->setAliasToken(yystack_[1].value.as < piranha::IrTokenInfo_string > ()); }
 #line 1898 "parser.auto.cpp"
     break;
 
-  case 65: // port_status: port_declaration
+  case 65: // port_status port_declaration
 #line 364 "flex-bison/specification.y"
                                         { yylhs.value.as < piranha::IrAttributeDefinition * > () = yystack_[0].value.as < piranha::IrAttributeDefinition * > (); yylhs.value.as < piranha::IrAttributeDefinition * > ()->setAlias(false); }
 #line 1904 "parser.auto.cpp"
     break;
 
-  case 66: // port_value: port_status '[' type_name_namespace ']'
+  case 66: // port_value port_status type_name_namespace
 #line 368 "flex-bison/specification.y"
                                                    { yylhs.value.as < piranha::IrAttributeDefinition * > () = yystack_[3].value.as < piranha::IrAttributeDefinition * > (); yylhs.value.as < piranha::IrAttributeDefinition * > ()->setTypeInfo(yystack_[1].value.as < piranha::IrTokenInfoSet<std::string, 2> > ()); }
 #line 1910 "parser.auto.cpp"
     break;
 
-  case 67: // port_value: port_status
+  case 67: // port_value port_status
 #line 369 "flex-bison/specification.y"
                                                    { yylhs.value.as < piranha::IrAttributeDefinition * > () = yystack_[0].value.as < piranha::IrAttributeDefinition * > (); }
 #line 1916 "parser.auto.cpp"
     break;
 
-  case 68: // port_connection: port_value ':' value
+  case 68: // port_connection port_value value
 #line 373 "flex-bison/specification.y"
                                             { yylhs.value.as < piranha::IrAttributeDefinition * > () = yystack_[2].value.as < piranha::IrAttributeDefinition * > (); yylhs.value.as < piranha::IrAttributeDefinition * > ()->setDefaultValue(yystack_[0].value.as < piranha::IrValue * > ()); }
 #line 1922 "parser.auto.cpp"
     break;
 
-  case 69: // port_connection: port_value
+  case 69: // port_connection port_value
 #line 374 "flex-bison/specification.y"
                                             { yylhs.value.as < piranha::IrAttributeDefinition * > () = yystack_[0].value.as < piranha::IrAttributeDefinition * > (); yylhs.value.as < piranha::IrAttributeDefinition * > ()->setDefaultValue(nullptr); }
 #line 1928 "parser.auto.cpp"
     break;
 
-  case 70: // documented_port_definition: decorator_list port_connection
+  case 70: // documented_port_definition decorator_list port_connection
 #line 378 "flex-bison/specification.y"
                                             { yylhs.value.as < piranha::IrAttributeDefinition * > () = yystack_[0].value.as < piranha::IrAttributeDefinition * > (); }
 #line 1934 "parser.auto.cpp"
     break;
 
-  case 71: // documented_port_definition: port_connection
+  case 71: // documented_port_definition port_connection
 #line 379 "flex-bison/specification.y"
                                             { yylhs.value.as < piranha::IrAttributeDefinition * > () = yystack_[0].value.as < piranha::IrAttributeDefinition * > (); }
 #line 1940 "parser.auto.cpp"
     break;
 
-  case 72: // inline_node_member: inline_node
+  case 72: // inline_node_member inline_node
 #line 383 "flex-bison/specification.y"
                                             { yylhs.value.as < piranha::IrNode * > () = yystack_[0].value.as < piranha::IrNode * > (); }
 #line 1946 "parser.auto.cpp"
     break;
 
-  case 73: // inline_node_member: data_access '.' inline_node
+  case 73: // inline_node_member data_access inline_node
 #line 384 "flex-bison/specification.y"
                                             {
                                                 yylhs.value.as < piranha::IrNode * > () = yystack_[0].value.as < piranha::IrNode * > ();
@@ -1954,13 +1954,13 @@ namespace piranha {
 #line 1955 "parser.auto.cpp"
     break;
 
-  case 74: // inline_node: type_name_namespace connection_block
+  case 74: // inline_node type_name_namespace connection_block
 #line 391 "flex-bison/specification.y"
                                             { yylhs.value.as < piranha::IrNode * > () = TRACK(new IrNode(yystack_[1].value.as < piranha::IrTokenInfoSet<std::string, 2> > ().data[1], yystack_[0].value.as < piranha::IrAttributeList * > (), yystack_[1].value.as < piranha::IrTokenInfoSet<std::string, 2> > ().data[0])); }
 #line 1961 "parser.auto.cpp"
     break;
 
-  case 75: // connection_block: '(' ')'
+  case 75: // connection_block
 #line 395 "flex-bison/specification.y"
                                         {
                                             yylhs.value.as < piranha::IrAttributeList * > () = TRACK(new IrAttributeList());
@@ -1970,7 +1970,7 @@ namespace piranha {
 #line 1971 "parser.auto.cpp"
     break;
 
-  case 76: // connection_block: '(' attribute_list ')'
+  case 76: // connection_block attribute_list
 #line 400 "flex-bison/specification.y"
                                         {
                                             yylhs.value.as < piranha::IrAttributeList * > () = yystack_[1].value.as < piranha::IrAttributeList * > ();
@@ -1980,13 +1980,13 @@ namespace piranha {
 #line 1981 "parser.auto.cpp"
     break;
 
-  case 77: // connection_block: '(' error ')'
+  case 77: // connection_block error
 #line 405 "flex-bison/specification.y"
                                         { yyerrok; }
 #line 1987 "parser.auto.cpp"
     break;
 
-  case 78: // attribute_list: attribute
+  case 78: // attribute_list attribute
 #line 409 "flex-bison/specification.y"
                                         { 
                                             yylhs.value.as < piranha::IrAttributeList * > () = TRACK(new IrAttributeList());
@@ -1995,7 +1995,7 @@ namespace piranha {
 #line 1996 "parser.auto.cpp"
     break;
 
-  case 79: // attribute_list: attribute_list ',' attribute
+  case 79: // attribute_list attribute_list attribute
 #line 413 "flex-bison/specification.y"
                                         {
                                             yystack_[2].value.as < piranha::IrAttributeList * > ()->addAttribute(yystack_[0].value.as < piranha::IrAttribute * > ()); 
@@ -2004,7 +2004,7 @@ namespace piranha {
 #line 2005 "parser.auto.cpp"
     break;
 
-  case 80: // attribute_list: error ',' attribute
+  case 80: // attribute_list error attribute
 #line 417 "flex-bison/specification.y"
                                         {
                                             yylhs.value.as < piranha::IrAttributeList * > () = TRACK(new IrAttributeList());
@@ -2013,37 +2013,37 @@ namespace piranha {
 #line 2014 "parser.auto.cpp"
     break;
 
-  case 81: // attribute: LABEL ':' value
+  case 81: // attribute label value
 #line 424 "flex-bison/specification.y"
                                         { yylhs.value.as < piranha::IrAttribute * > () = TRACK(new IrAttribute(yystack_[2].value.as < piranha::IrTokenInfo_string > (), yystack_[0].value.as < piranha::IrValue * > ())); }
 #line 2020 "parser.auto.cpp"
     break;
 
-  case 82: // attribute: value
+  case 82: // attribute value
 #line 425 "flex-bison/specification.y"
                                         { yylhs.value.as < piranha::IrAttribute * > () = TRACK(new IrAttribute(yystack_[0].value.as < piranha::IrValue * > ())); }
 #line 2026 "parser.auto.cpp"
     break;
 
-  case 83: // label_value: LABEL
+  case 83: // label_value label
 #line 429 "flex-bison/specification.y"
                                         { yylhs.value.as < piranha::IrValue * > () = static_cast<IrValue *>(TRACK(new IrValueLabel(yystack_[0].value.as < piranha::IrTokenInfo_string > ()))); }
 #line 2032 "parser.auto.cpp"
     break;
 
-  case 84: // value: add_exp
+  case 84: // value add_exp
 #line 433 "flex-bison/specification.y"
                                         { yylhs.value.as < piranha::IrValue * > () = yystack_[0].value.as < piranha::IrValue * > (); }
 #line 2038 "parser.auto.cpp"
     break;
 
-  case 85: // string: STRING
+  case 85: // string string
 #line 437 "flex-bison/specification.y"
                                         { yylhs.value.as < piranha::IrTokenInfo_string > () = yystack_[0].value.as < piranha::IrTokenInfo_string > (); yylhs.location = yystack_[0].value.as < piranha::IrTokenInfo_string > (); }
 #line 2044 "parser.auto.cpp"
     break;
 
-  case 86: // string: string STRING
+  case 86: // string string string
 #line 438 "flex-bison/specification.y"
                                         { 
                                             yylhs.value.as < piranha::IrTokenInfo_string > () = IrTokenInfo_string();
@@ -2054,73 +2054,73 @@ namespace piranha {
 #line 2055 "parser.auto.cpp"
     break;
 
-  case 87: // constant: INT
+  case 87: // constant int
 #line 447 "flex-bison/specification.y"
                                         { yylhs.value.as < piranha::IrValue * > () = static_cast<IrValue *>(TRACK(new IrValueInt(yystack_[0].value.as < piranha::IrTokenInfo_int > ()))); yylhs.location = yystack_[0].value.as < piranha::IrTokenInfo_int > (); }
 #line 2061 "parser.auto.cpp"
     break;
 
-  case 88: // constant: string
+  case 88: // constant string
 #line 448 "flex-bison/specification.y"
                                         { yylhs.value.as < piranha::IrValue * > () = static_cast<IrValue *>(TRACK(new IrValueString(yystack_[0].value.as < piranha::IrTokenInfo_string > ()))); }
 #line 2067 "parser.auto.cpp"
     break;
 
-  case 89: // constant: FLOAT
+  case 89: // constant float
 #line 449 "flex-bison/specification.y"
                                         { yylhs.value.as < piranha::IrValue * > () = static_cast<IrValue *>(TRACK(new IrValueFloat(yystack_[0].value.as < piranha::IrTokenInfo_float > ()))); yylhs.location = yystack_[0].value.as < piranha::IrTokenInfo_float > (); }
 #line 2073 "parser.auto.cpp"
     break;
 
-  case 90: // constant: BOOL
+  case 90: // constant bool
 #line 450 "flex-bison/specification.y"
                                         { yylhs.value.as < piranha::IrValue * > () = static_cast<IrValue *>(TRACK(new IrValueBool(yystack_[0].value.as < piranha::IrTokenInfo_bool > ()))); yylhs.location = yystack_[0].value.as < piranha::IrTokenInfo_bool > (); }
 #line 2079 "parser.auto.cpp"
     break;
 
-  case 91: // atomic_value: label_value
+  case 91: // atomic_value label_value
 #line 454 "flex-bison/specification.y"
                                         { yylhs.value.as < piranha::IrValue * > () = yystack_[0].value.as < piranha::IrValue * > (); }
 #line 2085 "parser.auto.cpp"
     break;
 
-  case 92: // atomic_value: inline_node_member
+  case 92: // atomic_value inline_node_member
 #line 455 "flex-bison/specification.y"
                                         { yylhs.value.as < piranha::IrValue * > () = static_cast<IrValue *>(TRACK(new IrValueNodeRef(yystack_[0].value.as < piranha::IrNode * > ()))); }
 #line 2091 "parser.auto.cpp"
     break;
 
-  case 93: // atomic_value: constant
+  case 93: // atomic_value constant
 #line 456 "flex-bison/specification.y"
                                         { yylhs.value.as < piranha::IrValue * > () = yystack_[0].value.as < piranha::IrValue * > (); }
 #line 2097 "parser.auto.cpp"
     break;
 
-  case 94: // primary_exp: atomic_value
+  case 94: // primary_exp atomic_value
 #line 460 "flex-bison/specification.y"
                                         { yylhs.value.as < piranha::IrValue * > () = yystack_[0].value.as < piranha::IrValue * > (); }
 #line 2103 "parser.auto.cpp"
     break;
 
-  case 95: // primary_exp: '(' value ')'
+  case 95: // primary_exp value
 #line 461 "flex-bison/specification.y"
                                         { yylhs.value.as < piranha::IrValue * > () = yystack_[1].value.as < piranha::IrValue * > (); yylhs.value.as < piranha::IrValue * > ()->registerToken(&yystack_[2].value.as < piranha::IrTokenInfo_string > ()); yylhs.value.as < piranha::IrValue * > ()->registerToken(&yystack_[0].value.as < piranha::IrTokenInfo_string > ()); }
 #line 2109 "parser.auto.cpp"
     break;
 
-  case 96: // primary_exp: '(' error ')'
+  case 96: // primary_exp error
 #line 462 "flex-bison/specification.y"
                                         { yylhs.value.as < piranha::IrValue * > () = nullptr; yyerrok; }
 #line 2115 "parser.auto.cpp"
     break;
 
-  case 97: // data_access: primary_exp
+  case 97: // data_access primary_exp
 #line 466 "flex-bison/specification.y"
                                         { yylhs.value.as < piranha::IrValue * > () = yystack_[0].value.as < piranha::IrValue * > (); }
 #line 2121 "parser.auto.cpp"
     break;
 
-  case 98: // data_access: data_access '.' label_value
+  case 98: // data_access data_access label_value
 #line 467 "flex-bison/specification.y"
                                         { 
                                             yylhs.value.as < piranha::IrValue * > () = static_cast<IrValue *>(
@@ -2129,13 +2129,13 @@ namespace piranha {
 #line 2130 "parser.auto.cpp"
     break;
 
-  case 99: // unary_exp: data_access
+  case 99: // unary_exp data_access
 #line 474 "flex-bison/specification.y"
                                         { yylhs.value.as < piranha::IrValue * > () = yystack_[0].value.as < piranha::IrValue * > (); }
 #line 2136 "parser.auto.cpp"
     break;
 
-  case 100: // unary_exp: '-' data_access
+  case 100: // unary_exp - data_access
 #line 475 "flex-bison/specification.y"
                                         {
                                             yylhs.value.as < piranha::IrValue * > () = static_cast<IrValue *>(
@@ -2144,7 +2144,7 @@ namespace piranha {
 #line 2145 "parser.auto.cpp"
     break;
 
-  case 101: // unary_exp: '+' data_access
+  case 101: // unary_exp + data_access
 #line 479 "flex-bison/specification.y"
                                         {
                                             yylhs.value.as < piranha::IrValue * > () = static_cast<IrValue *>(
@@ -2153,7 +2153,7 @@ namespace piranha {
 #line 2154 "parser.auto.cpp"
     break;
 
-  case 102: // unary_exp: '!' data_access
+  case 102: // unary_exp data_access
 #line 483 "flex-bison/specification.y"
                                         {
                                             yylhs.value.as < piranha::IrValue * > () = static_cast<IrValue *>(
@@ -2162,13 +2162,13 @@ namespace piranha {
 #line 2163 "parser.auto.cpp"
     break;
 
-  case 103: // mul_exp: unary_exp
+  case 103: // mul_exp unary_exp
 #line 490 "flex-bison/specification.y"
                                         { yylhs.value.as < piranha::IrValue * > () = yystack_[0].value.as < piranha::IrValue * > (); }
 #line 2169 "parser.auto.cpp"
     break;
 
-  case 104: // mul_exp: mul_exp '*' unary_exp
+  case 104: // mul_exp mul_exp * unary_exp
 #line 491 "flex-bison/specification.y"
                                         {
                                             yylhs.value.as < piranha::IrValue * > () = static_cast<IrValue *>(
@@ -2177,7 +2177,7 @@ namespace piranha {
 #line 2178 "parser.auto.cpp"
     break;
 
-  case 105: // mul_exp: mul_exp '/' unary_exp
+  case 105: // mul_exp mul_exp / unary_exp
 #line 495 "flex-bison/specification.y"
                                         {
                                             yylhs.value.as < piranha::IrValue * > () = static_cast<IrValue *>(
@@ -2186,13 +2186,13 @@ namespace piranha {
 #line 2187 "parser.auto.cpp"
     break;
 
-  case 106: // add_exp: mul_exp
+  case 106: // add_exp mul_exp
 #line 502 "flex-bison/specification.y"
                                         { yylhs.value.as < piranha::IrValue * > () = yystack_[0].value.as < piranha::IrValue * > (); }
 #line 2193 "parser.auto.cpp"
     break;
 
-  case 107: // add_exp: add_exp '+' mul_exp
+  case 107: // add_exp add_exp + mul_exp
 #line 503 "flex-bison/specification.y"
                                         {
                                             yylhs.value.as < piranha::IrValue * > () = static_cast<IrValue *>(
@@ -2201,7 +2201,7 @@ namespace piranha {
 #line 2202 "parser.auto.cpp"
     break;
 
-  case 108: // add_exp: add_exp '-' mul_exp
+  case 108: // add_exp add_exp - mul_exp
 #line 507 "flex-bison/specification.y"
                                         {
                                             yylhs.value.as < piranha::IrValue * > () = static_cast<IrValue *>(
@@ -2224,22 +2224,22 @@ namespace piranha {
           error (yyexc);
           YYERROR;
         }
-#endif // YY_EXCEPTIONS
+#endif //  YY_EXCEPTIONS
       YY_SYMBOL_PRINT ("-> $$ =", yylhs);
       yypop_ (yylen);
       yylen = 0;
 
-      // Shift the result of the reduction.
+      // shift the result of the reduction
       yypush_ (YY_NULLPTR, YY_MOVE (yylhs));
     }
     goto yynewstate;
 
 
-  /*--------------------------------------.
-  | yyerrlab -- here on detecting error.  |
-  `--------------------------------------*/
+  /*
+  | yyerrlab -- here on detecting error |
+  */
   yyerrlab:
-    // If not already recovering from an error, report this error.
+    // if not already recovering from an error report this error
     if (!yyerrstatus_)
       {
         ++yynerrs_;
@@ -2251,10 +2251,10 @@ namespace piranha {
     yyerror_range[1].location = yyla.location;
     if (yyerrstatus_ == 3)
       {
-        /* If just tried and failed to reuse lookahead token after an
-           error, discard it.  */
+        /* if just tried and failed to reuse lookahead token after an
+           error discard it */
 
-        // Return failure if at end of input.
+        // return failure if at end of input
         if (yyla.kind () == symbol_kind::S_YYEOF)
           YYABORT;
         else if (!yyla.empty ())
@@ -2264,33 +2264,33 @@ namespace piranha {
           }
       }
 
-    // Else will try to reuse lookahead token after shifting the error token.
+    // else will try to reuse lookahead token after shifting the error token
     goto yyerrlab1;
 
 
-  /*---------------------------------------------------.
-  | yyerrorlab -- error raised explicitly by YYERROR.  |
-  `---------------------------------------------------*/
+  /*
+  | yyerrorlab -- error raised explicitly by yyerror |
+  */
   yyerrorlab:
-    /* Pacify compilers when the user code never invokes YYERROR and
-       the label yyerrorlab therefore never appears in user code.  */
+    /* pacify compilers when the user code never invokes yyerror and
+       the label yyerrorlab therefore never appears in user code */
     if (false)
       YYERROR;
 
-    /* Do not reclaim the symbols of the rule whose action triggered
-       this YYERROR.  */
+    /* do not reclaim the symbols of the rule whose action triggered
+       this yyerror */
     yypop_ (yylen);
     yylen = 0;
     YY_STACK_PRINT ();
     goto yyerrlab1;
 
 
-  /*-------------------------------------------------------------.
-  | yyerrlab1 -- common code for both syntax error and YYERROR.  |
-  `-------------------------------------------------------------*/
+  /*
+  | yyerrlab1 -- common code for both syntax error and yyerror |
+  */
   yyerrlab1:
-    yyerrstatus_ = 3;   // Each real token shifted decrements this.
-    // Pop stack until we find a state that shifts the error token.
+    yyerrstatus_ = 3;   // each real token shifted decrements this
+    // pop stack until we find a state that shifts the error token
     for (;;)
       {
         yyn = yypact_[+yystack_[0].state];
@@ -2306,7 +2306,7 @@ namespace piranha {
               }
           }
 
-        // Pop the current state because it cannot handle the error token.
+        // pop the current state because it cannot handle the error token
         if (yystack_.size () == 1)
           YYABORT;
 
@@ -2321,38 +2321,38 @@ namespace piranha {
       yyerror_range[2].location = yyla.location;
       YYLLOC_DEFAULT (error_token.location, yyerror_range, 2);
 
-      // Shift the error token.
+      // shift the error token
       error_token.state = state_type (yyn);
       yypush_ ("Shifting", YY_MOVE (error_token));
     }
     goto yynewstate;
 
 
-  /*-------------------------------------.
-  | yyacceptlab -- YYACCEPT comes here.  |
-  `-------------------------------------*/
+  /*
+  | yyacceptlab -- yyaccept comes here |
+  */
   yyacceptlab:
     yyresult = 0;
     goto yyreturn;
 
 
-  /*-----------------------------------.
-  | yyabortlab -- YYABORT comes here.  |
-  `-----------------------------------*/
+  /*
+  | yyabortlab -- yyabort comes here |
+  */
   yyabortlab:
     yyresult = 1;
     goto yyreturn;
 
 
-  /*-----------------------------------------------------.
-  | yyreturn -- parsing is finished, return the result.  |
-  `-----------------------------------------------------*/
+  /*
+  | yyreturn -- parsing is finished return the result |
+  */
   yyreturn:
     if (!yyla.empty ())
       yy_destroy_ ("Cleanup: discarding lookahead", yyla);
 
-    /* Do not reclaim the symbols of the rule whose action triggered
-       this YYABORT or YYACCEPT.  */
+    /* do not reclaim the symbols of the rule whose action triggered
+       this yyabort or yyaccept */
     yypop_ (yylen);
     YY_STACK_PRINT ();
     while (1 < yystack_.size ())
@@ -2367,8 +2367,8 @@ namespace piranha {
     catch (...)
       {
         YYCDEBUG << "Exception caught: cleaning lookahead and stack\n";
-        // Do not try to display the values of the reclaimed symbols,
-        // as their printers might throw an exception.
+        // do not try to display the values of the reclaimed symbols
+        // as their printers might throw an exception
         if (!yyla.empty ())
           yy_destroy_ (YY_NULLPTR, yyla);
 
@@ -2379,7 +2379,7 @@ namespace piranha {
           }
         throw;
       }
-#endif // YY_EXCEPTIONS
+#endif //  YY_EXCEPTIONS
   }
 
   void
@@ -2394,7 +2394,7 @@ namespace piranha {
   {
     return yytname_[yysymbol];
   }
-#endif // #if YYDEBUG || 0
+#endif // #if yydebug || 0
 
 
 
@@ -2621,8 +2621,8 @@ namespace piranha {
 
 
 #if YYDEBUG
-  // YYTNAME[SYMBOL-NUM] -- String name of the symbol SYMBOL-NUM.
-  // First, the terminals, then, starting at \a YYNTOKENS, nonterminals.
+  // yytnamesymbol-num -- string name of the symbol symbol-num
+  // first the terminals then starting at \a yyntokens nonterminals
   const char*
   const Parser::yytname_[] =
   {
@@ -2682,21 +2682,21 @@ namespace piranha {
   {
     int yylno = yyrline_[yyrule];
     int yynrhs = yyr2_[yyrule];
-    // Print the symbols being reduced, and their result.
+    // print the symbols being reduced and their result
     *yycdebug_ << "Reducing stack by rule " << yyrule - 1
                << " (line " << yylno << "):\n";
-    // The symbols being reduced.
+    // the symbols being reduced
     for (int yyi = 0; yyi < yynrhs; yyi++)
       YY_SYMBOL_PRINT ("   $" << yyi + 1 << " =",
                        yystack_[(yynrhs) - (yyi + 1)]);
   }
-#endif // YYDEBUG
+#endif // yydebug
 
   Parser::symbol_kind_type
   Parser::yytranslate_ (int t) YY_NOEXCEPT
   {
-    // YYTRANSLATE[TOKEN-NUM] -- Symbol number corresponding to
-    // TOKEN-NUM as returned by yylex.
+    // yytranslatetoken-num -- symbol number corresponding to
+    // token-num as returned by yylex
     static
     const signed char
     translate_table[] =
@@ -2731,7 +2731,7 @@ namespace piranha {
       15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
       25,    26
     };
-    // Last valid token kind.
+    // last valid token kind
     const int code_max = 281;
 
     if (t <= 0)

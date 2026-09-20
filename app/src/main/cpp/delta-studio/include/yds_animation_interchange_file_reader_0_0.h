@@ -57,4 +57,4 @@ protected:
     unsigned int m_actionCount;
 };
 
-#endif /* YDS_ANIMATION_INTERCHANGE_FILE_READER_0_0_H */
+#endif /* YDS_ANIMATION_INTERCHANGE_FILE_READER_0_0_H  */

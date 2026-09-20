@@ -160,8 +160,8 @@ ysError ysDevice::ResizeRenderTarget(ysRenderTarget *target, int width,
     if (target == nullptr) return YDS_ERROR_RETURN(ysError::InvalidParameter);
 
     if (target->m_associatedContext != nullptr) {
-        // This is an on-screen render target so the width and height must match
-        // the requirements of the parent context.
+        // this is an on-screen render target so the width and height must match
+        // the requirements of the parent context
 
         const int reqWidth =
                 target->m_associatedContext->GetWindow()->GetGameWidth();
@@ -169,7 +169,7 @@ ysError ysDevice::ResizeRenderTarget(ysRenderTarget *target, int width,
                 target->m_associatedContext->GetWindow()->GetGameHeight();
 
         if (reqWidth != width || reqHeight != height) {
-            //return YDS_ERROR_RETURN_MSG(ysError::InvalidParameter, "On-screen render target size must match window size.");
+            // return yds_error_return_msgyserror::invalidparameter on-screen render target size must match window size
         }
     }
 
@@ -299,18 +299,18 @@ ysError ysDevice::EditBufferDataRange(ysGPUBuffer *buffer, char *data, int size,
                                       int offset) {
     YDS_ERROR_DECLARE("EditBufferDataRange");
 
-    // Error checking
+    // error checking
     if (data == nullptr) return YDS_ERROR_RETURN(ysError::InvalidParameter);
     if ((size + offset) > buffer->GetSize())
         return YDS_ERROR_RETURN(ysError::OutOfBounds);
     if (size < 0 || offset < 0) return YDS_ERROR_RETURN(ysError::OutOfBounds);
 
     if (buffer->m_mirrorToRAM) {
-        // Check that the buffer has a RAM buffer
+        // check that the buffer has a ram buffer
         if (buffer->m_RAMMirror == nullptr)
             return YDS_ERROR_RETURN(ysError::UninitializedBuffer);
 
-        // Copy memory
+        // copy memory
         memcpy(buffer->m_RAMMirror + offset, data, size);
     }
 

@@ -23,4 +23,4 @@ private:
     API m_api;
 };
 
-#endif /* YDS_AUDIO_SYSTEM_OBJECT_H */
+#endif /* YDS_AUDIO_SYSTEM_OBJECT_H  */

@@ -464,7 +464,7 @@ TEST(IrTests, IrCompilerTest) {
     int dependencyCount = unit->getDependencyCount();
     EXPECT_EQ(dependencyCount, 1);
 
-    // Simple sanity check to make sure it's the right file
+    // simple sanity check to make sure its the right file
     IrCompilationUnit *dep = unit->getDependency(0);
     EXPECT_EQ(dep->getNodeDefinitionCount(), 1);
 
@@ -485,7 +485,7 @@ TEST(IrTests, IrDependencyTreeTest) {
     int dependencyCount = unit->getDependencyCount();
     EXPECT_EQ(dependencyCount, 2);
 
-    // Simple sanity check to make sure it's the right file
+    // simple sanity check to make sure its the right file
     IrCompilationUnit *dep = unit->getDependency(0);
     EXPECT_EQ(dep->getNodeDefinitionCount(), 1);
 
@@ -497,11 +497,11 @@ TEST(IrTests, IrDependencyTreeTest) {
 
     IrCompilationUnit *secondaryDep = dep2->getDependency(0);
 
-    // Make sure that the compiler doesn't build a file twice
+    // make sure that the compiler doesnt build a file twice
     EXPECT_EQ(dep, secondaryDep);
     EXPECT_EQ(compiler.getUnitCount(), 3);
 
-    // Make sure the definitions were found
+    // make sure the definitions were found
     EXPECT_TRUE(unit->getNode(0)->getDefinition() != nullptr);
     EXPECT_TRUE(unit->getNode(1)->getDefinition() != nullptr);
 
@@ -521,7 +521,7 @@ TEST(IrTests, IrMissingNodeDefinitionTest) {
     CompilationError *err = errors->getCompilationError(0);
     EXPECT_ERROR_CODE(err, ErrorCode::UndefinedNodeType);
 
-    // Check that the location matches
+    // check that the location matches
     EXPECT_EQ(err->getErrorLocation()->lineStart, 1);
     EXPECT_EQ(err->getErrorLocation()->lineEnd, 1);
 
@@ -592,7 +592,7 @@ TEST(IrTests, IrNodeBodyTest) {
     const ErrorList *errors = compiler.getErrorList();
     int errorCount = errors->getErrorCount();
 
-    // No errors expected
+    // no errors expected
     EXPECT_EQ(errorCount, 0);
 
     IrNode *nodeInstance = unit->getNode(0);
@@ -602,7 +602,7 @@ TEST(IrTests, IrNodeBodyTest) {
     EXPECT_EQ(bodyNode->getName(), "add_mod");
     EXPECT_EQ(bodyNode->getType(), "Add");
 
-    // Check that the node was resolved properly
+    // check that the node was resolved properly
     IrNodeDefinition *bodyDefinition = bodyNode->getDefinition();
     EXPECT_NE(bodyDefinition, nullptr);
 
@@ -619,7 +619,7 @@ TEST(IrTests, IrMissingDependencyTest) {
     const ErrorList *errors = compiler.getErrorList();
     int errorCount = errors->getErrorCount();
 
-    // Expect an import error
+    // expect an import error
     EXPECT_EQ(errorCount, 1);
 
     CompilationError *err0 = errors->getCompilationError(0);
@@ -638,7 +638,7 @@ TEST(IrTests, IrReferenceResolutionTest) {
     const ErrorList *errors = compiler.getErrorList();
     const int errorCount = errors->getErrorCount();
 
-    // Expect no errors
+    // expect no errors
     EXPECT_EQ(errorCount, 0);
 
     IrNode *node = unit->getNode(0);
@@ -812,7 +812,7 @@ TEST(IrTests, IrOperationDefinitionTest) {
     IrNodeDefinition *definition = unit->getNodeDefinition(0);
     EXPECT_EQ(definition->getName(), "operator+");
 
-    // Expect no errors
+    // expect no errors
     EXPECT_EQ(errors->getErrorCount(), 0);
 
     compiler.free();

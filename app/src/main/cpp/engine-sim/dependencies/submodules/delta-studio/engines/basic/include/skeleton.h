@@ -32,4 +32,4 @@ namespace dbasic {
 
 } /* namespace dbasic */
 
-#endif /* DELTA_BASIC_SKELETON_H */
+#endif /* DELTA_BASIC_SKELETON_H  */

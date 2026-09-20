@@ -93,4 +93,4 @@ namespace piranha {
 
 } /* namespace piranha */
 
-#endif /* PIRANHA_OPERATION_NODE_H */
+#endif /* PIRANHA_OPERATION_NODE_H  */

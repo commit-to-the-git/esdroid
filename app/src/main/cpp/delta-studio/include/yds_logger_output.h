@@ -27,56 +27,56 @@ public:
     ysLoggerOutput(const char *typeID);
     ~ysLoggerOutput();
 
-    /* Initialize the output */
+    /* initialize the output */
     virtual void Initialize() = 0;
 
-    // Close the output
+    // close the output
     virtual void Close() = 0;
 
-    // Enable or disable this output
+    // enable or disable this output
     void SetEnable(bool enable) { m_enabled = enable; }
 
-    // Get whether this output is enabled or disabled
+    // get whether this output is enabled or disabled
     bool GetEnable() const { return m_enabled; }
 
-    // Log a message
+    // log a message
     void LogMessage(const char *message, const char *fname, int line, int level);
 
-    // Set format parameters
+    // set format parameters
     void SetFormatParameters(unsigned int formatParameters) { m_formatParameters = formatParameters; }
 
 protected:
-    // Write a message
+    // write a message
     virtual void Write(const char *data) = 0;
 
-    // Set the parent logger class used by this output
+    // set the parent logger class used by this output
     void SetLogger(ysLogger *logger);
 
 protected:
-    // Flag indicating whether this output is enabled.
+    // flag indicating whether this output is enabled
     bool m_enabled;
 
-    // The minimum level required to log a message
+    // the minimum level required to log a message
     int m_level;
 
-    // Output formatting parameters
+    // output formatting parameters
     unsigned int m_formatParameters;
 
-    // A reference to the higher level logger class
+    // a reference to the higher level logger class
     ysLogger *m_parentLogger;
 
 protected:
-    // Clear the internal buffer
+    // clear the internal buffer
     void ClearBuffer();
 
-    // Write to the internal buffer
+    // write to the internal buffer
     void WriteToBuffer(const char *data, int width = 0);
 
-    // Interal buffer
+    // interal buffer
     char m_buffer[1024];
 
-    // Internal buffer length
+    // internal buffer length
     int m_bufferLength;
 };
 
-#endif /* YDS_LOGGER_OUTPUT_H */
+#endif /* YDS_LOGGER_OUTPUT_H  */

@@ -30,4 +30,4 @@ class LabeledGauge : public UiElement {
         float m_needleOuterRadius = 0.7f;
 };
 
-#endif /* ATG_ENGINE_SIM_LABELED_GAUGE_H */
+#endif /* ATG_ENGINE_SIM_LABELED_GAUGE_H  */

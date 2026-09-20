@@ -29,4 +29,4 @@ private:
 #endif
 };
 
-#endif /* YDS_D3D11_CONTEXT_H */
+#endif /* YDS_D3D11_CONTEXT_H  */

@@ -77,4 +77,4 @@ private:
     bool m_locked;
 };
 
-#endif /* YDS_AUDIO_SOURCE_H */
+#endif /* YDS_AUDIO_SOURCE_H  */

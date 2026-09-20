@@ -104,7 +104,7 @@ void atg_scs::RollingConstraint::calculate(
     output->J[0][1] = -ds_dq2 * m_radius;
     output->J[0][2] = -ds_dq3 * m_radius;
 
-    // C1 = m_radius + dy * delta_x - dx * delta_y
+    // c1 = m_radius + dy * delta_x - dx * delta_y
     output->J[1][0] = dy * d_delta_x_dq1;
     output->J[1][1] = -dx * d_delta_y_dq2;
     output->J[1][2] =

@@ -189,11 +189,11 @@ void atg_scs::GenericRigidBodySystem::processConstraints(
 
     auto s2 = std::chrono::steady_clock::now();
 
-    // Constraint force derivation
-    //  R = J_T * lambda_scale
-    //  => transpose(J) * transpose(transpose(lambda_scale)) = R
-    //  => transpose(lambda_scale * J) = R
-    //  => transpose(J.leftScale(lambda_scale)) = R
+    // constraint force derivation
+    // r = j_t * lambda_scale
+    // => transposej * transposetransposelambda_scale = r
+    // => transposelambda_scale * j = r
+    // => transposej.leftscalelambda_scale = r
 
     m_iv.J_sparse.leftScale(m_iv.lambda, &m_iv.sreg0);
 

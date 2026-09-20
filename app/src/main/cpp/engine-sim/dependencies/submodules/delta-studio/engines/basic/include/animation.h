@@ -45,4 +45,4 @@ namespace dbasic {
 
 } /* namespace dbasic */
 
-#endif /* DELTA_BASIC_ANIMATION_H */
+#endif /* DELTA_BASIC_ANIMATION_H  */

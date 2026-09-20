@@ -21,4 +21,4 @@ namespace piranha {
 
 } /* namespace piranha */
 
-#endif /* PIRANHA_ASSEMBLY_H */
+#endif /* PIRANHA_ASSEMBLY_H  */

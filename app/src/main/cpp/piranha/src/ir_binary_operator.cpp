@@ -19,9 +19,9 @@ piranha::IrBinaryOperator::IrBinaryOperator(
     registerComponent(left);
     registerComponent(right);
 
-    // The data access operators are special in the sense that the right-hand operand
-    // will *always* be a standard label that doesn't reference anything itself.
-    // Therefore it wouldn't be wise to resolve the reference of that label
+    // the data access operators are special in the sense that the right-hand operand
+    // will *always* be a standard label that doesnt reference anything itself
+    // therefore it wouldnt be wise to resolve the reference of that label
     if (op == Operator::Dot) {
         if (m_rightOperand != nullptr) {
             m_rightOperand->setCheckReferences(false);
@@ -45,12 +45,12 @@ piranha::IrParserStructure *piranha::IrBinaryOperator::
     IR_RESET(query);
     
     if (m_leftOperand == nullptr || m_rightOperand == nullptr) {
-        // There was a syntax error so this step can be skipped
+        // there was a syntax error so this step can be skipped
         IR_FAIL();
         return nullptr;
     }
 
-    // The dot is the reference operator
+    // the dot is the reference operator
     if (m_operator == Operator::Dot) {
         IrReferenceQuery basicQuery;
         basicQuery.inputContext = query.inputContext;
@@ -83,7 +83,7 @@ piranha::IrParserStructure *piranha::IrBinaryOperator::
         IrValueLabel *labelConstant = static_cast<IrValueLabel *>(m_rightOperand);
 
         IrParserStructure *publicAttribute = resolvedLeft->resolveLocalName(labelConstant->getValue());
-        // Try the fixed type
+        // try the fixed type
         if (publicAttribute == nullptr && skeletonType != nullptr) {
             publicAttribute = skeletonType->resolveLocalName(labelConstant->getValue());
         }
@@ -93,7 +93,7 @@ piranha::IrParserStructure *piranha::IrBinaryOperator::
 
             const bool isValidError = (touchedMainContext && !basicInfo.isStaticType()) || IR_EMPTY_CONTEXT();
             if (query.recordErrors && isValidError) {
-                // Left hand does not have this member
+                // left hand does not have this member
                 IR_ERR_OUT(TRACK(new CompilationError(*m_rightOperand->getSummaryToken(),
                     ErrorCode::UndefinedMember, query.inputContext)));
             }
@@ -101,7 +101,7 @@ piranha::IrParserStructure *piranha::IrBinaryOperator::
             return nullptr;
         }
 
-        // Check to make sure that the user is not accidentally trying to use a hidden member
+        // check to make sure that the user is not accidentally trying to use a hidden member
         if (!publicAttribute->allowsExternalAccess()) {
             IR_FAIL();
 
@@ -203,7 +203,7 @@ void piranha::IrBinaryOperator::_expand(IrContextTree *context) {
         IrCompilationUnit *parentUnit = getParentUnit();
         IrNodeDefinition *nodeDefinition = parentUnit->resolveBuiltinNodeDefinition(builtinType, &count);
 
-        // Generate the expansion
+        // generate the expansion
         IrAttribute *leftAttribute = TRACK(new IrAttribute());
         leftAttribute->setValue(TRACK(new IrInternalReference(m_leftOperand, context)));
 
@@ -224,7 +224,7 @@ void piranha::IrBinaryOperator::_expand(IrContextTree *context) {
         expansion->expand(context);
 
         if (nodeDefinition == nullptr) {
-            // TODO: raise error here
+            // todo raise error here
         }
 
         *m_expansions.newValue(context) = expansion;

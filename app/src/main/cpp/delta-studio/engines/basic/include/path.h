@@ -45,4 +45,4 @@ namespace dbasic {
 
 } /* namespace dbasic */
 
-#endif /* DELTA_BASIC_PATH_H */
+#endif /* DELTA_BASIC_PATH_H  */

@@ -94,7 +94,7 @@ piranha::IrParserStructure::~IrParserStructure() {
 }
 
 void piranha::IrParserStructure::setRules(const LanguageRules *rules) {
-    // Set component rules
+    // set component rules
     const int componentCount = getComponentCount();
     for (int i = 0; i < componentCount; i++) {
         m_components[i]->setRules(rules);
@@ -189,7 +189,7 @@ piranha::IrParserStructure *piranha::IrParserStructure::getReference(
     }
 
     if (immediateReference != nullptr) {
-        // Check for an infinite loop
+        // check for an infinite loop
         const int infiniteLoop = chain->searchLink(immediateReference, immediateInfo.newContext);
         if (infiniteLoop >= 0) {
             IR_FAIL();
@@ -205,7 +205,7 @@ piranha::IrParserStructure *piranha::IrParserStructure::getReference(
         IrReferenceQuery nestedQuery;
         nestedQuery.inputContext = immediateInfo.newContext;
 
-        // Error checking is not done on any parent nodes because it's assumed that errors have
+        // error checking is not done on any parent nodes because its assumed that errors have
         // already been checked/reported
         nestedQuery.recordErrors = false;
         nestedQuery.recordInfiniteLoops = query.recordErrors || query.recordInfiniteLoops;
@@ -225,8 +225,8 @@ piranha::IrParserStructure *piranha::IrParserStructure::getReference(
             return nullptr;
         }
 
-        // Immediate takes precedence
-        // NOTE - this has to be done here because even when reaching a dead end
+        // immediate takes precedence
+        // note - this has to be done here because even when reaching a dead end
         // fixed type information can still be used
         if (immediateInfo.isFixedType()) {
             IR_INFO_OUT(staticType, immediateInfo.staticType);
@@ -255,7 +255,7 @@ void piranha::IrParserStructure::resolveDefinitions() {
     if (m_definitionsResolved) return;
     else m_definitionsResolved = true;
 
-    // Resolve components
+    // resolve components
     const int componentCount = getComponentCount();
     for (int i = 0; i < componentCount; i++) {
         m_components[i]->resolveDefinitions();
@@ -269,7 +269,7 @@ void piranha::IrParserStructure::checkCircularDefinitions() {
 }
 
 void piranha::IrParserStructure::checkCircularDefinitions(IrContextTree *context, IrNodeDefinition *root) {
-    // Check components
+    // check components
     const int componentCount = getComponentCount();
     for (int i = 0; i < componentCount; i++) {
         if (m_components[i]->getCheckReferences()) {
@@ -284,7 +284,7 @@ void piranha::IrParserStructure::expand() {
     if (m_expanded) return;
     else m_expanded = true;
 
-    // Check components
+    // check components
     const int componentCount = getComponentCount();
     for (int i = 0; i < componentCount; i++) {
         m_components[i]->expand();
@@ -297,7 +297,7 @@ void piranha::IrParserStructure::expand(IrContextTree *context) {
     if (m_expansions.lookup(context) != nullptr) return;
     else *m_expansions.newValue(context) = nullptr;
 
-    // Expand components
+    // expand components
     const int componentCount = getComponentCount();
     for (int i = 0; i < componentCount; i++) {
         if (m_components[i]->getCheckReferences()) {
@@ -305,7 +305,7 @@ void piranha::IrParserStructure::expand(IrContextTree *context) {
         }
     }
 
-    // Perform the actual expansion
+    // perform the actual expansion
     _expand(context);
 }
 
@@ -320,7 +320,7 @@ void piranha::IrParserStructure::expandChain(IrContextTree *context, IrReference
 
     expand(context);
 
-    // Expand reference
+    // expand reference
     IrReferenceInfo info;
     IrReferenceQuery query;
     query.inputContext = context;
@@ -333,7 +333,7 @@ void piranha::IrParserStructure::expandChain(IrContextTree *context, IrReference
 }
 
 void piranha::IrParserStructure::checkReferences(IrContextTree *inputContext) {
-    // Check components
+    // check components
     const int componentCount = getComponentCount();
     for (int i = 0; i < componentCount; i++) {
         m_components[i]->checkReferences(inputContext);
@@ -366,7 +366,7 @@ void piranha::IrParserStructure::checkInstantiation() {
     if (m_instantiationChecked) return;
     m_instantiationChecked = true;
 
-    // Check components
+    // check components
     const int componentCount = getComponentCount();
     for (int i = 0; i < componentCount; i++) {
         m_components[i]->checkInstantiation();
@@ -379,7 +379,7 @@ void piranha::IrParserStructure::checkTypes() {
     if (m_typesChecked) return;
     m_typesChecked = true;
 
-    // Check components
+    // check components
     const int componentCount = getComponentCount();
     for (int i = 0; i < componentCount; i++) {
         m_components[i]->checkTypes();
@@ -392,7 +392,7 @@ void piranha::IrParserStructure::validate() {
     if (m_validated) return;
     m_validated = true;
 
-    // Validate components
+    // validate components
     const int componentCount = getComponentCount();
     for (int i = 0; i < componentCount; i++) {
         m_components[i]->validate();

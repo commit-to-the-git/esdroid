@@ -79,4 +79,4 @@ class AudioBuffer {
         double m_offsetToSeconds;
 };
 
-#endif /* ATG_ENGINE_SIM_AUDIO_BUFFER_H */
+#endif /* ATG_ENGINE_SIM_AUDIO_BUFFER_H  */

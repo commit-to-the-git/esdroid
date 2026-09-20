@@ -20,7 +20,7 @@ public:
     };
 
 protected:
-    // Singelton interface (necessary for WndProc which is a global function)
+    // singelton interface necessary for wndproc which is a global function
     static ysWindowSystem *Get();
     static ysWindowSystem *g_instance;
 
@@ -32,7 +32,7 @@ public:
     static ysError CreateWindowSystem(ysWindowSystem **newSystem, Platform platform);
     static ysError DestroyWindowSystem(ysWindowSystem *&system);
 
-    // Window Interface
+    // window interface
     virtual ysError NewWindow(ysWindow **window) = 0;
 
     int GetWindowCount() const;
@@ -49,7 +49,7 @@ public:
     virtual void SetCursorVisible(bool visible) { m_cursorVisible = visible; }
     bool IsMouseVisible() const { return m_cursorVisible; };
 
-    // Monitor Interface
+    // monitor interface
     virtual ysMonitor *MonitorFromWindow(ysWindow *window) = 0;
     virtual ysMonitor *NewMonitor() = 0;
     virtual ysError SurveyMonitors();
@@ -59,7 +59,7 @@ public:
     ysMonitor *GetMonitor(int index);
     int GetNumMonitors();
 
-    // Message Interface
+    // message interface
     virtual void ProcessMessages() = 0;
 
     void CloseAllWindows();
@@ -86,4 +86,4 @@ protected:
     bool m_cursorConfined;
 };
 
-#endif /* YDS_WINDOW_SYSTEM_H */
+#endif /* YDS_WINDOW_SYSTEM_H  */

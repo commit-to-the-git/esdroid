@@ -50,4 +50,4 @@ private:
     double m_minThrottlePosition;
 };
 
-#endif /* ATG_ENGINE_SIM_VTEC_STANDARD_VALVETRAIN_H */
+#endif /* ATG_ENGINE_SIM_VTEC_STANDARD_VALVETRAIN_H  */

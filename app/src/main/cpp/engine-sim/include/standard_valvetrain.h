@@ -27,4 +27,4 @@ private:
     Camshaft *m_exhaustCamshaft;
 };
 
-#endif /* ATG_ENGINE_SIM_STANDARD_VALVETRAIN_H */
+#endif /* ATG_ENGINE_SIM_STANDARD_VALVETRAIN_H  */

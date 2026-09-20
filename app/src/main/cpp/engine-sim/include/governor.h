@@ -39,4 +39,4 @@ protected:
     double m_velocity;
 };
 
-#endif /* ATG_ENGINE_SIM_GOVERNOR_H */
+#endif /* ATG_ENGINE_SIM_GOVERNOR_H  */

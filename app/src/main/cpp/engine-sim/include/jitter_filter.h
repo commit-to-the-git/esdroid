@@ -60,4 +60,4 @@ protected:
     std::default_random_engine m_generator;
 };
 
-#endif /* ATG_ENGINE_SIM_JITTER_FILTER_H */
+#endif /* ATG_ENGINE_SIM_JITTER_FILTER_H  */

@@ -4,7 +4,7 @@
 
 #define max(a ,b)            (((a) > (b)) ? (a) : (b))
 
-// MSS Spring
+// mss spring
 dphysics::MSSSpring::MSSSpring() {
     m_length = 0.0f;
     m_constant = 0.0f;
@@ -33,7 +33,7 @@ void dphysics::MSSSpring::SetParticle1(MSSParticle *particle1) {
     m_particle1->RegisterSpring(this);
 }
 
-// MSS Particle
+// mss particle
 dphysics::MSSParticle::MSSParticle() {
     m_inverseMass = 0.0f;
 
@@ -80,7 +80,7 @@ ysVector dphysics::MSSParticle::CalculateAcceleration(MassSpringSystem::RK4_PASS
 
         if (spring->IsInvertedForce()) {
             falloff = powf(2, spring->GetLength(timeDelta) - actualLength);
-            falloff = std::fmin(falloff, 1.0f); // Clamp the value to 0.0 - 1.0
+            falloff = std::fmin(falloff, 1.0f); // clamp the value to 0.0 - 1.0
         }
 
         force = ysMath::Mul(ysMath::LoadScalar(spring->GetConstant() * (1.0f - ratio) * falloff), diff);
@@ -107,7 +107,7 @@ ysVector dphysics::MSSParticle::ExternalAcceleration(MassSpringSystem::RK4_PASS 
 
     ysVector drag = ysMath::Mul(viscosity, velocity);
 
-    // Collisions
+    // collisions
     int numCollisions = m_collidingParticles.GetNumObjects();
     ysVector avoidance = ysMath::Constants::Zero;
 
@@ -168,7 +168,7 @@ void dphysics::MSSParticle::DeleteAllConnections() {
             m_adjacentSprings[i]->SetParticle1(NULL);
         }
         else {
-            // Somehow this spring was never connected to this particle...
+            // somehow this spring was never connected to this particle
         }
     }
 }
@@ -244,7 +244,7 @@ bool dphysics::MSSParticle::IsConnected(MSSParticle *particle) {
     return false;
 }
 
-// Mass spring system
+// mass spring system
 dphysics::MassSpringSystem::MassSpringSystem() {
     /* void */
 }
@@ -297,7 +297,7 @@ void dphysics::MassSpringSystem::Update() {
     int i = 0;
     int numParticles = m_particles.GetNumObjects();
 
-    // Compute first step
+    // compute first step
     for (i = 0; i < numParticles; i++) {
         MSSParticle *particle = m_particles.Get(i);
         if (particle->GetInverseMass() > 0.0f) {
@@ -318,7 +318,7 @@ void dphysics::MassSpringSystem::Update() {
         }
     }
 
-    // Compute second step
+    // compute second step
     for (i = 0; i < numParticles; i++) {
         MSSParticle *particle = m_particles.Get(i);
         if (particle->GetInverseMass() > 0.0f) {
@@ -339,7 +339,7 @@ void dphysics::MassSpringSystem::Update() {
         }
     }
 
-    // Compute third step
+    // compute third step
     for (i = 0; i < numParticles; i++) {
         MSSParticle *particle = m_particles.Get(i);
         if (particle->GetInverseMass() > 0.0f) {
@@ -360,7 +360,7 @@ void dphysics::MassSpringSystem::Update() {
         }
     }
 
-    // Compute fourth step
+    // compute fourth step
     for (i = 0; i < numParticles; i++) {
         MSSParticle *particle = m_particles.Get(i);
         if (particle->GetInverseMass() > 0.0f) {
@@ -372,8 +372,8 @@ void dphysics::MassSpringSystem::Update() {
     for (i = 0; i < numParticles; i++) {
         MSSParticle *particle = m_particles.Get(i);
         if (particle->GetInverseMass() > 0.0f) {
-            // Implements:
-            // m_position += m_sixthStep * ( m_DPTemp1 + 2 * (m_DPTemp2 + m_DPTemp3 + m_DPTemp4) )
+            // implements
+            // m_position += m_sixthstep * m_dptemp1 + 2 * m_dptemp2 + m_dptemp3 + m_dptemp4
 
             ysVector pCalc = ysMath::Add(ysMath::Add(particle->m_DPTemp2, particle->m_DPTemp3), particle->m_DPTemp4);
             pCalc = ysMath::Mul(pCalc, ysMath::Constants::Double);

@@ -62,7 +62,7 @@ namespace piranha {
 
         IrTokenInfo_string m_scopeToken;
 
-        // Resolution stage
+        // resolution stage
     public:
         virtual void checkCircularDefinitions();
 
@@ -76,4 +76,4 @@ namespace piranha {
 
 } /* namespace piranha */
 
-#endif /* PIRANHA_IR_NODE_DEFINITION_H */
+#endif /* PIRANHA_IR_NODE_DEFINITION_H  */

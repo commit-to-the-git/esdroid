@@ -98,7 +98,7 @@ void Synthesizer::initializeImpulseResponse(
 
     const unsigned int sampleCount = std::min(10000U, clippedLength);
     m_filters[index].convolution.initialize(std::max(1U, sampleCount));
-    // Fixed above with max(1U, sampleCount)
+    // fixed above with max1u samplecount
     for (unsigned int i = 0; i < sampleCount; ++i) {
         m_filters[index].convolution.getImpulseResponse()[i] =
             volume * impulseResponse[i] / INT16_MAX;

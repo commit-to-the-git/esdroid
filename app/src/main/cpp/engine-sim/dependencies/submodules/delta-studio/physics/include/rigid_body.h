@@ -29,7 +29,7 @@ namespace dphysics {
         RigidBody();
         ~RigidBody();
 
-        // Interfaces
+        // interfaces
         CollisionGeometry CollisionGeometry;
         ysTransform Transform;
 
@@ -142,7 +142,7 @@ namespace dphysics {
         Collision *FindMatchingCollision(Collision *collision);
 
     protected:
-        // Properties
+        // properties
         bool m_registered;
         bool m_awake;
         bool m_requestsInformation;
@@ -164,7 +164,7 @@ namespace dphysics {
 
         ysMatrix m_inverseInertiaTensor;
 
-        // Derived
+        // derived
         bool m_derivedValid;
         bool m_ghost;
 
@@ -185,4 +185,4 @@ namespace dphysics {
 
 } /* namespace dbasic */
 
-#endif /* DELTA_BASIC_RIGID_BODY_H */
+#endif /* DELTA_BASIC_RIGID_BODY_H  */

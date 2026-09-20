@@ -46,7 +46,7 @@ void ysGeometryExportFile::FillOutputHeader(ysObjectData* object, ObjectOutputHe
     header->NumFaces = object->m_objectStatistics.NumFaces;
 
     header->NumBones = object->m_boneIndices.GetNumObjects();
-    header->MaxBonesPerVertex = 3; // TEMP
+    header->MaxBonesPerVertex = 3; // temp
 
     header->Flags = MDF_NONE;
 
@@ -93,8 +93,8 @@ void ysGeometryExportFile::FillOutputHeader(const ysInterchangeObject *object, c
     header->NumVertices = (int)object->Vertices.size();
     header->NumFaces = (int)object->VertexIndices.size();
 
-    header->NumBones = 0;            // TODO
-    header->MaxBonesPerVertex = 3;    // TODO
+    header->NumBones = 0;            // todo
+    header->MaxBonesPerVertex = 3;    // todo
 
     header->Flags = MDF_NONE;
 
@@ -126,7 +126,7 @@ int ysGeometryExportFile::GetVertexSize(ysInterchangeObject *object, const Verte
     const bool includeTangents = info->IncludeTangents;
 
     int vertexSize = 4 * sizeof(float);
-    /* TODO: bone weights */
+    /* todo bone weights */
     vertexSize += numUVChannels * (2 * sizeof(float));
     if (includeNormals) vertexSize += sizeof(float) * 4;
     if (includeTangents) vertexSize += sizeof(float) * 4;
@@ -147,10 +147,10 @@ void ysGeometryExportFile::WriteFloatToBuffer(float value, char **location) {
 int ysGeometryExportFile::PackVertexData(ysObjectData *object, int maxBonesPerVertex, void **output) {
     int packedSize = 0;
 
-    // First Calculate Size
+    // first calculate size
 
     int vertexSize = 4 * sizeof(float);
-    //if (object->m_materialList.IsActive()) vertexSize += sizeof(int);
+    // if object->m_materiallist.isactive vertexsize += sizeofint
     if (object->m_boneWeights.IsActive() && object->m_boneWeights.GetNumObjects() > 0) vertexSize += (sizeof(int) + sizeof(float)) * maxBonesPerVertex;
     if (object->m_channels.IsActive()) vertexSize += (object->m_objectStatistics.NumUVChannels) * (2 * sizeof(float));
     if (object->m_normals.IsActive()) vertexSize += sizeof(float) * 4;
@@ -191,7 +191,7 @@ int ysGeometryExportFile::PackVertexData(ysObjectData *object, int maxBonesPerVe
         WriteFloatToBuffer(1.0f, &location);
 
         if (object->m_materialList.IsActive()) {
-            //WriteIntToBuffer(object->m_materialList[vert], &location);
+            // writeinttobufferobject->m_materiallistvert &location
         }
 
         if (object->m_channels.IsActive()) {
@@ -214,7 +214,7 @@ int ysGeometryExportFile::PackVertexData(ysObjectData *object, int maxBonesPerVe
         }
 
         if (object->m_boneWeights.IsActive() && object->m_boneIndices.GetNumObjects()) {
-            for (int b = 0; b < 4 /* TEMP */; ++b) {
+            for (int b = 0; b < 4 /* temp */; ++b) {
                 if (b >= object->m_boneWeights[vert].m_boneIndices.GetNumObjects()) {
                     WriteIntToBuffer(-1, &location);
                 }
@@ -224,7 +224,7 @@ int ysGeometryExportFile::PackVertexData(ysObjectData *object, int maxBonesPerVe
                 }
             }
 
-            for (int b = 0; b < 4 /* TEMP */; ++b) {
+            for (int b = 0; b < 4 /* temp */; ++b) {
                 if (b >= object->m_boneWeights[vert].m_boneIndices.GetNumObjects()) {
                     WriteFloatToBuffer(0.0f, &location);
                 }
@@ -266,7 +266,7 @@ int ysGeometryExportFile::PackVertexData(ysInterchangeObject *object, int maxBon
     const int numNormals = (int)object->Normals.size();
     const int numTangents = (int)object->Tangents.size();
 
-    // First Calculate Size
+    // first calculate size
     int vertexSize = GetVertexSize(object, info);
     packedSize = vertexSize * numVertices;
 
@@ -352,7 +352,7 @@ int ysGeometryExportFile::PackVertexData(ysInterchangeObject *object, int maxBon
             WriteFloatToBuffer(0.0f, &location);
         }
 
-        /* TODO: bones */
+        /* todo bones */
         if (info->IncludeTangents) {
             const ysVector3 &tangent = (numTangents > 0)
                 ? object->Tangents[tangents[vert]]
@@ -362,7 +362,7 @@ int ysGeometryExportFile::PackVertexData(ysInterchangeObject *object, int maxBon
             WriteFloatToBuffer(tangent.y, &location);
             WriteFloatToBuffer(tangent.z, &location);
 
-            /* TODO: space handedness goes here */
+            /* todo space handedness goes here */
             WriteFloatToBuffer(1.0f, &location);
         }
     }
@@ -406,13 +406,13 @@ ysError ysGeometryExportFile::WriteObject(ysObjectData *object) {
     int vertexDataSize = 0;
 
     if (object->m_objectInformation.ObjectType == ysObjectData::ObjectType::Geometry) {
-        vertexDataSize = PackVertexData(object, 4 /* TEMP */, &vertexData);
+        vertexDataSize = PackVertexData(object, 4 /* temp */, &vertexData);
         header.VertexDataSize = vertexDataSize;
     }
 
     m_file.write((char *)&header, sizeof(ObjectOutputHeader));
 
-    // Geometry Data
+    // geometry data
     if (object->m_objectInformation.ObjectType == ysObjectData::ObjectType::Geometry) {
         m_file.write((char *)vertexData, vertexDataSize);
 
@@ -423,14 +423,14 @@ ysError ysGeometryExportFile::WriteObject(ysObjectData *object) {
             }
         }
 
-        // Bone Map
+        // bone map
         for (int i = 0; i < object->m_boneIndices.GetNumObjects(); ++i) {
             int *add = &object->m_boneIndices[i];
             m_file.write((char *)add, sizeof(int));
         }
     }
 
-    // Primitive Data
+    // primitive data
     if (object->m_objectInformation.ObjectType == ysObjectData::ObjectType::Plane) {
         m_file.write((char *)&object->m_length, sizeof(float));
         m_file.write((char *)&object->m_width, sizeof(float));
@@ -457,13 +457,13 @@ ysError ysGeometryExportFile::WriteObject(ysInterchangeObject *object, const Ver
     int vertexDataSize = 0;
 
     if (object->Type == ysInterchangeObject::ObjectType::Geometry) {
-        vertexDataSize = PackVertexData(object, 4 /* TEMP */, &vertexData, info);
+        vertexDataSize = PackVertexData(object, 4 /* temp */, &vertexData, info);
         header.VertexDataSize = vertexDataSize;
     }
 
     m_file.write((char *)&header, sizeof(ObjectOutputHeader));
 
-    // Geometry Data
+    // geometry data
     if (object->Type == ysInterchangeObject::ObjectType::Geometry) {
         m_file.write((char *)vertexData, vertexDataSize);
 
@@ -474,7 +474,7 @@ ysError ysGeometryExportFile::WriteObject(ysInterchangeObject *object, const Ver
             }
         }
 
-        // TODO: Bone Map
+        // todo bone map
     }
     else if (object->Type == ysInterchangeObject::ObjectType::Plane) {
         m_file.write((char *)&object->Length, sizeof(float));

@@ -19,4 +19,4 @@ protected:
 
 };
 
-#endif /* YDS_D3D11_INPUT_LAYOUT_H */
+#endif /* YDS_D3D11_INPUT_LAYOUT_H  */

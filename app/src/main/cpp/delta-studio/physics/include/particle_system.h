@@ -35,7 +35,7 @@ namespace dphysics {
 
         ysTexture *m_texture;
 
-        // Number of particles per second
+        // number of particles per second
         float m_rate;
 
         int m_layer;
@@ -43,4 +43,4 @@ namespace dphysics {
 
 } /* namespace dbasic */
 
-#endif /* DELTA_BASIC_PARTICLE_SYSTEM_H */
+#endif /* DELTA_BASIC_PARTICLE_SYSTEM_H  */

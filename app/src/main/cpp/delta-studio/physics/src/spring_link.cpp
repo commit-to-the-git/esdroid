@@ -39,23 +39,23 @@ int dphysics::SpringLink::GenerateCollisions(Collision *collisionArray) {
     ysMath::ExtendVector(forceVec);
 
     m_body1->AddForceLocalSpace(forceVec, m_relativePos1);
-    //m_body2->AddForceLocalSpace(ysMath::Negate3(forceVec), m_relativePos2);
+    // m_body2->addforcelocalspaceysmath::negate3forcevec m_relativepos2
 
     return 0;
 }
 
 /*
-void dphysics::SpringLink::DrawDebug(DeltaEngine *engine, int layer) {
-    int red[3] = { 255, 0, 0 };
-    int blue[3] = { 0, 0, 255 };
+void dphysics::springlink::drawdebugdeltaengine *engine int layer {
+    int red3 = { 255 0 0 }
+    int blue3 = { 0 0 255 }
 
-    ysVector actualPosition1 = m_body1->GetGlobalSpace(m_relativePos1);
-    ysVector actualPosition2 = m_body2->GetGlobalSpace(m_relativePos2);
+    ysvector actualposition1 = m_body1->getglobalspacem_relativepos1
+    ysvector actualposition2 = m_body2->getglobalspacem_relativepos2
 
     engine->SetObjectTransform(ysMath::TranslationTransform(actualPosition2));
-    engine->DrawBox(red, 20, 20, layer);
+    engine->drawboxred 20 20 layer
 
     engine->SetObjectTransform(ysMath::TranslationTransform(actualPosition1));
-    engine->DrawBox(blue, 20, 20, layer);
+    engine->drawboxblue 20 20 layer
 }
 */

@@ -57,4 +57,4 @@ protected:
     ButtonState m_buttonStates[(int)Button::Count];
 };
 
-#endif /* YDS_MOUSE_H */
+#endif /* YDS_MOUSE_H  */

@@ -18,52 +18,52 @@ namespace dbasic {
         Character();
         ~Character();
 
-        // Update the character
+        // update the character
         void Update();
 
-        // Set the skeleton being used by this character
+        // set the skeleton being used by this character
         void SetSkeleton(Skeleton *skeleton);
 
-        // Set the render skeleton used by this character
+        // set the render skeleton used by this character
         void SetRenderSkeleton(RenderSkeleton *renderSkeleton);
 
-        // Set the animation data used by this character
+        // set the animation data used by this character
         void SetAnimationData(AnimationExportData *animationData);
 
-        // Construct a controller for a bone
+        // construct a controller for a bone
         void ConstructBoneController(const char *boneName, AnimationGroup *group);
 
-        // Construct a controller for a render node
+        // construct a controller for a render node
         void ConstructNodeController(const char *nodeName, AnimationGroup *group);
 
-        // Construct the character
+        // construct the character
         virtual void ConstructCharacter() = 0;
 
-        // Get a reference to the main animation controller
+        // get a reference to the main animation controller
         AnimationGroup *GetAnimationController();
 
-        //protected:
+        // protected
 
-            // Set the asset manager that manages this character
+            // set the asset manager that manages this character
         void SetAssetManager(AssetManager *assetManager);
 
     protected:
-        // Reference to the render skeleton
+        // reference to the render skeleton
         RenderSkeleton *m_renderSkeleton;
 
-        // References to the skeleton being controlled
+        // references to the skeleton being controlled
         Skeleton *m_skeleton;
 
-        // Main top level animation controller
+        // main top level animation controller
         AnimationGroup m_animationController;
 
-        // Animation data like poses, motions, etc.
+        // animation data like poses motions etc
         AnimationExportData *m_animationData;
 
-        // Reference to top level asset manager
+        // reference to top level asset manager
         AssetManager *m_assetManager;
     };
 
 } /* namespace dbasic */
 
-#endif /* DELTA_BASIC_CHARACTER_H */
+#endif /* DELTA_BASIC_CHARACTER_H  */

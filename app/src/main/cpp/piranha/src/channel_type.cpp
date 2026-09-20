@@ -34,7 +34,7 @@ bool piranha::ChannelType::isEqual(const ChannelType &t) const {
 }
 
 int piranha::ChannelType::generateHash(const char *string) {
-    // Very simple hash for now
+    // very simple hash for now
     int sum = 0, i = 0;
     while (string[i] != '\0') sum += (int)string[i++];
 

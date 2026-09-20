@@ -55,12 +55,12 @@ public:
     }
 
     void DestroyArray(TYPE *arr) {
-        /*if (ALIGNMENT == 1) {
-            delete[] arr;
+        /*if alignment == 1 {
+            delete arr
         }
         else {
-            for (int i = 0; i < m_maxSize; i++) {
-                arr[i].~TYPE();
+            for int i = 0 i < m_maxsize i++ {
+                arri~type
             }
 
             _aligned_free(arr);
@@ -75,7 +75,7 @@ public:
                 Destroy();
             }
             else {
-                // Already allocated, no sense in wasting time
+                // already allocated no sense in wasting time
                 m_nObjects = nObjects;
                 return;
             }
@@ -93,7 +93,7 @@ public:
                 Destroy();
             }
             else {
-                // Already allocated, no sense in wasting time
+                // already allocated no sense in wasting time
                 m_nObjects = 0;
                 return;
             }
@@ -185,4 +185,4 @@ private:
     TYPE *m_array;
 };
 
-#endif /* YDS_EXPANDING_ARRAY_H */
+#endif /* YDS_EXPANDING_ARRAY_H  */

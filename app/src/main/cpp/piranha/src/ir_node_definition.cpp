@@ -15,7 +15,7 @@ piranha::IrNodeDefinition::IrNodeDefinition(const IrTokenInfo_string &name) {
     m_name = name;
     registerToken(&name);
 
-    // Node definitions are public by default
+    // node definitions are public by default
     setDefaultVisibility(IrVisibility::Public);
 }
 
@@ -65,9 +65,9 @@ piranha::IrAttributeDefinition *piranha::IrNodeDefinition::
 piranha::IrParserStructure *piranha::IrNodeDefinition::
     resolveName(const std::string &name) const 
 {
-    //return IrParserStructure::resolveName(name);
+    // return irparserstructure::resolvenamename
 
-    // Node definitions are not able to see variables outside of themselves for now
+    // node definitions are not able to see variables outside of themselves for now
     return resolveLocalName(name);
 }
 
@@ -166,7 +166,7 @@ piranha::IrParserStructure *piranha::IrNodeDefinition::resolveLocalName(
 void piranha::IrNodeDefinition::_validate() {
     IrCompilationUnit *unit = getParentUnit();
 
-    // Check that no symbol is used more than once
+    // check that no symbol is used more than once
     if (m_attributes != nullptr) {
         const int attributeCount = m_attributes->getDefinitionCount();
         for (int i = 0; i < attributeCount; i++) {
@@ -191,7 +191,7 @@ void piranha::IrNodeDefinition::_validate() {
         }
     }
 
-    // Check that every output has a definition of the right type
+    // check that every output has a definition of the right type
     if (m_attributes != nullptr) {
         const int attributeCount = m_attributes->getDefinitionCount();
         for (int i = 0; i < attributeCount; i++) {
@@ -223,7 +223,7 @@ void piranha::IrNodeDefinition::validateBuiltinMappings() {
 
     IrCompilationUnit *unit = getParentUnit();
 
-    // Check that the builtin type is a real type
+    // check that the builtin type is a real type
     std::string builtinName = getBuiltinName();
 
     if (!m_rules->checkBuiltinType(builtinName)) {
@@ -234,7 +234,7 @@ void piranha::IrNodeDefinition::validateBuiltinMappings() {
 
     if (m_attributes == nullptr) return;
 
-    // Check that the definition is compatible with the
+    // check that the definition is compatible with the
     // builtin node
     const Node *reference = m_rules->getReferenceNode(builtinName);
     const int attributeCount = m_attributes->getDefinitionCount();

@@ -20,4 +20,4 @@ public:
     ysExpandingArray<TimeTag, 1> m_timeTags;
 };
 
-#endif /* YDS_TIME_TAG_DATA_H */
+#endif /* YDS_TIME_TAG_DATA_H  */

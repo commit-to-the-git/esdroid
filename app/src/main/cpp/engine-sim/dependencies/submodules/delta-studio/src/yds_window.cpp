@@ -167,7 +167,7 @@ bool ysWindow::SetWindowStyle(WindowStyle style) {
     if (style == m_windowStyle) return false;
 
     if (style == WindowStyle::Fullscreen) {
-        //RaiseError(m_monitor != NULL, "Cannot go into fullscreen without an attached monitor.");
+        // raiseerrorm_monitor != null cannot go into fullscreen without an attached monitor
         m_windowStyle = style;
     } else if (style == WindowStyle::Windowed) {
         m_windowStyle = style;
@@ -178,7 +178,7 @@ bool ysWindow::SetWindowStyle(WindowStyle style) {
     return true;
 }
 
-// Handlers
+// handlers
 
 void ysWindow::AttachEventHandler(ysWindowEventHandler *handler) {
     if (m_eventHandler) m_eventHandler->m_window = NULL;
@@ -236,7 +236,7 @@ void ysWindow::OnKeyDown(int key) {
     if (m_eventHandler) m_eventHandler->OnKeyDown(key);
 }
 
-// Abstraction Layer
+// abstraction layer
 
 void ysWindow::AL_SetSize(int width, int height) {
     m_width = width;

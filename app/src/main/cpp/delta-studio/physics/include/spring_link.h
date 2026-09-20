@@ -45,4 +45,4 @@ namespace dphysics {
 
 } /* namespace dbasic */
 
-#endif /* DELTA_BASIC_SPRING_LINK_H */
+#endif /* DELTA_BASIC_SPRING_LINK_H  */

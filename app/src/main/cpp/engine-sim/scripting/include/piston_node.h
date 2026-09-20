@@ -46,7 +46,7 @@ namespace es_script {
         virtual void _evaluate() {
             setOutput(this);
 
-            // Read inputs
+            // read inputs
             readAllInputs();
 
             m_parameters.Bank = nullptr;
@@ -59,4 +59,4 @@ namespace es_script {
 
 } /* namespace es_script */
 
-#endif /* ATG_ENGINE_SIM_PISTON_NODE_H */
+#endif /* ATG_ENGINE_SIM_PISTON_NODE_H  */

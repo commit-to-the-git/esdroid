@@ -38,4 +38,4 @@ protected:
 
 }// namespace dbasic
 
-#endif /* DELTA_BASIC_DELTA_WINDOW_HANDLER_H */
+#endif /* DELTA_BASIC_DELTA_WINDOW_HANDLER_H  */

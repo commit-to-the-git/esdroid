@@ -28,7 +28,7 @@ ysD3D10Device::ysD3D10Device() : ysDevice(DeviceAPI::DirectX10) {
     m_device = nullptr;
     m_DXGIFactory = nullptr;
 
-    // TEMP
+    // temp
     m_rasterizerState = nullptr;
 }
 
@@ -61,8 +61,8 @@ ysError ysD3D10Device::InitializeDevice() {
         return YDS_ERROR_RETURN(ysError::CouldNotCreateGraphicsDevice);
     }
 
-    // TEMP
-    // This initialization probably should not be here.
+    // temp
+    // this initialization probably should not be here
     m_device->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     InitializeTextureSlots(D3D10_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT);
 
@@ -79,7 +79,7 @@ ysError ysD3D10Device::DestroyDevice() {
 }
 
 bool ysD3D10Device::CheckSupport() {
-    // TEMP
+    // temp
     return true;
 }
 
@@ -113,7 +113,7 @@ ysError ysD3D10Device::CreateRenderingContext(ysRenderingContext **context,
             m_renderingContexts.NewGeneric<ysD3D10Context>();
     newContext->m_targetWindow = window;
 
-    // Create the swap chain
+    // create the swap chain
 
     DXGI_SWAP_CHAIN_DESC swapChainDesc;
     ZeroMemory(&swapChainDesc, sizeof(DXGI_SWAP_CHAIN_DESC));
@@ -149,7 +149,7 @@ ysError ysD3D10Device::CreateRenderingContext(ysRenderingContext **context,
         return YDS_ERROR_RETURN(ysError::CouldNotCreateSwapChain);
     }
 
-    // TEMP
+    // temp
 
     if (!m_rasterizerState) {
         D3D10_RASTERIZER_DESC rasterizerDescription;
@@ -169,7 +169,7 @@ ysError ysD3D10Device::CreateRenderingContext(ysRenderingContext **context,
                                         &m_rasterizerState);
         m_device->RSSetState(m_rasterizerState);
 
-        // TEMPORARY ALPHA ENABLING
+        // temporary alpha enabling
         ID3D10BlendState *g_pBlendStateNoBlend = nullptr;
 
         D3D10_BLEND_DESC BlendState;
@@ -190,10 +190,10 @@ ysError ysD3D10Device::CreateRenderingContext(ysRenderingContext **context,
         m_device->OMSetBlendState(g_pBlendStateNoBlend, blendFactor,
                                   sampleMask);
 
-        // END TEMPORARY ALPHA BLENDING
+        // end temporary alpha blending
     }
 
-    // END TEMP
+    // end temp
 
     *context = static_cast<ysRenderingContext *>(newContext);
 
@@ -206,7 +206,7 @@ ysError ysD3D10Device::UpdateRenderingContext(ysRenderingContext *context) {
     if (context == nullptr) return YDS_ERROR_RETURN(ysError::InvalidParameter);
     if (m_device == nullptr) return YDS_ERROR_RETURN(ysError::NoDevice);
 
-    // Check the window
+    // check the window
     if (!context->GetWindow()->IsVisible())
         return YDS_ERROR_RETURN(ysError::None);
 
@@ -218,7 +218,7 @@ ysError ysD3D10Device::UpdateRenderingContext(ysRenderingContext *context) {
     ysD3D10RenderTarget *attachedTarget = static_cast<ysD3D10RenderTarget *>(
             context->GetAttachedRenderTarget());
 
-    // Destroy render target first
+    // destroy render target first
 
     if (attachedTarget != nullptr) {
         YDS_NESTED_ERROR_CALL(DestroyD3D10RenderTarget(attachedTarget));
@@ -245,14 +245,14 @@ ysError ysD3D10Device::UpdateRenderingContext(ysRenderingContext *context) {
 ysError ysD3D10Device::DestroyRenderingContext(ysRenderingContext *&context) {
     YDS_ERROR_DECLARE("DestroyRenderingContext");
 
-    // TEMP
+    // temp
 
     if (m_rasterizerState) {
         m_rasterizerState->Release();
         m_rasterizerState = nullptr;
     }
 
-    // END TEMP
+    // end temp
 
     if (context) {
         YDS_NESTED_ERROR_CALL(SetContextMode(
@@ -286,7 +286,7 @@ ysError ysD3D10Device::SetContextMode(ysRenderingContext *context,
 
     if (mode == ysRenderingContext::ContextMode::Fullscreen) {
         window->SetWindowStyle(ysWindow::WindowStyle::Fullscreen);
-        //d3d10Context->m_swapChain->ResizeBuffers
+        // d3d10Context->m_swapChain->ResizeBuffers
         result = d3d10Context->m_swapChain->SetFullscreenState(TRUE, nullptr);
 
         if (FAILED(result))
@@ -410,7 +410,7 @@ ysError ysD3D10Device::ResizeRenderTarget(ysRenderTarget *target, int width,
                 target->HasColorData(), target->HasDepthBuffer()));
         return YDS_ERROR_RETURN(ysError::NotImplemented);
     } else if (target->GetType() == ysRenderTarget::Type::Subdivision) {
-        // Nothing needs to be done
+        // nothing needs to be done
         return YDS_ERROR_RETURN(ysError::None);
     }
 
@@ -522,7 +522,7 @@ ysError ysD3D10Device::Present() {
     return YDS_ERROR_RETURN(ysError::None);
 }
 
-// Vertex Buffers
+// vertex buffers
 ysError ysD3D10Device::CreateVertexBuffer(ysGPUBuffer **newBuffer, int size,
                                           char *data, bool mirrorToRam) {
     YDS_ERROR_DECLARE("CreateVertexBuffer");
@@ -831,7 +831,7 @@ ysError ysD3D10Device::DestroyGPUBuffer(ysGPUBuffer *&buffer) {
     return YDS_ERROR_RETURN(ysError::None);
 }
 
-// Shaders
+// shaders
 
 ysError ysD3D10Device::CreateVertexShader(ysShader **newShader,
                                           const wchar_t *shaderFilename,
@@ -1240,7 +1240,7 @@ ysError ysD3D10Device::DestroyInputLayout(ysInputLayout *&layout) {
     return YDS_ERROR_RETURN(ysError::None);
 }
 
-// Textures
+// textures
 ysError ysD3D10Device::CreateTexture(ysTexture **newTexture,
                                      const wchar_t *fname) {
     YDS_ERROR_DECLARE("CreateTexture");
@@ -1404,7 +1404,7 @@ void ysD3D10Device::Draw(int numFaces, int indexOffset, int vertexOffset) {
     GetDevice()->DrawIndexed(numFaces * 3, indexOffset, vertexOffset);
 }
 
-// Non-standard interface
+// non-standard interface
 
 void ysD3D10Device::GetDXGIDevice(IDXGIDevice **device) {
     HRESULT hr = m_device->QueryInterface(IID_IDXGIDevice, (void **) device);
@@ -1523,7 +1523,7 @@ ysD3D10Device::CreateD3D10OnScreenRenderTarget(ysRenderTarget *newTarget,
         return YDS_ERROR_RETURN(ysError::CouldNotCreateRenderTarget);
     }
 
-    // Create Depth Buffer
+    // create depth buffer
     if (depthBuffer) {
         ysError depthResult;
         depthResult = CreateD3D10DepthBuffer(
@@ -1570,7 +1570,7 @@ ysError ysD3D10Device::CreateD3D10OffScreenRenderTarget(
     ID3D10ShaderResourceView *shaderResourceView = nullptr;
     ID3D10DepthStencilView *newDepthStencil = nullptr;
 
-    // Create the texture
+    // create the texture
     D3D10_TEXTURE2D_DESC descBuffer;
     ZeroMemory(&descBuffer, sizeof(descBuffer));
     descBuffer.Width = width;
@@ -1596,7 +1596,7 @@ ysError ysD3D10Device::CreateD3D10OffScreenRenderTarget(
         return YDS_ERROR_RETURN(ysError::CouldNotCreateRenderTarget);
     }
 
-    // Create the render target view
+    // create the render target view
     D3D10_RENDER_TARGET_VIEW_DESC rtDesc;
     ZeroMemory(&rtDesc, sizeof(rtDesc));
     rtDesc.Format = descBuffer.Format;
@@ -1610,7 +1610,7 @@ ysError ysD3D10Device::CreateD3D10OffScreenRenderTarget(
         return YDS_ERROR_RETURN(ysError::CouldNotCreateRenderTarget);
     }
 
-    // Create the shader resource view
+    // create the shader resource view
     D3D10_SHADER_RESOURCE_VIEW_DESC srDesc;
     ZeroMemory(&srDesc, sizeof(srDesc));
     srDesc.Format = descBuffer.Format;
@@ -1627,7 +1627,7 @@ ysError ysD3D10Device::CreateD3D10OffScreenRenderTarget(
 
     renderTarget->Release();
 
-    // Create Depth Buffer
+    // create depth buffer
     if (depthBuffer) {
         ysError depthResult;
         depthResult =
@@ -1639,7 +1639,7 @@ ysError ysD3D10Device::CreateD3D10OffScreenRenderTarget(
         }
     }
 
-    // Create the render target
+    // create the render target
 
     ysD3D10RenderTarget *newRenderTarget =
             static_cast<ysD3D10RenderTarget *>(target);

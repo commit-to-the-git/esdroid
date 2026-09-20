@@ -16,4 +16,4 @@ namespace piranha_demo {
 
 } /* namespace piranha_demo */
 
-#endif /* PIRANHA_REFERENCE_COMPILER_REFERENCE_LANGUAGE_RULES_H */
+#endif /* PIRANHA_REFERENCE_COMPILER_REFERENCE_LANGUAGE_RULES_H  */

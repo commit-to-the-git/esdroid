@@ -9,4 +9,4 @@ typedef VkSurfaceKHR_T *VkSurfaceKHR;
 typedef VkInstance_T *VkInstance;
 typedef VkDevice_T *VkDevice;
 
-#endif /* YDS_VULKAN_DECL_H */
+#endif /* YDS_VULKAN_DECL_H  */

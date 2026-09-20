@@ -7,4 +7,4 @@ struct ID3D11DeviceChild;
 
 void D3D11SetDebugName(ID3D11DeviceChild *object, const std::string &name);
 
-#endif /* YDS_D3D11_UTILITIES_H */
+#endif /* YDS_D3D11_UTILITIES_H  */

@@ -23,9 +23,9 @@ class OscilloscopeCluster : public UiElement {
 
         void sample();
         void setSimulator(Simulator *simulator);
-        // Cycles the big focus scope to the next scope group, the same groups
-        // clicking a mini scope selects in signal(). Used by the OSC PAGE
-        // touch button where no mouse click can reach the mini scopes.
+        // cycles the big focus scope to the next scope group the same groups
+        // clicking a mini scope selects in signal used by the osc page
+        // touch button where no mouse click can reach the mini scopes
         void nextFocusScope();
 
         Oscilloscope *getTotalExhaustFlowOscilloscope() const { return m_totalExhaustFlowScope; }
@@ -73,4 +73,4 @@ class OscilloscopeCluster : public UiElement {
 
 };
 
-#endif /* ATG_ENGINE_SIM_OSCILLOSCOPE_CLUSTER_H */
+#endif /* ATG_ENGINE_SIM_OSCILLOSCOPE_CLUSTER_H  */

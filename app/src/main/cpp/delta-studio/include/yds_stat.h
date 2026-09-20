@@ -12,6 +12,6 @@ namespace ysStat {
     float NormalRandomNumber(float variance);
     float NormalRandomNumber(float mean, float variance);
 
-} /* namespace ysStat */
+} /* namespace ysstat */
 
-#endif /* YDS_STAT_H */
+#endif /* YDS_STAT_H  */

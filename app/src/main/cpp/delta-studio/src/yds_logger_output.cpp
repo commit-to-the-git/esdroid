@@ -62,7 +62,7 @@ void ysLoggerOutput::LogMessage(const char *message, const char *fname, int line
     WriteToBuffer(message);
     WriteToBuffer("\n");
 
-    // Submit the entire message
+    // submit the entire message
     Write(m_buffer);
 }
 

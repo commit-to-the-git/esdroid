@@ -11,4 +11,4 @@ public:
     virtual ~ysVulkanRenderTarget();
 };
 
-#endif /* YDS_VULKAN_RENDER_TARGET_H */
+#endif /* YDS_VULKAN_RENDER_TARGET_H  */

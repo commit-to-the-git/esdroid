@@ -41,4 +41,4 @@ class SimulationObject {
         EngineSimApplication *m_app;
 };
 
-#endif /* ATG_ENGINE_SIM_SIMULATION_OBJECT_H */
+#endif /* ATG_ENGINE_SIM_SIMULATION_OBJECT_H  */

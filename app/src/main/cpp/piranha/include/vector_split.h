@@ -38,4 +38,4 @@ namespace piranha {
 
 } /* namespace piranha */
 
-#endif /* PIRANHA_VECTOR_SPLIT_H */
+#endif /* PIRANHA_VECTOR_SPLIT_H  */

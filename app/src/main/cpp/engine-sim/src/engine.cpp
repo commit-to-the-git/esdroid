@@ -206,7 +206,7 @@ bool placeRod(
     *p_x = p_x_0 + (dx * l_x - dy * l_y);
     *p_y = p_y_0 + (dy * l_x + dx * l_y);
 
-    // (bank->m_x + bank->m_dx * s - p_x)^2 + (bank->m_y + bank->m_dy * s - p_y)^2 = (rod->m_length)^2
+    // bank->m_x + bank->m_dx * s - p_x^2 + bank->m_y + bank->m_dy * s - p_y^2 = rod->m_length^2
     const double a = bank.getDx() * bank.getDx() + bank.getDy() * bank.getDy();
     const double b = -2 * bank.getDx() * ((*p_x) - bank.getX()) - 2 * bank.getDy() * ((*p_y) - bank.getY());
     const double c =
@@ -237,9 +237,9 @@ bool placeRod(
 }
 
 void Engine::calculateDisplacement() {
-    // There is a closed-form/correct way to do this which I really
-    // don't feel like deriving right now, so I'm just going with this
-    // numerical approximation.
+    // there is a closed-form/correct way to do this which i really
+    // dont feel like deriving right now so im just going with this
+    // numerical approximation
     constexpr int Resolution = 1000;
 
     double *min_s = new double[m_cylinderCount];

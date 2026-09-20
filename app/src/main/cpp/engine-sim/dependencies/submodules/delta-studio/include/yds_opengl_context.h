@@ -37,7 +37,7 @@ public:
         return YDS_ERROR_RETURN(ysError::None); 
     }
 
-    // OpenGL Extensions
+    // opengl extensions
     PFNGLGENBUFFERSPROC glGenBuffers = nullptr;
     PFNGLDELETEBUFFERSPROC glDeleteBuffers = nullptr;
     PFNGLDELETEVERTEXARRAYSPROC glDeleteVertexArrays = nullptr;
@@ -91,13 +91,13 @@ public:
 
     PFNGLDRAWELEMENTSBASEVERTEXPROC glDrawElementsBaseVertex = nullptr;
 
-    // Textures
+    // textures
 
     PFNGLTEXIMAGE2DMULTISAMPLEPROC glTexImage2DMultisample = nullptr;
     PFNGLACTIVETEXTUREPROC glActiveTexture = nullptr;
     PFNGLGENERATEMIPMAPPROC glGenerateMipmap = nullptr;
 
-    // Buffers
+    // buffers
 
     PFNGLMAPBUFFERPROC glMapBuffer = nullptr;
     PFNGLMAPBUFFERRANGEPROC glMapBufferRange = nullptr;
@@ -132,4 +132,4 @@ protected:
     bool m_isRealContext;
 };
 
-#endif /* YDS_OPENGL_CONTEXT_H */
+#endif /* YDS_OPENGL_CONTEXT_H  */

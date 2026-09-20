@@ -214,4 +214,4 @@ protected:
     } m_state;
 };
 
-#endif /* ATG_ENGINE_SIM_GEOMETRY_GENERATOR_H */
+#endif /* ATG_ENGINE_SIM_GEOMETRY_GENERATOR_H  */

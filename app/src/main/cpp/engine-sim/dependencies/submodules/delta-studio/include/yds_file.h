@@ -11,7 +11,7 @@ public:
     static const int MAX_FILE_NAME_LENGTH = 256;
 
     enum FILE_MODE {
-        // Defaults
+        // defaults
         FILE_WRITE = 0x000000,
         FILE_TEXT = 0x000000,
 
@@ -39,4 +39,4 @@ protected:
     std::fstream m_file;
 };
 
-#endif /* YDS_FILE_H */
+#endif /* YDS_FILE_H  */

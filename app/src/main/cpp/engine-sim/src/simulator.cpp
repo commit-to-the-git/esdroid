@@ -118,7 +118,7 @@ bool Simulator::simulateStep() {
     for (int i = 0; i < m_engine->getCrankshaftCount(); ++i) {
         Crankshaft *shaft = m_engine->getCrankshaft(i);
 
-        // Correct drift (temporary hack)
+        // correct drift temporary hack
         shaft->m_body.theta = outputShaft->m_body.theta;
     }
 

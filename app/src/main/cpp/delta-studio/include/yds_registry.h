@@ -31,7 +31,7 @@ public:
 
         m_array[m_nObjects] = obj;
 
-        // Cast to a standard array element
+        // cast to a standard array element
         ysDynamicArrayElement *sElement = static_cast<ysDynamicArrayElement *>(m_array[m_nObjects]);
         sElement->SetAlignment(0);
         sElement->SetIndex(m_nObjects);
@@ -45,7 +45,7 @@ public:
 
         m_array[m_nObjects] = static_cast<TYPE *>(obj);
 
-        // Cast to a standard array element
+        // cast to a standard array element
         ysDynamicArrayElement *sElement = static_cast<ysDynamicArrayElement *>(m_array[m_nObjects]);
         sElement->SetAlignment(alignment);
         sElement->SetIndex(m_nObjects);
@@ -65,7 +65,7 @@ public:
         m_array[index] = m_array[m_nObjects - 1];
         m_array[m_nObjects - 1] = NULL;
 
-        // Cast to a standard array element
+        // cast to a standard array element
         if (m_array[index]) {
             ysDynamicArrayElement *sElement = static_cast<ysDynamicArrayElement *>(m_array[index]);
             sElement->SetIndex(index);
@@ -119,4 +119,4 @@ protected:
     int m_nObjects;
 };
 
-#endif /* YDS_REGISTRY_H */
+#endif /* YDS_REGISTRY_H  */

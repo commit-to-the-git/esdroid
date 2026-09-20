@@ -12,8 +12,8 @@ float ysMath::UniformRandom(float range) {
     static constexpr float MAX_RAND = 0.9999f;
     float r = (rand() % RAND_MAX) / ((float) (RAND_MAX - 1));
 
-    // Limit the random number such that it is less than 1
-    // This approach will be made more robust in future versions
+    // limit the random number such that it is less than 1
+    // this approach will be made more robust in future versions
     r = r > MAX_RAND ? MAX_RAND : r;
 
     return range * r;
@@ -74,29 +74,29 @@ ysVector ysMath::Dot3(const ysVector &v1, const ysVector &v2) {
 }
 
 ysVector ysMath::Cross(const ysVector &v1, const ysVector &v2) {
-    // Based on example from XNA math
+    // based on example from xna math
 
-    // y1, z1, x1, w1
+    // y1 z1 x1 w1
     ysVector t1 = _mm_shuffle_ps(v1, v1, _MM_SHUFFLE(3, 0, 2, 1));
 
-    // z2, x2, y2, w2
+    // z2 x2 y2 w2
     ysVector t2 = _mm_shuffle_ps(v2, v2, _MM_SHUFFLE(3, 1, 0, 2));
 
     ysVector vResult = _mm_mul_ps(t1, t2);
 
-    // z1, x1, y1, w1
+    // z1 x1 y1 w1
     t1 = _mm_shuffle_ps(t1, t1, _MM_SHUFFLE(3, 0, 2, 1));
 
-    // y2, z2, x2, w2
+    // y2 z2 x2 w2
     t2 = _mm_shuffle_ps(t2, t2, _MM_SHUFFLE(3, 1, 0, 2));
 
-    // Perform the right operation
+    // perform the right operation
     t1 = _mm_mul_ps(t1, t2);
 
-    // Subract the right from left, and return answer
+    // subract the right from left and return answer
     vResult = _mm_sub_ps(vResult, t1);
 
-    // Set w to zero
+    // set w to zero
     return _mm_and_ps(vResult, ysMath::Constants::MaskOffW);
 }
 
@@ -119,7 +119,7 @@ ysVector ysMath::Or(const ysVector &v1, const ysVector &v2) {
     return _mm_or_ps(v1, v2);
 }
 
-// Quaternion
+// quaternion
 
 ysQuaternion ysMath::QuatInvert(const ysQuaternion &q) {
     return ysMath::Mul(q, Constants::QuatInvert);
@@ -196,7 +196,7 @@ ysQuaternion ysMath::QuatAddScaled(const ysQuaternion &q, const ysVector &vec,
     return ysMath::Normalize(ret);
 }
 
-// Matrices
+// matrices
 
 ysMatrix ysMath::LoadIdentity() {
     ysMatrix r;
@@ -222,25 +222,25 @@ ysMatrix ysMath::LoadMatrix(const ysVector &r1, const ysVector &r2,
 ysMatrix ysMath::LoadMatrix(const ysQuaternion &quat) {
     ysGeneric q = ysMath::Normalize(quat);// q = |quat|
     ysGeneric nq =
-            _mm_sub_ps(ysMath::Constants::Zero, q);// nq = [-w, -x, -y, -z]
-    ysGeneric qq = _mm_add_ps(q, q);               // qq = [2w, 2x, 2y, 2z]
-    ysGeneric q2 = _mm_mul_ps(qq, q);// q2 = [2w^2, 2x^2, 2y^2, 2z^2]
+            _mm_sub_ps(ysMath::Constants::Zero, q);// nq = -w -x -y -z
+    ysGeneric qq = _mm_add_ps(q, q);               // qq = 2w 2x 2y 2z
+    ysGeneric q2 = _mm_mul_ps(qq, q);// q2 = 2w^2 2x^2 2y^2 2z^2
 
     ysGeneric xxxy =
-            _mm_shuffle_ps(q, q, _MM_SHUFFLE(2, 1, 1, 1));// [x, x, x, y]
+            _mm_shuffle_ps(q, q, _MM_SHUFFLE(2, 1, 1, 1));// x x x y
     ysGeneric zyyz =
-            _mm_shuffle_ps(qq, qq, _MM_SHUFFLE(3, 2, 2, 3));// [2z, 2y, 2y, 2z]
+            _mm_shuffle_ps(qq, qq, _MM_SHUFFLE(3, 2, 2, 3));// 2z 2y 2y 2z
     ysGeneric yzzx =
-            _mm_shuffle_ps(qq, qq, _MM_SHUFFLE(1, 3, 3, 2));// [2y, 2z, 2z, 2x]
+            _mm_shuffle_ps(qq, qq, _MM_SHUFFLE(1, 3, 3, 2));// 2y 2z 2z 2x
     ysGeneric wwww =
-            _mm_shuffle_ps(q, nq, _MM_SHUFFLE(0, 0, 0, 0));// [w, w, -w, -w]
+            _mm_shuffle_ps(q, nq, _MM_SHUFFLE(0, 0, 0, 0));// w w -w -w
 
-    ysGeneric i1 = _mm_mul_ps(xxxy, zyyz);// [2xz, 2xy, 2xy, 2yz]
-    ysGeneric i2 = _mm_mul_ps(yzzx, wwww);// [2yw, 2zw, -2zw, -2xw]
+    ysGeneric i1 = _mm_mul_ps(xxxy, zyyz);// 2xz 2xy 2xy 2yz
+    ysGeneric i2 = _mm_mul_ps(yzzx, wwww);// 2yw 2zw -2zw -2xw
     ysGeneric calc1 =
-            _mm_add_ps(i1, i2);// [2xz + 2yw, 2xy + 2zw, 2xy - 2zw, 2yz - 2xw]
+            _mm_add_ps(i1, i2);// 2xz + 2yw 2xy + 2zw 2xy - 2zw 2yz - 2xw
 
-    // Stage 2
+    // stage 2
     ysGeneric y2_x2_x2_w2 = _mm_shuffle_ps(q2, q2, _MM_SHUFFLE(0, 1, 1, 2));
     ysGeneric z2_z2_y2_w2 = _mm_shuffle_ps(q2, q2, _MM_SHUFFLE(0, 2, 3, 3));
 
@@ -248,11 +248,11 @@ ysMatrix ysMath::LoadMatrix(const ysQuaternion &quat) {
                                  _mm_add_ps(y2_x2_x2_w2, z2_z2_y2_w2));
     calc2 = _mm_and_ps(calc2, ysMath::Constants::MaskOffW.vector);
 
-    // Stage 3
+    // stage 3
     ysGeneric calc3 =
-            _mm_sub_ps(i1, i2);// [2xz - 2yw, 2xy - 2zy, 2xy + 2zw, 2yz + 2xw]
+            _mm_sub_ps(i1, i2);// 2xz - 2yw 2xy - 2zy 2xy + 2zw 2yz + 2xw
 
-    // Assembly
+    // assembly
 
     // 2xz + 2yw -> 0
     // 2xy + 2zw -> 1
@@ -262,25 +262,25 @@ ysMatrix ysMath::LoadMatrix(const ysQuaternion &quat) {
     ysGeneric asm1 = _mm_shuffle_ps(
             calc2, calc3,
             _MM_SHUFFLE(0, 2, 3,
-                        0));// [1 - 2(y^2 + z^2), 0, 2xy - 2zw, 2xz + 2yw]
+                        0));// 1 - 2y^2 + z^2 0 2xy - 2zw 2xz + 2yw
     asm1 = _mm_shuffle_ps(
             asm1, asm1,
             _MM_SHUFFLE(1, 3, 2,
-                        0));// [1 - 2(y^2 + z^2), 2xy - 2zw, 2xz + 2yw, 0]
+                        0));// 1 - 2y^2 + z^2 2xy - 2zw 2xz + 2yw 0
 
     ysGeneric asm2 = _mm_shuffle_ps(
             calc2, calc3,
             _MM_SHUFFLE(3, 1, 3,
-                        1));// [1 - 2(x^2 + z^2), 0, 2xy + 2zw, 2yz - 2xw]
+                        1));// 1 - 2x^2 + z^2 0 2xy + 2zw 2yz - 2xw
     asm2 = _mm_shuffle_ps(
             asm2, asm2,
             _MM_SHUFFLE(1, 3, 0,
-                        2));// [2xy + 2zw, 1 - 2(x^2 + z^2), 2yz - 2xw, 0]
+                        2));// 2xy + 2zw 1 - 2x^2 + z^2 2yz - 2xw 0
 
     ysGeneric asm3 = _mm_shuffle_ps(
             calc1, calc2,
-            _MM_SHUFFLE(3, 2, 3, 0));// [2xz - 2yw, 2yz + 2xw, 1 - 2(x^2 + y^2)]
-    // No need to shuffle this one
+            _MM_SHUFFLE(3, 2, 3, 0));// 2xz - 2yw 2yz + 2xw 1 - 2x^2 + y^2
+    // no need to shuffle this one
 
     return ysMath::Transpose(
             ysMath::LoadMatrix(asm1, asm2, asm3, Constants::IdentityRow4));
@@ -289,25 +289,25 @@ ysMatrix ysMath::LoadMatrix(const ysQuaternion &quat) {
 ysMatrix ysMath::LoadMatrix(const ysQuaternion &quat, const ysVector &origin) {
     ysGeneric q = ysMath::Normalize(quat);// q = |quat|
     ysGeneric nq =
-            _mm_sub_ps(ysMath::Constants::Zero, q);// nq = [-w, -x, -y, -z]
-    ysGeneric qq = _mm_add_ps(q, q);               // qq = [2w, 2x, 2y, 2z]
-    ysGeneric q2 = _mm_mul_ps(qq, q);// q2 = [2w^2, 2x^2, 2y^2, 2z^2]
+            _mm_sub_ps(ysMath::Constants::Zero, q);// nq = -w -x -y -z
+    ysGeneric qq = _mm_add_ps(q, q);               // qq = 2w 2x 2y 2z
+    ysGeneric q2 = _mm_mul_ps(qq, q);// q2 = 2w^2 2x^2 2y^2 2z^2
 
     ysGeneric xxxy =
-            _mm_shuffle_ps(q, q, _MM_SHUFFLE(2, 1, 1, 1));// [x, x, x, y]
+            _mm_shuffle_ps(q, q, _MM_SHUFFLE(2, 1, 1, 1));// x x x y
     ysGeneric zyyz =
-            _mm_shuffle_ps(qq, qq, _MM_SHUFFLE(3, 2, 2, 3));// [2z, 2y, 2y, 2z]
+            _mm_shuffle_ps(qq, qq, _MM_SHUFFLE(3, 2, 2, 3));// 2z 2y 2y 2z
     ysGeneric yzzx =
-            _mm_shuffle_ps(qq, qq, _MM_SHUFFLE(1, 3, 3, 2));// [2y, 2z, 2z, 2x]
+            _mm_shuffle_ps(qq, qq, _MM_SHUFFLE(1, 3, 3, 2));// 2y 2z 2z 2x
     ysGeneric wwww =
-            _mm_shuffle_ps(q, nq, _MM_SHUFFLE(0, 0, 0, 0));// [w, w, -w, -w]
+            _mm_shuffle_ps(q, nq, _MM_SHUFFLE(0, 0, 0, 0));// w w -w -w
 
-    ysGeneric i1 = _mm_mul_ps(xxxy, zyyz);// [2xz, 2xy, 2xy, 2yz]
-    ysGeneric i2 = _mm_mul_ps(yzzx, wwww);// [2yw, 2zw, -2zw, -2xw]
+    ysGeneric i1 = _mm_mul_ps(xxxy, zyyz);// 2xz 2xy 2xy 2yz
+    ysGeneric i2 = _mm_mul_ps(yzzx, wwww);// 2yw 2zw -2zw -2xw
     ysGeneric calc1 =
-            _mm_add_ps(i1, i2);// [2xz + 2yw, 2xy + 2zw, 2xy - 2zw, 2yz - 2xw]
+            _mm_add_ps(i1, i2);// 2xz + 2yw 2xy + 2zw 2xy - 2zw 2yz - 2xw
 
-    // Stage 2
+    // stage 2
 
     ysGeneric y2_x2_x2_w2 = _mm_shuffle_ps(q2, q2, _MM_SHUFFLE(0, 1, 1, 2));
     ysGeneric z2_z2_y2_w2 = _mm_shuffle_ps(q2, q2, _MM_SHUFFLE(0, 2, 3, 3));
@@ -316,12 +316,12 @@ ysMatrix ysMath::LoadMatrix(const ysQuaternion &quat, const ysVector &origin) {
                                  _mm_add_ps(y2_x2_x2_w2, z2_z2_y2_w2));
     calc2 = _mm_and_ps(calc2, ysMath::Constants::MaskOffW.vector);
 
-    // Stage 3
+    // stage 3
 
     ysGeneric calc3 =
-            _mm_sub_ps(i1, i2);// [2xz - 2yw, 2xy - 2zy, 2xy + 2zw, 2yz + 2xw]
+            _mm_sub_ps(i1, i2);// 2xz - 2yw 2xy - 2zy 2xy + 2zw 2yz + 2xw
 
-    // Assembly
+    // assembly
 
     // 2xz + 2yw -> 0
     // 2xy + 2zw -> 1
@@ -331,25 +331,25 @@ ysMatrix ysMath::LoadMatrix(const ysQuaternion &quat, const ysVector &origin) {
     ysGeneric asm1 = _mm_shuffle_ps(
             calc2, calc3,
             _MM_SHUFFLE(0, 2, 3,
-                        0));// [1 - 2(y^2 + z^2), 0, 2xy - 2zw, 2xz + 2yw]
+                        0));// 1 - 2y^2 + z^2 0 2xy - 2zw 2xz + 2yw
     asm1 = _mm_shuffle_ps(
             asm1, asm1,
             _MM_SHUFFLE(1, 3, 2,
-                        0));// [1 - 2(y^2 + z^2), 2xy - 2zw, 2xz + 2yw, 0]
+                        0));// 1 - 2y^2 + z^2 2xy - 2zw 2xz + 2yw 0
 
     ysGeneric asm2 = _mm_shuffle_ps(
             calc2, calc3,
             _MM_SHUFFLE(3, 1, 3,
-                        1));// [1 - 2(x^2 + z^2), 0, 2xy + 2zw, 2yz - 2xw]
+                        1));// 1 - 2x^2 + z^2 0 2xy + 2zw 2yz - 2xw
     asm2 = _mm_shuffle_ps(
             asm2, asm2,
             _MM_SHUFFLE(1, 3, 0,
-                        2));// [2xy + 2zw, 1 - 2(x^2 + z^2), 2yz - 2xw, 0]
+                        2));// 2xy + 2zw 1 - 2x^2 + z^2 2yz - 2xw 0
 
     ysGeneric asm3 = _mm_shuffle_ps(
             calc1, calc2,
-            _MM_SHUFFLE(3, 2, 3, 0));// [2xz - 2yw, 2yz + 2xw, 1 - 2(x^2 + y^2)]
-    // No need to shuffle this one
+            _MM_SHUFFLE(3, 2, 3, 0));// 2xz - 2yw 2yz + 2xw 1 - 2x^2 + y^2
+    // no need to shuffle this one
 
     ysGeneric asm4 = _mm_and_ps(origin, ysMath::Constants::MaskOffW.vector);
     asm4 = _mm_add_ps(asm4, ysMath::Constants::IdentityRow4);
@@ -361,25 +361,25 @@ void ysMath::LoadMatrix(const ysQuaternion &quat, const ysVector &origin,
                         ysMatrix *full, ysMatrix *orientation) {
     ysGeneric q = ysMath::Normalize(quat);// q = |quat|
     ysGeneric nq =
-            _mm_sub_ps(ysMath::Constants::Zero, q);// nq = [-w, -x, -y, -z]
-    ysGeneric qq = _mm_add_ps(q, q);               // qq = [2w, 2x, 2y, 2z]
-    ysGeneric q2 = _mm_mul_ps(qq, q);// q2 = [2w^2, 2x^2, 2y^2, 2z^2]
+            _mm_sub_ps(ysMath::Constants::Zero, q);// nq = -w -x -y -z
+    ysGeneric qq = _mm_add_ps(q, q);               // qq = 2w 2x 2y 2z
+    ysGeneric q2 = _mm_mul_ps(qq, q);// q2 = 2w^2 2x^2 2y^2 2z^2
 
     ysGeneric xxxy =
-            _mm_shuffle_ps(q, q, _MM_SHUFFLE(2, 1, 1, 1));// [x, x, x, y]
+            _mm_shuffle_ps(q, q, _MM_SHUFFLE(2, 1, 1, 1));// x x x y
     ysGeneric zyyz =
-            _mm_shuffle_ps(qq, qq, _MM_SHUFFLE(3, 2, 2, 3));// [2z, 2y, 2y, 2z]
+            _mm_shuffle_ps(qq, qq, _MM_SHUFFLE(3, 2, 2, 3));// 2z 2y 2y 2z
     ysGeneric yzzx =
-            _mm_shuffle_ps(qq, qq, _MM_SHUFFLE(1, 3, 3, 2));// [2y, 2z, 2z, 2x]
+            _mm_shuffle_ps(qq, qq, _MM_SHUFFLE(1, 3, 3, 2));// 2y 2z 2z 2x
     ysGeneric wwww =
-            _mm_shuffle_ps(q, nq, _MM_SHUFFLE(0, 0, 0, 0));// [w, w, -w, -w]
+            _mm_shuffle_ps(q, nq, _MM_SHUFFLE(0, 0, 0, 0));// w w -w -w
 
-    ysGeneric i1 = _mm_mul_ps(xxxy, zyyz);// [2xz, 2xy, 2xy, 2yz]
-    ysGeneric i2 = _mm_mul_ps(yzzx, wwww);// [2yw, 2zw, -2zw, -2xw]
+    ysGeneric i1 = _mm_mul_ps(xxxy, zyyz);// 2xz 2xy 2xy 2yz
+    ysGeneric i2 = _mm_mul_ps(yzzx, wwww);// 2yw 2zw -2zw -2xw
     ysGeneric calc1 =
-            _mm_add_ps(i1, i2);// [2xz + 2yw, 2xy + 2zw, 2xy - 2zw, 2yz - 2xw]
+            _mm_add_ps(i1, i2);// 2xz + 2yw 2xy + 2zw 2xy - 2zw 2yz - 2xw
 
-    // Stage 2
+    // stage 2
 
     ysGeneric y2_x2_x2_w2 = _mm_shuffle_ps(q2, q2, _MM_SHUFFLE(0, 1, 1, 2));
     ysGeneric z2_z2_y2_w2 = _mm_shuffle_ps(q2, q2, _MM_SHUFFLE(0, 2, 3, 3));
@@ -388,12 +388,12 @@ void ysMath::LoadMatrix(const ysQuaternion &quat, const ysVector &origin,
                                  _mm_add_ps(y2_x2_x2_w2, z2_z2_y2_w2));
     calc2 = _mm_and_ps(calc2, ysMath::Constants::MaskOffW.vector);
 
-    // Stage 3
+    // stage 3
 
     ysGeneric calc3 =
-            _mm_sub_ps(i1, i2);// [2xz - 2yw, 2xy - 2zy, 2xy + 2zw, 2yz + 2xw]
+            _mm_sub_ps(i1, i2);// 2xz - 2yw 2xy - 2zy 2xy + 2zw 2yz + 2xw
 
-    // Assembly
+    // assembly
 
     // 2xz + 2yw -> 0
     // 2xy + 2zw -> 1
@@ -403,25 +403,25 @@ void ysMath::LoadMatrix(const ysQuaternion &quat, const ysVector &origin,
     ysGeneric asm1 = _mm_shuffle_ps(
             calc2, calc3,
             _MM_SHUFFLE(0, 2, 3,
-                        0));// [1 - 2(y^2 + z^2), 0, 2xy - 2zw, 2xz + 2yw]
+                        0));// 1 - 2y^2 + z^2 0 2xy - 2zw 2xz + 2yw
     asm1 = _mm_shuffle_ps(
             asm1, asm1,
             _MM_SHUFFLE(1, 3, 2,
-                        0));// [1 - 2(y^2 + z^2), 2xy - 2zw, 2xz + 2yw, 0]
+                        0));// 1 - 2y^2 + z^2 2xy - 2zw 2xz + 2yw 0
 
     ysGeneric asm2 = _mm_shuffle_ps(
             calc2, calc3,
             _MM_SHUFFLE(3, 1, 3,
-                        1));// [1 - 2(x^2 + z^2), 0, 2xy + 2zw, 2yz - 2xw]
+                        1));// 1 - 2x^2 + z^2 0 2xy + 2zw 2yz - 2xw
     asm2 = _mm_shuffle_ps(
             asm2, asm2,
             _MM_SHUFFLE(1, 3, 0,
-                        2));// [2xy + 2zw, 1 - 2(x^2 + z^2), 2yz - 2xw, 0]
+                        2));// 2xy + 2zw 1 - 2x^2 + z^2 2yz - 2xw 0
 
     ysGeneric asm3 = _mm_shuffle_ps(
             calc1, calc2,
-            _MM_SHUFFLE(3, 2, 3, 0));// [2xz - 2yw, 2yz + 2xw, 1 - 2(x^2 + y^2)]
-    // No need to shuffle this one
+            _MM_SHUFFLE(3, 2, 3, 0));// 2xz - 2yw 2yz + 2xw 1 - 2x^2 + y^2
+    // no need to shuffle this one
 
     *orientation =
             Transpose(LoadMatrix(asm1, asm2, asm3, Constants::IdentityRow4));
@@ -445,8 +445,8 @@ ysMatrix ysMath::OrthogonalInverse(const ysMatrix &m) {
 
     _MM_TRANSPOSE4_PS(r.rows[0], r.rows[1], r.rows[2], r.rows[3]);
 
-    // RTv
-    // (Tinv)(Rinv)v
+    // rtv
+    // tinvrinvv
 
     ysMatrix r_inv = LoadMatrix(r.rows[0], r.rows[1], r.rows[2],
                                 ysMath::Constants::IdentityRow4);
@@ -458,9 +458,9 @@ ysMatrix ysMath::OrthogonalInverse(const ysMatrix &m) {
 }
 
 ysVector ysMath::Det3x3(const ysMatrix &m) {
-    // m[0][0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1]) -
-    // m[0][1] * (m[1][0] * m[2][2] - m[1][2] * m[2][0]) +
-    // m[0][2] * (m[1][0] * m[2][1] - m[1][1] * m[2][0])
+    // m00 * m11 * m22 - m12 * m21 -
+    // m01 * m10 * m22 - m12 * m20 +
+    // m02 * m10 * m21 - m11 * m20
 
     ysVector c0 = _mm_shuffle_ps(m.rows[1], m.rows[1], _MM_SHUFFLE(3, 0, 0, 1));
     ysVector c1 = _mm_shuffle_ps(m.rows[2], m.rows[2], _MM_SHUFFLE(3, 1, 2, 2));
@@ -481,25 +481,25 @@ ysVector ysMath::Det3x3(const ysMatrix &m) {
 }
 
 ysMatrix ysMath::Inverse3x3(const ysMatrix &m) {
-    // Row 1
-    // m[1][1] * m[2][2] - m[1][2] * m[2][1]
-    // m[0][2] * m[2][1] - m[0][1] * m[2][2]
-    // m[0][1] * m[1][2] - m[0][2] * m[1][1]
+    // row 1
+    // m11 * m22 - m12 * m21
+    // m02 * m21 - m01 * m22
+    // m01 * m12 - m02 * m11
 
-    // Row 2
-    // m[1][2] * m[2][0] - m[1][0] * m[2][2]
-    // m[0][0] * m[2][2] - m[0][2] * m[2][0]
-    // m[0][2] * m[1][0] - m[0][0] * m[1][2]
+    // row 2
+    // m12 * m20 - m10 * m22
+    // m00 * m22 - m02 * m20
+    // m02 * m10 - m00 * m12
 
-    // Row 3
-    // m[1][0] * m[2][1] - m[1][1] * m[2][0]
-    // m[0][1] * m[2][0] - m[0][0] * m[2][1]
-    // m[0][0] * m[1][1] - m[0][1] * m[1][0]
+    // row 3
+    // m10 * m21 - m11 * m20
+    // m01 * m20 - m00 * m21
+    // m00 * m11 - m01 * m10
 
     ysVector inv_det = Det3x3(m);
     inv_det = _mm_div_ps(ysMath::Constants::One, inv_det);
 
-    // Calculate row 1
+    // calculate row 1
     ysVector r1_0 =
             _mm_shuffle_ps(m.rows[1], m.rows[0], _MM_SHUFFLE(1, 2, 3, 1));
     r1_0 = _mm_shuffle_ps(r1_0, r1_0, _MM_SHUFFLE(1, 3, 2, 0));
@@ -516,7 +516,7 @@ ysMatrix ysMath::Inverse3x3(const ysMatrix &m) {
     ysVector row1 = _mm_sub_ps(_mm_mul_ps(r1_0, r1_1), _mm_mul_ps(r1_2, r1_3));
     row1 = _mm_mul_ps(inv_det, row1);
 
-    // Calculate row 2
+    // calculate row 2
     ysVector r2_0 =
             _mm_shuffle_ps(m.rows[1], m.rows[0], _MM_SHUFFLE(2, 0, 3, 2));
     r2_0 = _mm_shuffle_ps(r2_0, r2_0, _MM_SHUFFLE(1, 3, 2, 0));
@@ -533,7 +533,7 @@ ysMatrix ysMath::Inverse3x3(const ysMatrix &m) {
     ysVector row2 = _mm_sub_ps(_mm_mul_ps(r2_0, r2_1), _mm_mul_ps(r2_2, r2_3));
     row2 = _mm_mul_ps(inv_det, row2);
 
-    // Calculate row 3
+    // calculate row 3
     ysVector r3_0 =
             _mm_shuffle_ps(m.rows[1], m.rows[0], _MM_SHUFFLE(0, 1, 3, 0));
     r3_0 = _mm_shuffle_ps(r3_0, r3_0, _MM_SHUFFLE(1, 3, 2, 0));
@@ -608,7 +608,7 @@ ysVector ysMath::MatMult(const ysMatrix &m, const ysVector &v) {
     ysMatrix t = m;
     _MM_TRANSPOSE4_PS(t.rows[0], t.rows[1], t.rows[2], t.rows[3]);
 
-    //ysVector exV = ExtendVector(v);
+    // ysvector exv = extendvectorv
 
     ysVector r;
     r = _mm_mul_ps(_mm_replicate_x_ps(v), t.rows[0]);
@@ -748,8 +748,8 @@ ysMatrix ysMath::ScaleTransform(const ysVector &scale) {
 }
 
 ysMatrix ysMath::RotationTransform(const ysVector &axis, float angle) {
-    // TEMP
-    // BAD IMPLEMENTATION
+    // temp
+    // bad implementation
     ysVector naxis = ysMath::Normalize(axis);
 
     float ux = ysMath::GetX(naxis);
@@ -796,11 +796,11 @@ ysVector ysMath::Clamp(const ysVector &a, const ysVector &r_min,
 }
 
 ysVector ysMath::MaxComponent(const ysVector &v) {
-    // y, x, w, z
+    // y x w z
     ysVector r1 = _mm_shuffle_ps(v, v, _MM_SHUFFLE(2, 3, 0, 1));
     r1 = _mm_max_ps(r1, v);
 
-    // z, z, x, x
+    // z z x x
     ysVector r2 = _mm_shuffle_ps(r1, r1, _MM_SHUFFLE(0, 0, 2, 2));
     r1 = _mm_max_ps(r1, r2);
 

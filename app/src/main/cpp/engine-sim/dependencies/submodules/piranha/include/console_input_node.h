@@ -53,4 +53,4 @@ namespace piranha {
 
 } /* namespace piranha */
 
-#endif /* PIRANHA_CONSOLE_OUTPUT_NODE_H */
+#endif /* PIRANHA_CONSOLE_OUTPUT_NODE_H  */

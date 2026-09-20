@@ -13,17 +13,17 @@ public:
         int ObjectCount;
     };
 
-    // Keep track of allocations
+    // keep track of allocations
     class Allocation : public ysDynamicArrayElement {
     public:
         void *m_allocation;
     };
 
-    // File Information
+    // file information
     static const int CURRENT_FILE_VERSION = 0x0;
     static const unsigned int MAGIC_NUMBER = 0x50F1AA;
 
-    // Software codes
+    // software codes
     enum class EditorId {
         UNDEFINED = 0x0,
 
@@ -34,7 +34,7 @@ public:
         COUNT = 0x3
     };
 
-    // Compilation status
+    // compilation status
     enum class CompilationStatus {
         UNDEFINED = 0x0,
         RAW = 0x1,
@@ -59,7 +59,7 @@ public:
     ysError ReadTimeTagData(ysTimeTagData **newTimeTagData);
 
 protected:
-    // Protected Methods
+    // protected methods
     ysError ReadHeader(int fileVersion);
     ysError ReadString(char *dest);
 
@@ -68,7 +68,7 @@ protected:
 
     template<typename Type>
     Type *Allocate(int count) {
-        //Type *ret = (Type *)malloc(sizeof(Type) * count);
+        // type *ret = type *mallocsizeoftype * count
         Type *ret = new Type[count];
         Allocation *track = m_allocationTracker.New();
         track->m_allocation = (void *)ret;
@@ -86,10 +86,10 @@ protected:
     EditorId m_lastEditor;
     CompilationStatus m_compilationStatus;
 
-    // File
+    // file
     std::fstream m_file;
 
     ysDynamicArray<Allocation, 4> m_allocationTracker;
 };
 
-#endif /* YDS_TOOL_ANIMATION_FILE_H */
+#endif /* YDS_TOOL_ANIMATION_FILE_H  */

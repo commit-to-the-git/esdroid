@@ -57,4 +57,4 @@ namespace piranha {
 
 } /* namespace piranha */
 
-#endif /* PIRANHA_VECTOR_SPLIT_NODE_H */
+#endif /* PIRANHA_VECTOR_SPLIT_NODE_H  */

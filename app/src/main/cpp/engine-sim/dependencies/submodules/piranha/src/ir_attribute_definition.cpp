@@ -58,7 +58,7 @@ piranha::IrParserStructure *piranha::IrAttributeDefinition::getImmediateReferenc
 {
     IR_RESET(query);
 
-    // If a type definition is present, then this chain of references must have a fixed type
+    // if a type definition is present then this chain of references must have a fixed type
     if (m_typeDefinition != nullptr) {
         IR_INFO_OUT(fixedType, getTypeDefinition());
     }
@@ -66,7 +66,7 @@ piranha::IrParserStructure *piranha::IrAttributeDefinition::getImmediateReferenc
         IR_INFO_OUT(staticType, false);
     }
 
-    // First check the input context for the reference
+    // first check the input context for the reference
     if (!IR_EMPTY_CONTEXT()) {
         IrParserStructure *reference = query.inputContext->resolveDefinition(this);
         if (reference != nullptr) {
@@ -75,16 +75,16 @@ piranha::IrParserStructure *piranha::IrAttributeDefinition::getImmediateReferenc
 
             IR_INFO_OUT(newContext, query.inputContext->getParent());
 
-            // This flag must be set to notify that this chain of resolutions actually
-            // touched the important main context (the only context for which errors
-            // are being logged)
+            // this flag must be set to notify that this chain of resolutions actually
+            // touched the important main context the only context for which errors
+            // are being logged
             IR_INFO_OUT(touchedMainContext, query.inputContext->isMainContext());
 
             return reference;
         }
     }
 
-    // An attribute definition will by default point to its definition (ie default value)
+    // an attribute definition will by default point to its definition ie default value
     if (m_defaultValue == nullptr && isInput()) {
         if (IR_EMPTY_CONTEXT() || query.inputContext->getContext()->isInterface()) {
             IrNode **expansion = m_expansions.lookup(query.inputContext);
@@ -97,7 +97,7 @@ piranha::IrParserStructure *piranha::IrAttributeDefinition::getImmediateReferenc
             return *expansion;
         }
         else {
-            // This is the result of an unconnected input (that has no default)
+            // this is the result of an unconnected input that has no default
             IR_FAIL();
             return nullptr;
         }
@@ -117,7 +117,7 @@ piranha::IrParserStructure *piranha::IrAttributeDefinition::getImmediateReferenc
         }
     }
 
-    // Look up the expansion for the default case and return it if it exists
+    // look up the expansion for the default case and return it if it exists
     IrNode **expansion = m_expansions.lookup(query.inputContext);
     if (expansion == nullptr) {
         IR_FAIL();
@@ -184,7 +184,7 @@ void piranha::IrAttributeDefinition::_expand(IrContextTree *context) {
             return;
         }
 
-        // Make sure the entire reference chain is expanded
+        // make sure the entire reference chain is expanded
         immediateReference->expandChain(immediateInfo.newContext);
 
         IrReferenceInfo referenceInfo;
@@ -196,7 +196,7 @@ void piranha::IrAttributeDefinition::_expand(IrContextTree *context) {
 
         if (referenceInfo.failed) return;
         if (referenceInfo.reachedDeadEnd) {
-            // A dead end is okay as long as the fixed type is known
+            // a dead end is okay as long as the fixed type is known
             if (!referenceInfo.isFixedType()) return;
             else reference = referenceInfo.fixedType;
         }
@@ -204,9 +204,9 @@ void piranha::IrAttributeDefinition::_expand(IrContextTree *context) {
         IrNodeDefinition *fixedTypeDefinition = (referenceInfo.isFixedType())
             ? referenceInfo.fixedType
             : nullptr;
-        // IMPORTANT: fixed type information from the immediate reference cannot be
+        // important fixed type information from the immediate reference cannot be
         // used because it will always get forced to the type of this attribute definition
-        // thereby preventing automatic conversion from taking place.
+        // thereby preventing automatic conversion from taking place
 
         const ChannelType *referenceType = (fixedTypeDefinition != nullptr)
             ? fixedTypeDefinition->getChannelType()
@@ -220,20 +220,20 @@ void piranha::IrAttributeDefinition::_expand(IrContextTree *context) {
                 : fixedTypeDefinition;
 
             if (typeDefinition != nullptr && typeDefinition != getTypeDefinition()) {
-                // This error was already detected in an earlier step
+                // this error was already detected in an earlier step
                 return;
             }
         }
-        else if (referenceType == expectedType) return; // No expansion/conversion needed
+        else if (referenceType == expectedType) return; // no expansion/conversion needed
 
-        // Stop if language rules are not specified
-        // NOTE - This should only really be used in unit testing
+        // stop if language rules are not specified
+        // note - this should only really be used in unit testing
         if (m_rules == nullptr) return;
 
         std::string builtinType =
             m_rules->resolveConversionBuiltinType(referenceType, expectedType);
 
-        if (builtinType.empty()) return; // Incompatible types
+        if (builtinType.empty()) return; // incompatible types
 
         IrCompilationUnit *parentUnit = (context->isEmpty())
             ? getParentUnit()
@@ -243,7 +243,7 @@ void piranha::IrAttributeDefinition::_expand(IrContextTree *context) {
         IrNodeDefinition *nodeDefinition =
             parentUnit->resolveBuiltinNodeDefinition(builtinType, &count);
 
-        // Create expanion structure
+        // create expanion structure
         IrInternalReference *internalReference =
             TRACK(new IrInternalReference(reference, referenceInfo.newContext));
 
@@ -267,8 +267,8 @@ void piranha::IrAttributeDefinition::_expand(IrContextTree *context) {
 }
 
 void piranha::IrAttributeDefinition::_checkTypes(IrContextTree *context) {
-    // Skips this step completely if language rules are not specified
-    // NOTE - This should only really be used in unit testing
+    // skips this step completely if language rules are not specified
+    // note - this should only really be used in unit testing
     if (m_rules == nullptr) return;
 
     if (getTypeDefinition() != nullptr && m_defaultValue != nullptr) {
@@ -280,7 +280,7 @@ void piranha::IrAttributeDefinition::_checkTypes(IrContextTree *context) {
 
         if (info.failed) return;
         if (info.reachedDeadEnd) {
-            // A dead end is okay as long as the fixed type is known
+            // a dead end is okay as long as the fixed type is known
             if (!info.isFixedType()) return;
             else defaultReference = info.fixedType;
         }
@@ -290,14 +290,14 @@ void piranha::IrAttributeDefinition::_checkTypes(IrContextTree *context) {
             if (!context->isMainContext()) return;
         }
 
-        // If the incoming type is fixed, then only the null context would interest us
+        // if the incoming type is fixed then only the null context would interest us
         if (info.isStaticType() && !context->isEmpty()) return;
 
         IrNode *refAsNode = defaultReference->getAsNode();
         if (refAsNode != nullptr) {
             IrNodeDefinition *definition = refAsNode->getDefinition()->getAliasType();
-            if (definition == nullptr) return; // A syntax error must have already occurred
-            if (definition == getTypeDefinition()) return; // Type is confirmed to be correct
+            if (definition == nullptr) return; // a syntax error must have already occurred
+            if (definition == getTypeDefinition()) return; // type is confirmed to be correct
         }
 
         const ChannelType *type = info.isFixedType()
@@ -305,13 +305,13 @@ void piranha::IrAttributeDefinition::_checkTypes(IrContextTree *context) {
             : defaultReference->getImmediateChannelType();
         const ChannelType *expectedType = getTypeDefinition()->getChannelType();
 
-        if (type == expectedType && expectedType != nullptr) return; // No conversion necessary
-        if (m_rules->checkConversion(type, expectedType)) return; // Conversion is valid
+        if (type == expectedType && expectedType != nullptr) return; // no conversion necessary
+        if (m_rules->checkConversion(type, expectedType)) return; // conversion is valid
 
-        // Conversion is invalid
+        // conversion is invalid
         IrCompilationUnit *unit = getParentUnit();
 
-        // Errors for inputs/outputs differ only in code but are fundamentally the same
+        // errors for inputs/outputs differ only in code but are fundamentally the same
         if (m_direction == Direction::Input ||
             m_direction == Direction::Modify ||
             m_direction == Direction::Output)
@@ -344,7 +344,7 @@ void piranha::IrAttributeDefinition::_resolveDefinitions() {
     const IrTokenInfo_string &libraryToken = m_typeInfo.data[0];
     const IrTokenInfo_string &typeToken = m_typeInfo.data[1];
 
-    // No action is needed if a type wasn't specified
+    // no action is needed if a type wasnt specified
     if (!typeToken.specified) return;
 
     const std::string &type = typeToken.data;
@@ -357,14 +357,14 @@ void piranha::IrAttributeDefinition::_resolveDefinitions() {
             definition = unit->resolveNodeDefinition(type, &definitionCount, library);
         }
         else {
-            // Adding an empty library name means that the local scope must strictly be used
+            // adding an empty library name means that the local scope must strictly be used
             definition = unit->resolveLocalNodeDefinition(type, &definitionCount);
         }
     }
     else definition = unit->resolveNodeDefinition(type, &definitionCount, "");
 
     if (definitionCount > 0) {
-        // TODO: log a warning when a node type is ambiguous
+        // todo log a warning when a node type is ambiguous
     }
 
     if (definition == nullptr) {
@@ -385,7 +385,7 @@ piranha::Node *piranha::IrAttributeDefinition::_generateNode(
         m_direction == Direction::Output &&
         m_defaultValue == nullptr)
     {
-        // This must be an interface
+        // this must be an interface
         Node *interfaceNode = context
             ->getContext()
             ->_generateNode(context->getParent(), program, container)
@@ -410,7 +410,7 @@ piranha::NodeOutput *piranha::IrAttributeDefinition::_generateNodeOutput(
         m_direction == Direction::Output &&
         m_defaultValue == nullptr)
     {
-        // This must be an interface
+        // this must be an interface
         return context
             ->getContext()
             ->generateNode(context->getParent(), program, container)

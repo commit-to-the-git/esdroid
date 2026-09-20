@@ -15,7 +15,7 @@ dbasic::Console::Console() {
     m_bufferWidth = 0;
     m_bufferHeight = 0;
 
-    // Resetting settings
+    // resetting settings
     m_buffer = nullptr;
 
     m_engine = nullptr;
@@ -204,7 +204,7 @@ void dbasic::Console::DrawBoundText(const char *text, int width, int height,
 
     while (text[i]) {
         if (text[i] != '\n') {
-            // Check boundaries
+            // check boundaries
             if (currentColumn >= xOffset && currentColumn < xOffset + width) {
                 if (currentLine >= yOffset && currentLine < yOffset + height) {
                     OutputChar(text[i], 1);
@@ -260,7 +260,7 @@ int dbasic::Console::GetTotalNotWhitespace() const {
     return n;
 }
 
-// Drawing shapes
+// drawing shapes
 
 void dbasic::Console::DrawHorizontalLine(int length) {
     RealignLocation();
@@ -306,7 +306,7 @@ void dbasic::Console::DrawLineRectangle(int width, int height) {
     OutputChar(217, 1);
 }
 
-// Utilities
+// utilities
 
 int dbasic::Console::FindEndOfNextWord(const char *text, int location) {
     while (text[location] != '\0') {

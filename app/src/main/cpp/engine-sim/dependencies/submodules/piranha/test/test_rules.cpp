@@ -31,7 +31,7 @@ TestRules::~TestRules() {
 }
 
 void TestRules::registerBuiltinNodeTypes() {
-    // Builtin Types
+    // builtin types
     registerBuiltinType<piranha::ChannelNode>(
         "__piranha__int", &piranha::FundamentalType::IntType);
     registerBuiltinType<piranha::ChannelNode>(
@@ -80,7 +80,7 @@ void TestRules::registerBuiltinNodeTypes() {
     registerBuiltinType<piranha::OperationNodeSpecialized<
         piranha::native_vector, piranha::AddOperationNodeOutput>>("__piranha__vector_divide");
 
-    // Unary operations
+    // unary operations
     registerBuiltinType<piranha::NumNegateOperationNode<piranha::native_int>>("__piranha__int_negate");
     registerBuiltinType<piranha::NumNegateOperationNode<piranha::native_float>>("__piranha__float_negate");
     registerBuiltinType<piranha::NumNegateOperationNode<piranha::native_vector>>("__piranha__vector_negate");
@@ -107,13 +107,13 @@ void TestRules::registerBuiltinNodeTypes() {
     registerBuiltinType<piranha::ConsoleOutputNode>("__piranha__console_out");
     registerBuiltinType<piranha::ConsoleInputNode>("__piranha__console_in");
 
-    // Literals
+    // literals
     registerLiteralType(piranha::LiteralType::String, "__piranha__literal_string");
     registerLiteralType(piranha::LiteralType::Integer, "__piranha__literal_int");
     registerLiteralType(piranha::LiteralType::Float, "__piranha__literal_float");
     registerLiteralType(piranha::LiteralType::Boolean, "__piranha__literal_bool");
 
-    // Conversions
+    // conversions
     registerConversion(
         { &piranha::FundamentalType::StringType, &piranha::FundamentalType::FloatType },
         "__piranha__string_to_float"
@@ -127,9 +127,9 @@ void TestRules::registerBuiltinNodeTypes() {
         "__piranha__int_to_float"
     );
 
-    // Operations
+    // operations
 
-    // ADD
+    // add
     registerOperator(
         { piranha::IrBinaryOperator::Operator::Add, &piranha::FundamentalType::IntType, &piranha::FundamentalType::IntType },
         "__piranha__int_add"
@@ -151,7 +151,7 @@ void TestRules::registerBuiltinNodeTypes() {
         "__piranha__vector_add"
     );
 
-    // SUBTRACT
+    // subtract
     registerOperator(
         { piranha::IrBinaryOperator::Operator::Sub, &piranha::FundamentalType::IntType, &piranha::FundamentalType::IntType },
         "__piranha__int_subtract"
@@ -169,7 +169,7 @@ void TestRules::registerBuiltinNodeTypes() {
         "__piranha__vector_subtract"
     );
 
-    // MULTIPLY
+    // multiply
     registerOperator(
         { piranha::IrBinaryOperator::Operator::Mul, &piranha::FundamentalType::IntType, &piranha::FundamentalType::IntType },
         "__piranha__int_multiply"
@@ -187,7 +187,7 @@ void TestRules::registerBuiltinNodeTypes() {
         "__piranha__vector_multiply"
     );
 
-    // DIVIDE
+    // divide
     registerOperator(
         { piranha::IrBinaryOperator::Operator::Div, &piranha::FundamentalType::IntType, &piranha::FundamentalType::IntType },
         "__piranha__int_divide"
@@ -205,9 +205,9 @@ void TestRules::registerBuiltinNodeTypes() {
         "__piranha__vector_divide"
     );
 
-    // Unary operations
+    // unary operations
 
-    // POSITIVE
+    // positive
     registerUnaryOperator(
         { piranha::IrUnaryOperator::Operator::Positive, &piranha::FundamentalType::IntType },
         "__piranha__int_positive"
@@ -221,7 +221,7 @@ void TestRules::registerBuiltinNodeTypes() {
         "__piranha__vector_positive"
     );
 
-    // NEGATE
+    // negate
     registerUnaryOperator(
         { piranha::IrUnaryOperator::Operator::NumericNegate, &piranha::FundamentalType::IntType },
         "__piranha__int_negate"
@@ -235,7 +235,7 @@ void TestRules::registerBuiltinNodeTypes() {
         "__piranha__vector_negate"
     );
 
-    // INVERT
+    // invert
     registerUnaryOperator(
         { piranha::IrUnaryOperator::Operator::BoolNegate, &piranha::FundamentalType::BoolType },
         "__piranha__bool_negate"

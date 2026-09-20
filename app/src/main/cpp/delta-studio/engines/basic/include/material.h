@@ -77,4 +77,4 @@ namespace dbasic {
 
 } /* namespace dbasic */
 
-#endif /* DELTA_BASIC_MATERIAL_H */
+#endif /* DELTA_BASIC_MATERIAL_H  */

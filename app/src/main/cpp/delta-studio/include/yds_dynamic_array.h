@@ -66,7 +66,7 @@ public:
 
         m_array[m_nObjects] = ysAllocator::TypeAllocate<TYPE, 1>();
 
-        // Cast to a standard array element
+        // cast to a standard array element
         ysDynamicArrayElement *sElement = static_cast<ysDynamicArrayElement *>(m_array[m_nObjects]);
         sElement->SetAlignment(1);
         sElement->SetIndex(m_nObjects);
@@ -79,7 +79,7 @@ public:
 
         m_array[m_nObjects] = type;
 
-        // Cast to a standard array element
+        // cast to a standard array element
         ysDynamicArrayElement *sElement = static_cast<ysDynamicArrayElement *>(m_array[m_nObjects]);
         sElement->SetIndex(m_nObjects);
 
@@ -89,14 +89,14 @@ public:
     void Add(TYPE *type, int offset) {
         if (m_nObjects >= m_maxSize) Extend();
 
-        // Make room
+        // make room
         for (int i = m_nObjects; i > offset; i--) {
             m_array[i] = m_array[i - 1];
         }
 
         m_array[offset] = type;
 
-        // Cast to a standard array element
+        // cast to a standard array element
         ysDynamicArrayElement *sElement = static_cast<ysDynamicArrayElement *>(m_array[offset]);
         sElement->SetIndex(offset);
 
@@ -104,14 +104,14 @@ public:
     }
 
     void Move(TYPE *type, int offset) {
-        // Make room
+        // make room
         for (int i = m_nObjects - 1; i > offset; i--) {
             m_array[i] = m_array[i - 1];
         }
 
         m_array[offset] = type;
 
-        // Cast to a standard array element
+        // cast to a standard array element
         ysDynamicArrayElement *sElement = static_cast<ysDynamicArrayElement *>(m_array[offset]);
         sElement->SetIndex(offset);
     }
@@ -122,7 +122,7 @@ public:
 
         T_Create *newObject = ysAllocator::TypeAllocate<T_Create, Alignment>();
 
-        // Cast to a standard array element
+        // cast to a standard array element
         ysDynamicArrayElement *sElement = static_cast<ysDynamicArrayElement *>(newObject);
         sElement->SetAlignment(Alignment);
         sElement->SetIndex(m_nObjects);
@@ -156,7 +156,7 @@ public:
                     sElement->SetIndex(i);
                 }
 
-                // Just as a precaution
+                // just as a precaution
                 m_array[m_nObjects - 1] = nullptr;
             }
         }
@@ -164,7 +164,7 @@ public:
             m_array[index] = replacement;
         }
 
-        // Cast to a standard array element
+        // cast to a standard array element
         if (m_array[index]) {
             ysDynamicArrayElement *sElement = static_cast<ysDynamicArrayElement *>(m_array[index]);
             sElement->SetIndex(index);
@@ -229,4 +229,4 @@ protected:
     int m_nObjects;
 };
 
-#endif /* YDS_DYNAMIC_ARRAY_H */
+#endif /* YDS_DYNAMIC_ARRAY_H  */

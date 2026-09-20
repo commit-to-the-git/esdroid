@@ -21,7 +21,7 @@ ysError dbasic::AnimationExportFile::Open(const wchar_t *fname, Mode mode) {
     if (!m_file.is_open()) return YDS_ERROR_RETURN(ysError::CouldNotOpenFile);
 
     if (mode == Mode::Read) {
-        // Read header
+        // read header
         ExportFileHeader header;
         m_file.read((char *)&header, sizeof(ExportFileHeader));
 
@@ -76,7 +76,7 @@ ysError dbasic::AnimationExportFile::WriteObjectAnimationData(AnimationExportDat
     if (objectAnimationData == NULL) return YDS_ERROR_RETURN(ysError::InvalidParameter);
     if (m_openMode != Mode::Write) return YDS_ERROR_RETURN(ysError::InvalidOperation);
 
-    // Write Keys First
+    // write keys first
     KeyframeSectionHeader keyHeader;
     keyHeader.KeyframeCount = objectAnimationData->GetKeyCount();
 
@@ -93,7 +93,7 @@ ysError dbasic::AnimationExportFile::WriteObjectAnimationData(AnimationExportDat
         m_file.write((char *)keyData->GetKeyBuffer(), sizeof(ObjectKeyframeDataExport::KEY_DATA) * (std::streamsize)keyData->GetKeyCount());
     }
 
-    // Write Poses
+    // write poses
     int poseCount = objectAnimationData->GetPoseCount();
 
     PoseSectionHeader poseSectionHeader;
@@ -111,7 +111,7 @@ ysError dbasic::AnimationExportFile::WriteObjectAnimationData(AnimationExportDat
         m_file.write((char *)&poseHeader, sizeof(PoseOutputHeader));
     }
 
-    // Write motions
+    // write motions
     int motionCount = objectAnimationData->GetMotionCount();
 
     MotionSectionHeader motionSectionHeader;
@@ -140,7 +140,7 @@ ysError dbasic::AnimationExportFile::ReadObjectAnimationData(AnimationExportData
     if (objectAnimationData == NULL) return YDS_ERROR_RETURN(ysError::InvalidParameter);
     if (m_openMode != Mode::Read) return YDS_ERROR_RETURN(ysError::InvalidOperation);
 
-    // Read Keys First
+    // read keys first
     KeyframeSectionHeader keyHeader;
 
     m_file.read((char *)&keyHeader, sizeof(KeyframeSectionHeader));
@@ -162,7 +162,7 @@ ysError dbasic::AnimationExportFile::ReadObjectAnimationData(AnimationExportData
         if (!m_file) return YDS_ERROR_RETURN(ysError::CorruptedFile);
     }
 
-    // Read Poses
+    // read poses
 
     PoseSectionHeader poseSectionHeader;
     m_file.read((char *)&poseSectionHeader, sizeof(PoseSectionHeader));
@@ -178,7 +178,7 @@ ysError dbasic::AnimationExportFile::ReadObjectAnimationData(AnimationExportData
         PoseExport *newPose = objectAnimationData->AddPose(poseHeader.PoseName, poseHeader.Frame);
     }
 
-    // Read motions
+    // read motions
 
     MotionSectionHeader motionSectionHeader;
 

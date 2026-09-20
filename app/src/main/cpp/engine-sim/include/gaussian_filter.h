@@ -31,4 +31,4 @@ class GaussianFilter {
         double m_inv_r;
 };
 
-#endif /* ATG_ENGINE_SIM_GAUSSIAN_FILTER_H */
+#endif /* ATG_ENGINE_SIM_GAUSSIAN_FILTER_H  */

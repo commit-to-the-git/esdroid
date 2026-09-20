@@ -55,4 +55,4 @@ class IgnitionModule : public Part {
         double m_limiterDuration;
 };
 
-#endif /* ATG_ENGINE_SIM_IGNITION_MODULE_H */
+#endif /* ATG_ENGINE_SIM_IGNITION_MODULE_H  */

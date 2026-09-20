@@ -8,6 +8,6 @@ namespace constants {
     constexpr double root_2 = 1.41421356237309504880168872420969807856967187537694807317667973799;
     constexpr double e = 2.71828182845904523536028747135266249775724709369995;
 
-} /* namespace Constants */
+} /* namespace constants */
 
-#endif /* ATG_ENGINE_SIM_CONSTANTS_H */
+#endif /* ATG_ENGINE_SIM_CONSTANTS_H  */

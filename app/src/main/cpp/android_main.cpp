@@ -38,12 +38,12 @@
 #define LOGE(...) ((void)__android_log_print(ANDROID_LOG_ERROR, "ESDroid", __VA_ARGS__))
 
 extern "C" void esdroid_pre_main(android_app*);
+extern "C" void esdroid_render_loading_frame();
 
 static std::string g_logDir;
 static int g_logFd = -1;
 
-// One append mode fd, one write() per line. Safe from any thread and
-// from the signal handler: no stdio locks, no heap.
+// one fd one write per line so any thread and the signal handler can log
 static void log_write(const char* text, size_t len) {
     if (g_logFd >= 0) {
         ssize_t ignored = write(g_logFd, text, len);
@@ -99,9 +99,7 @@ static void initCrashLogger() {
     g_logDir = "/data/data/com.esdroid.engine_sim/wtflogs";
     mkdir("/data/data/com.esdroid.engine_sim", 0755);
     mkdir(g_logDir.c_str(), 0755);
-    // Fresh log every run. piranha_errors.log is rewritten by every script
-    // compile; java_crash.log and last_logcat.txt are managed on the Java
-    // side and left alone.
+    // fresh log every run the other log files are managed elsewhere
     std::string path = g_logDir + "/wtfhappened.log";
     remove(path.c_str());
     std::string errPath = g_logDir + "/piranha_errors.log";
@@ -113,7 +111,7 @@ static void initCrashLogger() {
     }
 }
 
-// Writes only through write() so it stays usable from a signal handler.
+// write only so the signal handler can use it
 static void crash_handler(int sig, siginfo_t* info, void*) {
     const char* signame = "UNKNOWN";
     switch (sig) {
@@ -156,8 +154,7 @@ static void terminate_handler() {
     abort();
 }
 
-// No crash line and no exit line means an external kill (SIGKILL, ANR,
-// low memory); nothing in process can record that.
+// no crash and no exit line means an outside kill sigkill anr or low memory
 static void atexit_handler() {
     const char* msg = "=== process exited normally (atexit) ===\n";
     log_write(msg, strlen(msg));
@@ -211,6 +208,7 @@ static void extractAssets(android_app* app, const std::string& destBase) {
     if (!mgr) return;
     wtflog("Extracting assets to: %s", destBase.c_str());
     copyAllAssets(mgr, "", destBase);
+    esdroid_render_loading_frame();
     const char* subdirs[] = {
         "engines", "engines/atg-video-1", "engines/atg-video-2",
         "engines/audi", "engines/bmw", "engines/chevrolet", "engines/kohler",
@@ -227,8 +225,11 @@ static void extractAssets(android_app* app, const std::string& destBase) {
         "es/types", "es/utilities",
         nullptr
     };
-    for (int i = 0; subdirs[i]; ++i)
+    for (int i = 0; subdirs[i]; ++i) {
         copyAllAssets(mgr, subdirs[i], destBase + "/" + subdirs[i]);
+        // keep the loading screen moving while the assets copy
+        esdroid_render_loading_frame();
+    }
     wtflog("Asset extraction complete");
 }
 
@@ -247,7 +248,7 @@ static void waitForWindow(android_app* app) {
     wtflog("Window ready: %p", app->window);
 }
 
-// Poll Android events to prevent ANR during long operations
+// poll android events to prevent anr during long operations
 static void pollEvents() {
     android_app* app = esdroid::AndroidBackend::getAndroidApp();
     if (!app) return;
@@ -263,9 +264,8 @@ static EngineSimApplication* createApplication(android_app* app) {
     EngineSimApplication* application = new EngineSimApplication();
     try {
         application->initialize(reinterpret_cast<void*>(app), ysContextObject::DeviceAPI::OpenGL4_0);
-        // initialize() returns early on core failures (e.g. CreateGameWindow).
-        // Such an app has no window or device and destroy() skips its
-        // teardown; return null so the caller never touches it.
+        // initialize returns early on failure return null so the caller
+        // never touches the half built app
         if (!application->isCoreReady()) {
             wtflog("  initialize() aborted, core not ready, engine present: %s",
                 application->hasEngine() ? "yes" : "no");
@@ -286,9 +286,8 @@ extern "C" void android_main(struct android_app* app) {
     installCrashHandlers();
     wtflog("=== android_main START ===");
 
-    // The native_app_glue thread has a 16MB stack (see
-    // android_native_app_glue.c); the looper needs this thread for
-    // window/input events.
+    // this thread has a 16mb stack and owns the looper for window and
+    // input events
 
     wtflog("Step 1: esdroid_pre_main");
     esdroid_pre_main(app);
@@ -306,12 +305,16 @@ extern "C" void android_main(struct android_app* app) {
     waitForWindow(app);
     if (app->window == nullptr) { wtflog("FATAL: No window"); if(g_logFd>=0){close(g_logFd);g_logFd=-1;} return; }
 
-    wtflog("Step 5: Extract assets");
+    wtflog("Step 5: Init EGL");
+    if (!esdroid::AndroidBackend::instance().isWindowReady()) esdroid::AndroidBackend::instance().initWindow(0, 0);
+    // first loading frame so the screen is never dead black past this point
+    esdroid_render_loading_frame();
+
+    wtflog("Step 6: Extract assets");
     std::string filesDir = esdroid::AndroidBackend::instance().filesDir();
     if (filesDir.empty()) { filesDir = "/data/data/com.esdroid.engine_sim/files"; esdroid::AndroidBackend::instance().setFilesDir(filesDir); }
     std::string assetsDest = filesDir + "/assets";
-    // Extract only when the assets dir is missing or empty, otherwise every
-    // launch would recompile the scripts.
+    // extract only when missing so every launch does not recompile
     bool needExtract = true;
     DIR *dir = opendir(assetsDest.c_str());
     if (dir) {
@@ -333,12 +336,10 @@ extern "C" void android_main(struct android_app* app) {
         wtflog("Assets already extracted, skipping");
     }
 
-    wtflog("Step 6: Init EGL");
-    if (!esdroid::AndroidBackend::instance().isWindowReady()) esdroid::AndroidBackend::instance().initWindow(0, 0);
     wtflog("Step 7: Init audio");
     esdroid::AndroidBackend::instance().initAudio(44100, 1);
 
-    // Imports are per session, remove any leftover from a previous run.
+    // imports are per session remove any leftover from a previous run
     {
         std::string staleFiles[] = {
             filesDir + "/assets/imported.mr",
@@ -356,7 +357,7 @@ extern "C" void android_main(struct android_app* app) {
         EngineSimApplication* application = createApplication(app);
         if (application == nullptr) break;
 
-        // An imported engine that failed to compile falls back to the default one
+        // an imported engine that failed to compile falls back to the default one
         if (!application->hasEngine() &&
                 esdroid::AndroidBackend::instance().activeMrPath() != "assets/main.mr") {
             wtflog("Imported engine failed to load, falling back to the default engine");
@@ -369,7 +370,7 @@ extern "C" void android_main(struct android_app* app) {
             if (application == nullptr) break;
         }
 
-        // Touch UI overlay, drawn on top of the engine.
+        // touch ui overlay drawn on top of the engine
         esdroid::AndroidBackend::instance().initTouchUI();
         wtflog("Touch UI initialized");
 
@@ -383,7 +384,7 @@ extern "C" void android_main(struct android_app* app) {
         wtflog("run() finished, restart requested: %s", restart ? "yes" : "no");
 
         if (restart && !esdroid::AndroidBackend::instance().shouldQuit()) {
-            // Log the imported file size; an empty copy should be visible.
+            // log the imported file size
             {
                 std::string candidates[] = {
                     filesDir + "/assets/imported.mr",
@@ -400,8 +401,7 @@ extern "C" void android_main(struct android_app* app) {
                 }
                 if (!logged) wtflog("Imported engine file not found in either known location");
             }
-            // The picker may still be closing; wait for the window before
-            // rebuilding so teardown runs with a live GL context.
+            // wait for the window so teardown runs with a live gl context
             wtflog("Restart requested, waiting for the window");
             waitForWindow(app);
             if (esdroid::AndroidBackend::instance().shouldQuit() || app->window == nullptr) {
@@ -411,6 +411,8 @@ extern "C" void android_main(struct android_app* app) {
             else {
                 if (!esdroid::AndroidBackend::instance().isWindowReady())
                     esdroid::AndroidBackend::instance().initWindow(0, 0);
+                // the import rebuild starts with the loading screen up
+                esdroid_render_loading_frame();
                 esdroid::AndroidBackend::instance().resetAudioRing();
                 esdroid::AndroidBackend::instance().clearAllKeys();
                 pollEvents();
@@ -423,8 +425,8 @@ extern "C" void android_main(struct android_app* app) {
         catch (...) { wtflog("UNKNOWN EXCEPTION in destroy()"); }
         delete application;
 
-        // Teardown may take the EGL surface down with it; bring it back
-        // before the next application builds against it.
+        // bring the egl surface back before the next application builds
+        // against it
         if (restart && !esdroid::AndroidBackend::instance().shouldQuit()
                 && app->window != nullptr
                 && !esdroid::AndroidBackend::instance().isWindowReady()) {

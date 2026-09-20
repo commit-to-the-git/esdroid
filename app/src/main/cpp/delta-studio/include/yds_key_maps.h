@@ -14,4 +14,4 @@ protected:
     static ysKey::Code *m_windowsKeyMap;
 };
 
-#endif /* YDS_KEY_MAPS_H */
+#endif /* YDS_KEY_MAPS_H  */

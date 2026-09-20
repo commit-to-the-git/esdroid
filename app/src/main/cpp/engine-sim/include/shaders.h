@@ -51,4 +51,4 @@ class Shaders : public dbasic::ShaderBase {
         dbasic::LightingControls m_lightingControls;
 };
 
-#endif /* ATG_ENGINE_SIM_SHADERS_H */
+#endif /* ATG_ENGINE_SIM_SHADERS_H  */

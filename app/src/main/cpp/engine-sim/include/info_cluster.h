@@ -28,4 +28,4 @@ protected:
     std::string m_logMessage;
 };
 
-#endif /* ATG_ENGINE_SIM_INFO_CLUSTER_H */
+#endif /* ATG_ENGINE_SIM_INFO_CLUSTER_H  */

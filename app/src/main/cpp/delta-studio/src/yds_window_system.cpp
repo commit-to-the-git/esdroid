@@ -42,10 +42,10 @@ ysWindowSystem::ysWindowSystem(Platform platform) : ysWindowSystemObject("WINDOW
 }
 
 ysWindowSystem::~ysWindowSystem() {
-    // Clear the singleton so a new window system can be created after this
-    // one is destroyed. Without this a stale pointer blocks every later
-    // CreateWindowSystem call with MultipleErrorSystems, which broke the
-    // stop and rebuild flow used for imported engines.
+    // clear the singleton so a new window system can be created after this
+    // one is destroyed without this a stale pointer blocks every later
+    // createwindowsystem call with multipleerrorsystems which broke the
+    // stop and rebuild flow used for imported engines
     if (g_instance == this) { g_instance = nullptr; }
 }
 

@@ -4,18 +4,18 @@
 #include "constants.h"
 
 namespace units {
-    // Force
+    // force
     constexpr double N = 1.0;
 
     constexpr double lbf = N * 4.44822;
 
-    // Mass
+    // mass
     constexpr double kg = 1.0;
     constexpr double g = kg / 1000.0;
 
     constexpr double lb = 0.45359237 * kg;
 
-    // Distance
+    // distance
     constexpr double m = 1.0;
     constexpr double cm = m / 100.0;
     constexpr double mm = m / 1000.0;
@@ -26,21 +26,21 @@ namespace units {
     constexpr double thou = inch / 1000.0;
     constexpr double mile = m * 1609.344;
 
-    // Time
+    // time
     constexpr double sec = 1.0;
     constexpr double minute = 60 * sec;
     constexpr double hour = 60 * minute;
 
-    // Torque
+    // torque
     constexpr double Nm = N * m;
     constexpr double ft_lb = foot * lbf;
 
-    // Power
+    // power
     constexpr double W = Nm / sec;
     constexpr double kW = W * 1000.0;
     constexpr double hp = 745.699872 * W;
 
-    // Volume
+    // volume
     constexpr double m3 = 1.0;
     constexpr double cc = cm * cm * cm;
     constexpr double mL = cc;
@@ -49,21 +49,21 @@ namespace units {
     constexpr double cubic_inches = inch * inch * inch;
     constexpr double gal = 3.785411784 * L;
 
-    // Molecular
+    // molecular
     constexpr double mol = 1.0;
     constexpr double kmol = mol / 1000.0;
     constexpr double mmol = mol / 1000000.0;
     constexpr double lbmol = mol * 453.59237;
 
-    // Flow-rate (moles)
+    // flow-rate moles
     constexpr double mol_per_sec = mol / sec;
     constexpr double scfm = 0.002641 * lbmol / minute;
 
-    // Area
+    // area
     constexpr double m2 = 1.0;
     constexpr double cm2 = cm * cm;
 
-    // Pressure
+    // pressure
     constexpr double Pa = 1.0;
     constexpr double kPa = Pa * 1000.0;
     constexpr double MPa = Pa * 1000000.0;
@@ -77,23 +77,23 @@ namespace units {
     constexpr double inHg = Pa * 3386.3886666666713;
     constexpr double inH2O = inHg * 0.0734824;
 
-    // Temperature
+    // temperature
     constexpr double K = 1.0;
     constexpr double K0 = 273.15;
     constexpr double C = K;
     constexpr double F = (5.0 / 9.0) * K;
     constexpr double F0 = -459.67;
 
-    // Energy
+    // energy
     constexpr double J = 1.0;
     constexpr double kJ = J * 1000;
     constexpr double MJ = J * 1000000;
 
-    // Angles
+    // angles
     constexpr double rad = 1.0;
     constexpr double deg = rad * (constants::pi / 180);
 
-    // Conversions
+    // conversions
     inline constexpr double distance(double v, double unit) {
         return v * unit;
     }
@@ -174,8 +174,8 @@ namespace units {
         return v * unit;
     }
 
-    // Physical Constants
+    // physical constants
     constexpr double AirMolecularMass = units::mass(28.97, units::g) / units::mol;
 };
 
-#endif /* ATG_ENGINE_SIM_UNITS_H */
+#endif /* ATG_ENGINE_SIM_UNITS_H  */

@@ -84,4 +84,4 @@ namespace dbasic {
 
 } /* namespace dbasic */
 
-#endif /* DELTA_BASIC_SCENE_OBJECT_ASSET_H */
+#endif /* DELTA_BASIC_SCENE_OBJECT_ASSET_H  */

@@ -23,4 +23,4 @@ class Dynamometer : public atg_scs::Constraint {
         bool m_enabled;
 };
 
-#endif /* ATG_ENGINE_SIM_DYNAMOMETER_H */
+#endif /* ATG_ENGINE_SIM_DYNAMOMETER_H  */

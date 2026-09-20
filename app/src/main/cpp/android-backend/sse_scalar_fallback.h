@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-// sse_scalar_fallback.h - Scalar SSE intrinsics for non-x86 platforms.
+// sse_scalar_fallback.h - scalar sse intrinsics for non-x86 platforms
 #ifndef SSE_SCALAR_FALLBACK_H
 #define SSE_SCALAR_FALLBACK_H
 #if defined(__x86_64__)||defined(_M_X64)||defined(__i386__)||defined(_M_IX86)
@@ -77,5 +77,5 @@ static inline void _mm_storeu_ps(float*p,__m128 a){_mm_store_ps(p,a);}
 static inline float _mm_cvtss_f32(__m128 a){return a.m128_f32[0];}
 static inline __m128 _mm_rcp_ps(__m128 a){__m128 r;for(int i=0;i<4;++i)r.m128_f32[i]=1.0f/a.m128_f32[i];return r;}
 static inline __m128 _mm_rsqrt_ps(__m128 a){__m128 r;for(int i=0;i<4;++i)r.m128_f32[i]=1.0f/sqrtf(a.m128_f32[i]);return r;}
-#endif // __x86_64__
-#endif // SSE_SCALAR_FALLBACK_H
+#endif //  __x86_64__
+#endif //  SSE_SCALAR_FALLBACK_H

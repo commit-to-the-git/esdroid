@@ -18,4 +18,4 @@ class AdaptiveVolumeFilter : public Filter {
         int m_lookahead;
 };
 
-#endif /* ATG_ENGINE_SIM_CONVOLUTION_ADAPTIVE_VOLUME */
+#endif /* ATG_ENGINE_SIM_CONVOLUTION_ADAPTIVE_VOLUME  */

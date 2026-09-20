@@ -54,4 +54,4 @@ namespace dbasic {
 
 } /* namespace dbasic */
 
-#endif /* DELTA_BASIC_SHADER_SET_H */
+#endif /* DELTA_BASIC_SHADER_SET_H  */

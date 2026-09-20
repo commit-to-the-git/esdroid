@@ -3,4 +3,4 @@
 
 #include "../../include/yds_core.h"
 
-#endif /* DELTA_PHYSICS_DELTA_CORE_H */
+#endif /* DELTA_PHYSICS_DELTA_CORE_H  */

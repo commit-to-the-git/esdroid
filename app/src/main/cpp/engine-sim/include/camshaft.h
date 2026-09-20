@@ -10,19 +10,19 @@ class Crankshaft;
 class Camshaft : public Part {
     public:
         struct Parameters {
-            // Number of lobes
+            // number of lobes
             int lobes;
 
-            // Camshaft advance in camshaft degrees
+            // camshaft advance in camshaft degrees
             double advance = 0;
 
-            // Corresponding crankshaft
+            // corresponding crankshaft
             Crankshaft *crankshaft;
 
-            // Lobe profile
+            // lobe profile
             Function *lobeProfile;
 
-            // Base radius
+            // base radius
             double baseRadius = units::distance(600, units::thou);
         };
 
@@ -54,4 +54,4 @@ class Camshaft : public Part {
         int m_lobes;
 };
 
-#endif /* ATG_ENGINE_SIM_CAMSHAFT_H */
+#endif /* ATG_ENGINE_SIM_CAMSHAFT_H  */

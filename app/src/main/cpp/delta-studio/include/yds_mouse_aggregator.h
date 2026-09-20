@@ -29,4 +29,4 @@ protected:
     ysExpandingArray<ysMouse *, 4> m_mice;
 };
 
-#endif /* YDS_MOUSE_AGGREGATOR_H */
+#endif /* YDS_MOUSE_AGGREGATOR_H  */

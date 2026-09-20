@@ -135,8 +135,8 @@ class ysAndroidMouse : public ysMouse {
 public:
     ysAndroidMouse();
     virtual ~ysAndroidMouse();
-    // Raw touch position, y-down, exactly what the window's ScreenToLocal
-    // expects as input (same as the raw cursor pos the desktop stores).
+    // raw touch position y-down exactly what the windows screentolocal
+    // expects as input same as the raw cursor pos the desktop stores
     virtual int GetOsPositionX() const override;
     virtual int GetOsPositionY() const override;
     virtual int GetX() const override;
@@ -160,4 +160,4 @@ private:
     void *m_bufferOwner=nullptr;
 };
 
-#endif // ESDROID_ANDROID_SHIM_H
+#endif //  ESDROID_ANDROID_SHIM_H

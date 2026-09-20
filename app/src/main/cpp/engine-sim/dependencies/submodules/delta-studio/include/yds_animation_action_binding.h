@@ -25,4 +25,4 @@ protected:
     ysAnimationAction *m_action;
 };
 
-#endif /* YDS_ANIMATION_ACTION_BINDING_H */
+#endif /* YDS_ANIMATION_ACTION_BINDING_H  */

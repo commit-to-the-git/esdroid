@@ -34,7 +34,7 @@ namespace piranha {
                 LiteralNode<NativeType> *literalNode =
                     static_cast<LiteralNode<NativeType> *>(newNode);
 
-                // Inject the literal data
+                // inject the literal data
                 literalNode->setData(m_literalData);
             }
 
@@ -54,4 +54,4 @@ namespace piranha {
 
 } /* namespace piranha */
 
-#endif /* PIRANHA_IR_LITERAL_NODE_H */
+#endif /* PIRANHA_IR_LITERAL_NODE_H  */

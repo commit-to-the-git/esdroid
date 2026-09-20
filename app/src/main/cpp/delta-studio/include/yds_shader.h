@@ -34,4 +34,4 @@ protected:
     ShaderType m_shaderType;
 };
 
-#endif /* YDS_SHADER_H */
+#endif /* YDS_SHADER_H  */

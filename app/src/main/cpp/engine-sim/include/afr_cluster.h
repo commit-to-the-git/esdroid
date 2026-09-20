@@ -28,4 +28,4 @@ class AfrCluster : public UiElement {
         LabeledGauge *m_exhaustAfrGauge;
 };
 
-#endif /* ATG_ENGINE_SIM_AFR_CLUSTER_H */
+#endif /* ATG_ENGINE_SIM_AFR_CLUSTER_H  */

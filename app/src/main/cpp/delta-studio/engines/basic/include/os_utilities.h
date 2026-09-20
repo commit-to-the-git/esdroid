@@ -9,4 +9,4 @@ namespace dbasic {
 
 } /* namespace dbasic */
 
-#endif /* DELTA_BASIC_OS_UTILITIES_H */
+#endif /* DELTA_BASIC_OS_UTILITIES_H  */

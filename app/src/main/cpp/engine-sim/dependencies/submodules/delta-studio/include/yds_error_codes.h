@@ -4,9 +4,9 @@
 enum class ysError {
     None,
 
-    // ------------------------------------------------------------------------------
-    // Programming Errors
-    // ------------------------------------------------------------------------------
+    //
+    // programming errors
+    //
 
     InvalidParameter,
     MultipleErrorSystems,
@@ -24,28 +24,28 @@ enum class ysError {
     UninitializedBuffer,
     OutOfBounds,
 
-    // Shaders
+    // shaders
     ProgramAlreadyLinked,
     ProgramNotLinked,
     ProgramLinkError,
 
-    // Contexts
+    // contexts
     ContextAlreadyHasRenderTarget,
 
     NoDevice,
     NoRenderTarget,
     NoContext,
 
-    // ------------------------------------------------------------------------------
-    // API Errors
-    // ------------------------------------------------------------------------------
+    //
+    // api errors
+    //
 
     CouldNotCreateGraphicsDevice,
     CouldNotObtainDevice,
 
     ApiError,
 
-    // DirectX Specific
+    // directx specific
     CouldNotCreateSwapChain,
 
     CouldNotEnterFullscreen,
@@ -53,7 +53,7 @@ enum class ysError {
 
     CouldNotCreateGpuBuffer,
 
-    // OpenGL specific
+    // opengl specific
     CouldNotActivateTemporaryContext,
     CouldNotActivateContext,
     CouldNotCreateTemporaryContext,
@@ -61,47 +61,47 @@ enum class ysError {
     CouldNotDestroyContext,
     BufferSwapError,
 
-    // Vulkan specific
+    // vulkan specific
     NoQueueFamilyFound,
 
-    // Render Targets
+    // render targets
     CouldNotGetBackBuffer,
     CouldNotCreateRenderTarget,
     CouldNotCreateDepthBuffer,
 
-    // Shaders
+    // shaders
     VertexShaderCompilationError,
     FragmentShaderCompilationError,
     CouldNotCreateShader, 
 
-    // Input Formats
+    // input formats
     IncompatibleInputFormat,
 
-    // Textures
+    // textures
     CouldNotOpenTexture,
     CouldNotMakeShaderResourceView,
 
-    // Testing
+    // testing
     TestError,
 
-    // Input System
+    // input system
     NoDeviceList,
     CouldNotRegisterForInput,
     NoWindowSystem,
 
-    // Audio System
+    // audio system
     BufferAlreadyLocked,
     BufferNotLocked,
 
-    // Streaming Audio
+    // streaming audio
     NoFile,
     NoAudioBuffer,
     NoFileBuffer,
     IncompatibleBufferAndFile,
 
-    // ------------------------------------------------------------------------------
-    // File Errors
-    // ------------------------------------------------------------------------------
+    //
+    // file errors
+    //
 
     CouldNotOpenFile,
     InvalidFileType,
@@ -130,4 +130,4 @@ enum class ysError {
     CouldNotCreateDS8DeviceOutOfMemory,
 };
 
-#endif /* YDS_ERROR_CODES_H */
+#endif /* YDS_ERROR_CODES_H  */

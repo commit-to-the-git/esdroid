@@ -22,4 +22,4 @@ class FeedbackCombFilter : public Filter {
         int M;
 };
 
-#endif /* ATG_ENGINE_SIM_FEEDBACK_COMB_FILTER_H */
+#endif /* ATG_ENGINE_SIM_FEEDBACK_COMB_FILTER_H  */

@@ -78,7 +78,7 @@ void dphysics::RigidBody::UpdateDerivedData(bool force) {
 }
 
 void dphysics::RigidBody::CheckAwake() {
-    // Determine if rigid body is awake
+    // determine if rigid body is awake
     ysVector d = ysMath::Sub(m_lastWorldPosition, Transform.GetWorldPosition());
     ysVector d2 = ysMath::Mask(ysMath::Mul(d, d), ysMath::Constants::MaskOffW);
 
@@ -211,7 +211,7 @@ void dphysics::RigidBody::AddTorqueLocal(const ysVector &torque) {
 }
 
 void dphysics::RigidBody::GenerateForces(float dt) {
-    //for (int j = 0; j < 8; ++j) {
+    // for int j = 0 j < 8 ++j {
         ClearAccumulators();
 
         int generatorCount = m_forceGenerators.GetNumObjects();
@@ -219,9 +219,9 @@ void dphysics::RigidBody::GenerateForces(float dt) {
             m_forceGenerators.Get(i)->GenerateForces(dt);
         }
 
-        //Integrate(dt);
-        //UpdateDerivedData();
-    //}
+        // integratedt
+        // updatederiveddata
+    // }
 }
 
 bool dphysics::RigidBody::CheckState() {

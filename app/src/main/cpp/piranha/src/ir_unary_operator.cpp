@@ -79,7 +79,7 @@ void piranha::IrUnaryOperator::_expand(IrContextTree *context) {
     IrCompilationUnit *parentUnit = getParentUnit();
     IrNodeDefinition *nodeDefinition = parentUnit->resolveBuiltinNodeDefinition(builtinType, &count);
 
-    // Generate the expansion
+    // generate the expansion
     IrAttribute *attribute = TRACK(new IrAttribute());
     attribute->setValue(TRACK(new IrInternalReference(m_operand, context)));
 

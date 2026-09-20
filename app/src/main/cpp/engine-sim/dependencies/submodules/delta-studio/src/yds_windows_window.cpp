@@ -295,7 +295,7 @@ int ysWindowsWindow::GetWindowsState(WindowState state) {
     }
 }
 
-// Abstraction Layer
+// abstraction layer
 
 void ysWindowsWindow::Close() {
     ysWindow::Close();

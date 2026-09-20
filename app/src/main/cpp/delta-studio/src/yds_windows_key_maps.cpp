@@ -50,7 +50,7 @@ const ysKey::Code *ysKeyMaps::GetWindowsKeyMap() {
         // 0 - 9 keys
         for (int i = 0; i < 10; ++i) m_windowsKeyMap[0x30 + i] = (ysKey::Code)((int)ysKey::Code::N0 + i);
 
-        // A - Z keys
+        // a - z keys
         for (int i = 0; i < 26; ++i) m_windowsKeyMap[0x41 + i] = (ysKey::Code)((int)ysKey::Code::A + i);
 
         m_windowsKeyMap[VK_LWIN] = ysKey::Code::LeftWin;
@@ -59,7 +59,7 @@ const ysKey::Code *ysKeyMaps::GetWindowsKeyMap() {
 
         m_windowsKeyMap[VK_SLEEP] = ysKey::Code::Sleep;
 
-        // Numpad keys
+        // numpad keys
         for (int i = 0; i < 10; ++i) m_windowsKeyMap[VK_NUMPAD0 + i] = (ysKey::Code)((int)ysKey::Code::Numpad0 + i);
 
         m_windowsKeyMap[VK_ADD] = ysKey::Code::Add;
@@ -69,7 +69,7 @@ const ysKey::Code *ysKeyMaps::GetWindowsKeyMap() {
         m_windowsKeyMap[VK_DIVIDE] = ysKey::Code::Divide;
         m_windowsKeyMap[VK_MULTIPLY] = ysKey::Code::Multiply;
 
-        // F keys
+        // f keys
         for (int i = 0; i < 24; ++i) m_windowsKeyMap[VK_F1 + i] = (ysKey::Code)((int)ysKey::Code::F1 + i);
 
         m_windowsKeyMap[VK_NUMLOCK] = ysKey::Code::NumLock;

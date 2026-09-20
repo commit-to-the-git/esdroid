@@ -20,7 +20,9 @@ import android.app.Dialog;
 import android.app.NativeActivity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -51,7 +53,7 @@ public class ESDroidActivity extends NativeActivity {
     private Dialog mValueDialog = null;
     private Typeface mSilk = null;
     private Typeface mSilkBold = null;
-    // Which import the picker result belongs to; set when the picker opens.
+    // which import the picker result belongs to
     private String mPickerKind = "engine";
 
     static {
@@ -65,11 +67,12 @@ public class ESDroidActivity extends NativeActivity {
         rotateJavaCrashLog(logDir);
         installCrashHandler(logDir);
         dumpLogcat(logDir);
-        // Imports are per session, every launch starts on the default engine.
+        // imports are per session every launch starts on the default engine
         deleteIfExists(new File(getFilesDir(), "assets/imported.mr"));
         deleteIfExists(new File(getFilesDir(), "assets/imported_main.mr"));
         deleteIfExists(new File(getFilesDir(), "assets/imported_theme.mr"));
         deleteIfExists(new File(getFilesDir(), "imported.mr"));
+        getWindow().setBackgroundDrawable(new ColorDrawable(Color.BLACK));
     }
 
     private void deleteIfExists(File file) {
@@ -83,7 +86,7 @@ public class ESDroidActivity extends NativeActivity {
         return new File(logDir, name);
     }
 
-    // Keep one generation of the previous java crash log.
+    // keep one generation of the previous java crash log
     private void rotateJavaCrashLog(File logDir) {
         try {
             File current = new File(logDir, "java_crash.log");
@@ -97,8 +100,7 @@ public class ESDroidActivity extends NativeActivity {
         }
     }
 
-    // Uncaught java exceptions leave no native signal; log them before the
-    // default handler runs.
+    // uncaught java exceptions leave no native signal so log them here
     private void installCrashHandler(final File logDir) {
         final Thread.UncaughtExceptionHandler previous = Thread.getDefaultUncaughtExceptionHandler();
         Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
@@ -116,8 +118,8 @@ public class ESDroidActivity extends NativeActivity {
         });
     }
 
-    // Dump logcat at every launch; the previous process's last lines are
-    // still in the buffer.
+    // dump logcat at every launch the previous process lines are still
+    // in the buffer
     private void dumpLogcat(final File logDir) {
         new Thread(new Runnable() {
             @Override
@@ -140,8 +142,7 @@ public class ESDroidActivity extends NativeActivity {
         }).start();
     }
 
-    // Plain file append into the native logger's file, no JNI, safe to call
-    // when native is in a bad state.
+    // plain file append into the native log file no jni
     private void jlog(String message) {
         try {
             File logDir = new File(getFilesDir().getParentFile(), "wtflogs");
@@ -163,7 +164,7 @@ public class ESDroidActivity extends NativeActivity {
     }
 
     private void startMrPicker(final String kind, final String title) {
-        // MUST run on UI thread, native code runs on a different thread
+        // must run on ui thread native code runs elsewhere
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -199,8 +200,7 @@ public class ESDroidActivity extends NativeActivity {
                 jlog("openInputStream returned null for " + uri);
                 return;
             }
-            // The copy lands in the extracted assets dir so the compiler
-            // resolves it through the default search paths.
+            // the copy lands in the assets dir so the compiler finds it
             File assetsDir = new File(getFilesDir(), "assets");
             assetsDir.mkdirs();
             boolean theme = "theme".equals(mPickerKind);
@@ -217,8 +217,8 @@ public class ESDroidActivity extends NativeActivity {
             in.close();
             Log.i(TAG, "Copied " + total + " bytes to " + outFile.getAbsolutePath());
             jlog("copied " + total + " bytes to " + outFile.getAbsolutePath());
-            // Throwable, not Exception: an UnsatisfiedLinkError must not
-            // kill the app here.
+            // throwable not exception an unsatisfiedlinkerror must not
+            // kill the app
             try {
                 if (theme) {
                     nativeOnThemePicked(outFile.getAbsolutePath());
@@ -239,11 +239,11 @@ public class ESDroidActivity extends NativeActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        // A dialog whose window dies with the pause cannot be dismissed later.
+        // a paused dialog cannot be dismissed later
         dismissValueDialog();
     }
 
-    // The same Silkscreen faces the native UI bakes, straight from assets.
+    // the same silkscreen the native ui bakes
     private Typeface silkFont(boolean bold) {
         try {
             if (bold) {
@@ -263,9 +263,8 @@ public class ESDroidActivity extends NativeActivity {
         }
     }
 
-    // Value entry for the settings panel. A real Dialog is used because it
-    // owns its own window: its buttons and the IME receive input normally
-    // over a NativeActivity, whose own input all goes to the native queue.
+    // value entry for the settings panel a real dialog owns its own
+    // window so its buttons and the ime work over the native input queue
     public void showValueInput(final int index, final String label, final String current) {
         runOnUiThread(new Runnable() {
             @Override
@@ -420,9 +419,8 @@ public class ESDroidActivity extends NativeActivity {
         }
     }
 
-    // "2000", "2000 HZ" and "60%" all commit: take the leading numeric
-    // run and ignore whatever follows it. Returns NaN when there is no
-    // number at all.
+    // 2000 2000 hz and 60% all commit take the leading numeric run and
+    // ignore the rest returns nan when there is no number
     private static double parseNumericPrefix(String s) {
         int end = 0;
         if (end < s.length() && (s.charAt(end) == '-' || s.charAt(end) == '+')) end++;

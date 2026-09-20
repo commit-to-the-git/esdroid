@@ -73,7 +73,7 @@ namespace piranha {
 
         IrAttribute *getAttribute(IrAttributeDefinition *definition, int *count = nullptr) const;
 
-        // Resolution stage
+        // resolution stage
     public:
         IrNodeDefinition *getDefinition() const { return m_definition; }
         void setDefinition(IrNodeDefinition *definition) { m_definition = definition; }
@@ -104,4 +104,4 @@ namespace piranha {
 
 } /* namespace piranha */
 
-#endif /* PIRANHA_IR_NODE_H */
+#endif /* PIRANHA_IR_NODE_H  */

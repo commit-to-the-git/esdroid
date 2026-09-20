@@ -21,4 +21,4 @@ namespace dphysics {
 
 } /* namespace dbasic */
 
-#endif /* DELTA_BASIC_EXPANDING_SPRING_H */
+#endif /* DELTA_BASIC_EXPANDING_SPRING_H  */

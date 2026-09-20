@@ -7,8 +7,8 @@ project(simple-2d-constraint-solver)
 
 set(CMAKE_CXX_STANDARD 11)
 
-# ========================================================
-# GTEST
+#
+# gtest
 
 include(FetchContent)
 FetchContent_Declare(
@@ -25,10 +25,10 @@ set_property(TARGET gmock_main PROPERTY FOLDER "gtest")
 set_property(TARGET gtest PROPERTY FOLDER "gtest")
 set_property(TARGET gtest_main PROPERTY FOLDER "gtest")
 
-# ========================================================
+#
 
 add_library(simple-2d-constraint-solver STATIC
-    # Source files
+    # source files
     src/fixed_rotation_constraint.cpp
     src/rigid_body_system.cpp
     src/matrix.cpp
@@ -61,7 +61,7 @@ add_library(simple-2d-constraint-solver STATIC
     src/rotation_friction_constraint.cpp
     src/simple_gear_constraint.cpp
 
-    # Header files
+    # header files
     include/fixed_rotation_constraint.h
     include/rigid_body_system.h
     include/matrix.h
@@ -96,12 +96,12 @@ add_library(simple-2d-constraint-solver STATIC
     include/simple_gear_constraint.h
 )
 
-# GTEST
+# gtest
 
 enable_testing()
 
 add_executable(simple-2d-constraint-solver-test
-    # Source files
+    # source files
     test/sanity_tests.cpp
     test/matrix_tests.cpp
     test/euler_ode_solver_tests.cpp
@@ -113,7 +113,7 @@ add_executable(simple-2d-constraint-solver-test
     test/sparse_matrix_tests.cpp
     test/conjugate_gradient_sle_solver_tests.cpp
 
-    # Header files
+    # header files
     test/utilities.h
 )
 

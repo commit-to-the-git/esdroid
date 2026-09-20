@@ -55,4 +55,4 @@ class RightGaugeCluster : public UiElement {
         bool m_isAbsolute;
 };
 
-#endif /* ATG_ENGINE_SIM_GAUGE_CLUSTER_H */
+#endif /* ATG_ENGINE_SIM_GAUGE_CLUSTER_H  */

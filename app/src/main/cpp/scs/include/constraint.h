@@ -52,4 +52,4 @@ namespace atg_scs {
     };
 } /* namespace atg_scs */
 
-#endif /* ATG_SIMPLE_2D_CONSTRAINT_SOLVER_CONSTRAINT_H */
+#endif /* ATG_SIMPLE_2D_CONSTRAINT_SOLVER_CONSTRAINT_H  */

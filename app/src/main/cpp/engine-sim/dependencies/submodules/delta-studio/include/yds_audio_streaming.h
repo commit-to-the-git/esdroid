@@ -36,4 +36,4 @@ protected:
     SampleOffset m_fileOffset;
 };
 
-#endif /* YDS_AUDIO_STREAMING_H */
+#endif /* YDS_AUDIO_STREAMING_H  */

@@ -29,7 +29,7 @@ public:
     ysError AttachErrorHandler(T_ErrorHandler **handler) {
         if (handler == nullptr) { return ysError::InvalidParameter; }
 
-        // Create the new handler
+        // create the new handler
         *handler = m_errorHandlers.NewGeneric<T_ErrorHandler>();
 
         return ysError::None;
@@ -80,4 +80,4 @@ private:
 
 #define YDS_ERROR_DECLARE(call) (call)
 
-#endif /* YDS_ERROR_SYSTEM_H */
+#endif /* YDS_ERROR_SYSTEM_H  */

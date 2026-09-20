@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-# Enable group projects in folders
+# enable group projects in folders
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER "cmake")
 
@@ -12,12 +12,12 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
 find_package(FFmpeg REQUIRED)
 
 add_library(direct-to-video
-    # Source files
+    # source files
     src/frame.cpp
     src/frame_queue.cpp
     src/encoder.cpp
 
-    # Include files
+    # include files
     include/dtv/frame.h
     include/dtv/ffmpeg.h
     include/dtv/frame_queue.h
@@ -26,10 +26,10 @@ add_library(direct-to-video
 )
 
 add_executable(direct-to-video-demo
-    # Source files
+    # source files
     demo/src/main.cpp
 
-    # Include files
+    # include files
     demo/include/dtv.h
 )
 

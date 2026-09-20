@@ -19,4 +19,4 @@ protected:
     bool m_isLinked;
 };
 
-#endif /* YDS_SHADER_PROGRAM_H */
+#endif /* YDS_SHADER_PROGRAM_H  */

@@ -44,9 +44,8 @@ class EngineSimApplication {
 
         bool restartRequested() const { return m_restartRequested; }
         bool hasEngine() const { return m_iceEngine != nullptr; }
-        // True once the engine core (window system, device, shaders) came up
-        // during initialize(). When false the application cannot run and
-        // destroy() skips teardown, callers must treat it as unusable.
+        // true once the core window system device and shaders came up
+        // when false destroy skips teardown
         bool isCoreReady() const { return m_coreReady; }
 
         void loadEngine(Engine *engine, Vehicle *vehicle, Transmission *transmission);
@@ -107,8 +106,8 @@ class EngineSimApplication {
         double m_targetSpeedSetting = 1.0;
 
 #if defined(__ANDROID__)
-        // What fraction of full throttle the touch THROTTLE button applies,
-        // driven by the settings panel (default 100%).
+        // what fraction of full throttle the touch throttle button applies
+        // driven by the settings panel default 100%
         double m_androidThrottleScale = 1.0;
 #endif
 
@@ -164,9 +163,8 @@ class EngineSimApplication {
 
         bool m_paused;
         bool m_restartRequested;
-        // True once CreateGameWindow succeeded. destroy() must not touch the
-        // engine when initialization bailed out early, everything would be
-        // null or half built.
+        // true once creategamewindow succeeded destroy must not touch
+        // a half built engine
         bool m_coreReady = false;
 
     protected:
@@ -204,7 +202,7 @@ class EngineSimApplication {
 
 #ifdef ATG_ENGINE_SIM_VIDEO_CAPTURE
         atg_dtv::Encoder m_encoder;
-#endif /* ATG_ENGINE_SIM_VIDEO_CAPTURE */
+#endif /* ATG_ENGINE_SIM_VIDEO_CAPTURE  */
 };
 
-#endif /* ATG_ENGINE_SIM_ENGINE_SIM_APPLICATION_H */
+#endif /* ATG_ENGINE_SIM_ENGINE_SIM_APPLICATION_H  */

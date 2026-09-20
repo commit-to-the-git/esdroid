@@ -97,7 +97,7 @@ void piranha::NodeProgram::initialize() {
 
     const int nodeCount = m_topLevelContainer.getNodeCount();
 
-    // Initialize all nodes
+    // initialize all nodes
     for (int i = 0; i < nodeCount; i++) {
 #if defined(__ANDROID__)
         if (i < 100 || i % 100 == 0) esdroid_wtflog("execute: node %d/%d", i, nodeCount);
@@ -138,12 +138,12 @@ bool piranha::NodeProgram::execute() {
 #endif
     const int nodeCount = m_topLevelContainer.getNodeCount();
 
-    // For backward compatibility
+    // for backward compatibility
     initialize();
 
     if (isKilled()) return true;
     
-    // Execute all nodes
+    // execute all nodes
     for (int i = 0; i < nodeCount; i++) {
 #if defined(__ANDROID__)
         if (i < 100 || i % 100 == 0) esdroid_wtflog("execute: node %d/%d", i, nodeCount);

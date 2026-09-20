@@ -176,18 +176,18 @@ void atg_scs::OptimizedNsvRigidBodySystem::processConstraints(
         m_iv.F_ext.set(0, i * 3 + 2, m_state.t[i]);
     }
 
-    // Calculate q_dot_prime
-    //  q_dot_prime = q_dot + M_inv * F_ext * dt
+    // calculate q_dot_prime
+    // q_dot_prime = q_dot + m_inv * f_ext * dt
     m_iv.F_ext.scale(dt, &m_iv.reg0);
     m_iv.reg0.leftScale(m_iv.M_inv, &m_iv.reg1);
     m_iv.reg1.add(m_iv.q_dot, &m_iv.q_dot_prime);
 
-    // Calculate b_err
-    //  b_err = (bias_factor / dt) * C
+    // calculate b_err
+    // b_err = bias_factor / dt * c
     m_iv.C.scale(m_biasFactor / dt, &m_iv.b_err);
 
-    // Calculate right side of linear equation
-    //  -(J * q_dot_prime + v_bias + b_err)
+    // calculate right side of linear equation
+    // -j * q_dot_prime + v_bias + b_err
     m_iv.J_sparse.multiply(m_iv.q_dot_prime, &m_iv.reg0);
     m_iv.reg0.add(m_iv.v_bias, &m_iv.reg1);
     m_iv.reg1.add(m_iv.b_err, &m_iv.reg0);
@@ -220,11 +220,11 @@ void atg_scs::OptimizedNsvRigidBodySystem::processConstraints(
 
     auto s2 = std::chrono::steady_clock::now();
 
-    // Constraint force derivation
-    //  R = J_T * lambda_scale
-    //  => transpose(J) * transpose(transpose(lambda_scale)) = R
-    //  => transpose(lambda_scale * J) = R
-    //  => transpose(J.leftScale(lambda_scale)) = R
+    // constraint force derivation
+    // r = j_t * lambda_scale
+    // => transposej * transposetransposelambda_scale = r
+    // => transposelambda_scale * j = r
+    // => transposej.leftscalelambda_scale = r
 
     m_iv.lambda.scale(1 / dt, &m_iv.reg0);
     m_iv.J_sparse.leftScale(m_iv.reg0, &m_iv.sreg0);

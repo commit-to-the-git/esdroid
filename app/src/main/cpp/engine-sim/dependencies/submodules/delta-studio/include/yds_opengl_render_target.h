@@ -20,4 +20,4 @@ protected:
     unsigned int m_textureHandle;
 };
 
-#endif /* YDS_OPENGL_RENDER_TARGET_H */
+#endif /* YDS_OPENGL_RENDER_TARGET_H  */

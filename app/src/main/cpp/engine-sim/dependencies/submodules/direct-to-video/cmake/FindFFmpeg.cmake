@@ -51,7 +51,7 @@ if(WIN32)
           "${VC_LIB_PATH_SUFFIX}/bin"
           "${VC_LIB_PATH_SUFFIX}/lib")
 elseif(UNIX)
-  #includes
+  # includes
   find_path(AVCODEC_INCLUDE_DIR libavcodec/avcodec.h
           PATHS
           /usr/local/include
@@ -69,7 +69,7 @@ elseif(UNIX)
           PATHS
           /usr/local/include
           /usr/include)
-  #libs
+  # libs
   find_library(AVCODEC_LIBRARY avcodec
           PATHS
           /usr/lib

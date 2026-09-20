@@ -66,4 +66,4 @@ class Fuel {
         Function *m_turbulenceToFlameSpeedRatio;
 };
 
-#endif /* ATG_ENGINE_FUEL_H */
+#endif /* ATG_ENGINE_FUEL_H  */

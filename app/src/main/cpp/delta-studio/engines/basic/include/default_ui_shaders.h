@@ -50,4 +50,4 @@ private:
 
 } /* namespace dbasic */
 
-#endif /* DELTA_BASIC_DEFAULT_UI_SHADERS_H */
+#endif /* DELTA_BASIC_DEFAULT_UI_SHADERS_H  */

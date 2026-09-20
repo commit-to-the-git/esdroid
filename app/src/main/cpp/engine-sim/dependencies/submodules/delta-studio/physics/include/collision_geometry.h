@@ -32,4 +32,4 @@ namespace dphysics {
 
 } /* namespace dbasic */
 
-#endif /* DELTA_BASIC_COLLISION_GEOMETRY_H */
+#endif /* DELTA_BASIC_COLLISION_GEOMETRY_H  */

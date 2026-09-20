@@ -16,4 +16,4 @@ public:
     int m_sampleRate;
 };
 
-#endif /* YDS_AUDIO_PARAMETERS_H */
+#endif /* YDS_AUDIO_PARAMETERS_H  */

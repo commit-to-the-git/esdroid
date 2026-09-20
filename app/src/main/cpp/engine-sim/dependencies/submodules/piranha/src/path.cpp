@@ -9,9 +9,9 @@ extern "C" void esdroid_wtflog(const char*,...);
 
 #if defined(__ANDROID__) || defined(__linux__)
 
-// std::filesystem is broken on Android < API 30.
-// We don't use it at all. m_path is void* (always nullptr).
-// Everything uses m_pathString.
+// std::filesystem is broken on android < api 30
+// we dont use it at all m_path is void* always nullptr
+// everything uses m_pathstring
 
 piranha::Path::Path() : m_path(nullptr), m_pathString("") {}
 piranha::Path::Path(const std::string &path) : m_path(nullptr), m_pathString(path) {}
@@ -64,7 +64,7 @@ void piranha::Path::setPath(const std::string &path) {
 }
 
 piranha::Path piranha::Path::canonicalize() const {
-    // Resolve . and .. in the path
+    // resolve and in the path
     std::string result;
     std::vector<std::string> parts;
     std::string current;
@@ -82,7 +82,7 @@ piranha::Path piranha::Path::canonicalize() const {
             current += m_pathString[i];
         }
     }
-    // Rebuild path
+    // rebuild path
     if (m_pathString[0] == '/') result = "/";
     for (size_t i = 0; i < parts.size(); ++i) {
         if (i > 0) result += "/";

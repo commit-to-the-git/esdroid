@@ -121,12 +121,12 @@ ysError dbasic::AssetManager::CompileSceneFile(const wchar_t *fname,
     if (toolFile.GetCompilationStatus() ==
                 ysToolGeometryFile::CompilationStatus::Compiled &&
         !force) {
-        // Check if the file actually exists
+        // check if the file actually exists
         struct _stat buffer;
         if (_wstat(total_path, &buffer) == 0) {
             YDS_NESTED_ERROR_CALL(toolFile.Close());
 
-            // File already exists, no compilation required
+            // file already exists no compilation required
             return YDS_ERROR_RETURN(ysError::None);
         }
     }
@@ -177,16 +177,16 @@ ysError dbasic::AssetManager::CompileSceneFile(const wchar_t *fname,
         YDS_NESTED_ERROR_CALL(exportFile.WriteObject(objects[i]));
     }
 
-    // Clear memory
+    // clear memory
     for (int i = 0; i < objectCount; i++) { delete objects[i]; }
 
     delete[] objects;
 
-    // Update compilation status
+    // update compilation status
     YDS_NESTED_ERROR_CALL(toolFile.UpdateCompilationStatus(
             ysToolGeometryFile::CompilationStatus::Compiled));
 
-    // Close files
+    // close files
     exportFile.Close();
     toolFile.Close();
 
@@ -216,12 +216,12 @@ ysError dbasic::AssetManager::CompileInterchangeFile(const wchar_t *fname,
     wcscat_s(completePath, 512, L".ysce");
 
     if (toolFile.GetCompilationStatus() && !force) {
-        // Check if the file actually exists
+        // check if the file actually exists
         struct _stat buffer;
         if (_wstat(completePath, &buffer) == 0) {
             YDS_NESTED_ERROR_CALL(toolFile.Close());
 
-            // File already exists, no compilation required
+            // file already exists no compilation required
             return YDS_ERROR_RETURN(ysError::None);
         }
     }
@@ -265,12 +265,12 @@ ysError dbasic::AssetManager::CompileInterchangeFile(const wchar_t *fname,
         YDS_NESTED_ERROR_CALL(exportFile.WriteObject(&objects[i]));
     }
 
-    // Clear memory
+    // clear memory
     delete[] objects;
 
-    // TODO: update compilation status
+    // todo update compilation status
 
-    // Close files
+    // close files
     exportFile.Close();
     toolFile.Close();
 
@@ -290,8 +290,8 @@ ysError dbasic::AssetManager::LoadSceneFile(const wchar_t *fname,
     CompiledHeader fileHeader;
     file.read((char *) &fileHeader, sizeof(CompiledHeader));
 
-    unsigned short *indicesFile = new unsigned short[16 * 1024 * 1024];// 1 MB
-    char *verticesFile = (char *) malloc(16 * 4 * 1024 * 1024);        // 4 MB
+    unsigned short *indicesFile = new unsigned short[16 * 1024 * 1024];// 1 mb
+    char *verticesFile = (char *) malloc(16 * 4 * 1024 * 1024);        // 4 mb
 
     if (indicesFile == nullptr) {
         if (verticesFile != nullptr) { free(verticesFile); }
@@ -340,7 +340,7 @@ ysError dbasic::AssetManager::LoadSceneFile(const wchar_t *fname,
 
             newObject->m_material = FindMaterial(header.ObjectMaterial);
 
-            // Load Object Transformation
+            // load object transformation
             ysVector translation = ysMath::LoadVector(header.Position, 1.0f);
             ysVector scale = ysMath::LoadVector(header.Scale);
 
@@ -412,7 +412,7 @@ ysError dbasic::AssetManager::LoadSceneFile(const wchar_t *fname,
         } else if (objectType == ysObjectData::ObjectType::Geometry) {
             modelIndexMap[i] = m_modelAssets.GetNumObjects();
 
-            // New model asset
+            // new model asset
             ModelAsset *newModelAsset = NewModelAsset();
 
             int vertexDataSize = header.VertexDataSize;
@@ -463,7 +463,7 @@ ysError dbasic::AssetManager::LoadSceneFile(const wchar_t *fname,
             currentIndexOffset += header.NumFaces * 3;
             currentVertexByteOffset += header.VertexDataSize;
 
-            // Load Object Transformation
+            // load object transformation
             ysVector translation = ysMath::LoadVector(header.Position);
             ysVector scale = ysMath::LoadVector(header.Scale);
 
@@ -674,7 +674,7 @@ dbasic::Skeleton *dbasic::AssetManager::BuildSkeleton(ModelAsset *model) {
 
     Skeleton *newSkeleton = m_skeletons.NewGeneric<Skeleton, 16>();
 
-    // Get the root bone
+    // get the root bone
     SceneObjectAsset *rootBoneReference = GetSceneObject(model->GetBoneMap(0));
     int nSceneObjects = GetSceneObjectCount();
     for (int i = 0; i < nSceneObjects; i++) {
@@ -750,7 +750,7 @@ dbasic::AssetManager::BuildRenderSkeleton(ysTransform *root,
     newNode->SetRestLocation(rootBone->GetPosition());
     newNode->SetRestOrientation(rootBone->GetLocalOrientation());
 
-    // Get the root bone
+    // get the root bone
     SceneObjectAsset *rootBoneReference = rootBone;
     ProcessRenderNode(rootBoneReference, newRenderSkeleton, nullptr, newNode);
 

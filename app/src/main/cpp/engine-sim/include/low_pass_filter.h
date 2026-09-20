@@ -30,4 +30,4 @@ class LowPassFilter : public Filter {
         float m_rc;
 };
 
-#endif /* ATG_ENGINE_SIM_LOW_PASS_FILTER_H */
+#endif /* ATG_ENGINE_SIM_LOW_PASS_FILTER_H  */

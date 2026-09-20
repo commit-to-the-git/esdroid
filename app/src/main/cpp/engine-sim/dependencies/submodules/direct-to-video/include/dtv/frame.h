@@ -20,4 +20,4 @@ public:
 };
 } /* namespace atg_dtv */
 
-#endif /* ATG_DIRECT_TO_VIDEO_FRAME_H */
+#endif /* ATG_DIRECT_TO_VIDEO_FRAME_H  */

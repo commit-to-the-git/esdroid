@@ -9,11 +9,11 @@ public:
     ysObject(const char *typeID);
     ~ysObject();
 
-//#ifdef _DEBUG
-//    void RaiseError(bool condition, const char *format, ...);
-//#else
-//#define RaiseError(condition, format, ...) ((void)0)
-//#endif
+// #ifdef _debug
+// void raiseerrorbool condition const char *format
+// #else
+// #define raiseerrorcondition format void0
+// #endif
 
     const char *GetTypeID() const { return m_typeID; }
 
@@ -21,7 +21,7 @@ protected:
     const char *m_typeID;
 };
 
-// TEMP
+// temp
 #include "yds_error_system.h"
 
-#endif /* YDS_BASE_H */
+#endif /* YDS_BASE_H  */

@@ -15,9 +15,9 @@ dphysics::ParticleSystem::~ParticleSystem() {
 }
 
 void dphysics::ParticleSystem::Update(float timeStep) {
-    // Phase I: Create new particles
+    // phase i create new particles
     float expected = m_rate * timeStep;
-    int n = (rand() % (100)) < 100; // Get a random number centered on the mean
+    int n = (rand() % (100)) < 100; // get a random number centered on the mean
 
     for (int i = 0; i < n; i++) {
         Particle *newParticle = m_particles.NewGeneric<Particle, 16>();
@@ -33,7 +33,7 @@ void dphysics::ParticleSystem::Update(float timeStep) {
         newParticle->m_density = ((rand() % 200 - 100) / 800.0f) + 0.2f;
     }
 
-    // Phase II: Delete dead particles
+    // phase ii delete dead particles
     int n_particles = GetParticleCount();
     for (int i = 0; i < n_particles; i++) {
         if (m_particles.Get(i)->GetAge() > m_particles.Get(i)->GetLife()) {
@@ -43,7 +43,7 @@ void dphysics::ParticleSystem::Update(float timeStep) {
         }
     }
 
-    // Phase III: Update all particles
+    // phase iii update all particles
     for (int i = 0; i < n_particles; i++) {
         m_particles.Get(i)->Update(timeStep);
     }

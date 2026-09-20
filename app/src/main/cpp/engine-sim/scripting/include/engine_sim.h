@@ -19,4 +19,4 @@
 #include "../../include/direct_throttle_linkage.h"
 #include "../../include/governor.h"
 
-#endif /* ATG_ENGINE_SIM_ENGINE_SIM_H */
+#endif /* ATG_ENGINE_SIM_ENGINE_SIM_H  */

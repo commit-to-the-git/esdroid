@@ -47,4 +47,4 @@ namespace piranha {
 
 } /* namespace piranha */
 
-#endif /* PIRANHA_FUNDAMENTAL_OUTPUT_H */
+#endif /* PIRANHA_FUNDAMENTAL_OUTPUT_H  */

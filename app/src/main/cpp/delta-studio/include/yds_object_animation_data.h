@@ -44,11 +44,11 @@ public:
 
     void Clear();
 
-    // Header
+    // header
     char m_objectName[64];
 
     PositionKeySeries m_positionKeys;
     RotationKeySeries m_rotationKeys;
 };
 
-#endif /* YDS_OBJECT_ANIMATION_DATA_H */
+#endif /* YDS_OBJECT_ANIMATION_DATA_H  */

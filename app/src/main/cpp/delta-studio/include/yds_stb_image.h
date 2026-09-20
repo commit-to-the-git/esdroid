@@ -3,4 +3,4 @@
 
 #include "../dependencies/libraries/stb/stb/stb_image.h"
 
-#endif /* YDS_STB_IMAGE_HPP */
+#endif /* YDS_STB_IMAGE_HPP  */

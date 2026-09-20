@@ -175,7 +175,7 @@ bool dbasic::AnimationExportData::ReadName(const char *tag, char *name, int &ind
     return true;
 }
 
-// Pose Export Structure
+// pose export structure
 dbasic::PoseExport::PoseExport() : ysObject("PoseExport") {
     m_name[0] = '\0';
     m_frame = -1;
@@ -185,7 +185,7 @@ dbasic::PoseExport::~PoseExport() {
     /* void */
 }
 
-// Keyframe Export Structure
+// keyframe export structure
 dbasic::ObjectKeyframeDataExport::ObjectKeyframeDataExport() {
     m_objectName[0] = '\0';
 }
@@ -212,7 +212,7 @@ dbasic::ObjectKeyframeDataExport::KEY_DATA *dbasic::ObjectKeyframeDataExport::Ad
     }
 
     if (data == NULL) {
-        // Insert a new key at the end
+        // insert a new key at the end
         data = &m_keyData.New();
         data->m_keyType = KEY_FLAG_UNDEFINED;
     }
@@ -223,7 +223,7 @@ dbasic::ObjectKeyframeDataExport::KEY_DATA *dbasic::ObjectKeyframeDataExport::Ad
     return data;
 }
 
-// Motion Export Structure
+// motion export structure
 dbasic::MotionExport::MotionExport() {
     Clear();
 }

@@ -15,7 +15,7 @@ namespace ysGeometryPreprocessing {
 
     int CreateVertexCopy(ysObjectData *data, int vertex);
 
-    // Processing
+    // processing
     void ResolveSmoothingGroupAmbiguity(ysObjectData *object);
     void CreateAutomaticSmoothingGroups(ysObjectData *object);
 
@@ -36,4 +36,4 @@ namespace ysGeometryPreprocessing {
 
 };
 
-#endif /* YDS_GEOMETRY_PREPROCESSING_H */
+#endif /* YDS_GEOMETRY_PREPROCESSING_H  */

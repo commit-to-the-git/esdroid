@@ -25,4 +25,4 @@ protected:
     float m_lastSample;
 };
 
-#endif /* ATG_ENGINE_SIM_PREEMPHASIS_FILTER_H */
+#endif /* ATG_ENGINE_SIM_PREEMPHASIS_FILTER_H  */

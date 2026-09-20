@@ -48,4 +48,4 @@ namespace dbasic {
 
 } /* namespace dbasic */
 
-#endif /* DELTA_BASIC_BONE_H */
+#endif /* DELTA_BASIC_BONE_H  */

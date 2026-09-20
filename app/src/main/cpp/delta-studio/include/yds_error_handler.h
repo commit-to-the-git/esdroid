@@ -13,4 +13,4 @@ public:
     virtual void OnError(ysError error, unsigned int line, ysObject *object, const char *file);
 };
 
-#endif /* YDS_ERROR_HANDLER_H */
+#endif /* YDS_ERROR_HANDLER_H  */

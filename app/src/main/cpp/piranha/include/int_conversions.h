@@ -24,4 +24,4 @@ namespace piranha {
 
 } /* namespace piranha */
 
-#endif /* PIRANHA_INT_CONVERSIONS_H */
+#endif /* PIRANHA_INT_CONVERSIONS_H  */

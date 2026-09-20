@@ -19,28 +19,28 @@ ysAudioFile::Error ysWindowsAudioWaveFile::OpenFile(const wchar_t *fname) {
     wchar_t localFname[256];
     wcscpy_s(localFname, 256, fname);
 
-    // Attempt to open the file
+    // attempt to open the file
     HMMIO file = mmioOpen(localFname, 0, MMIO_READ);
 
     if (file == NULL) {
         return Error::CouldNotOpenFile;
     }
 
-    // Check that the file is a wave file
+    // check that the file is a wave file
     MMCKINFO mmckinfoParent;
     MMCKINFO mmckinfoSubchunk;
 
     mmckinfoParent.fccType = mmioFOURCC('W', 'A', 'V', 'E');
     if (mmioDescend(file, (LPMMCKINFO)&mmckinfoParent, NULL, MMIO_FINDRIFF)) {
-        // Not a waveform file
+        // not a waveform file
         mmioClose(file, 0);
         return Error::InvalidFileFormat;
     }
 
-    // Find the wave format segment
+    // find the wave format segment
     mmckinfoSubchunk.ckid = mmioFOURCC('f', 'm', 't', ' ');
     if (mmioDescend(file, &mmckinfoSubchunk, &mmckinfoParent, MMIO_FINDCHUNK)) {
-        // Could not find format segment
+        // could not find format segment
         mmioClose(file, 0);
         return Error::InvalidFileFormat;
     }
@@ -48,38 +48,38 @@ ysAudioFile::Error ysWindowsAudioWaveFile::OpenFile(const wchar_t *fname) {
     DWORD dwFmtSize = mmckinfoSubchunk.cksize;
     WAVEFORMATEX format;
 
-    // Read the "FMT" chunk. 
+    // read the fmt chunk
     if (mmioRead(file, (HPSTR)(&format), dwFmtSize) != dwFmtSize) {
-        // Failed to read format chunk
+        // failed to read format chunk
         mmioClose(file, 0);
         return Error::InvalidFileFormat;
     }
 
-    // Find the data segment
+    // find the data segment
     mmckinfoSubchunk.ckid = mmioFOURCC('d', 'a', 't', 'a');
     if (mmioDescend(file, &mmckinfoSubchunk, &mmckinfoParent, MMIO_FINDCHUNK)) {
-        // No data chunk
+        // no data chunk
         mmioClose(file, 0);
         return Error::InvalidFileFormat;
     }
 
-    // Get size of data segment
+    // get size of data segment
     DWORD dwDataSize = mmckinfoSubchunk.cksize;
     if (dwDataSize == 0L) {
-        // File contains no data
+        // file contains no data
         mmioClose(file, 0);
         return Error::InvalidFileFormat;
     }
 
-    // Save the location within the file
+    // save the location within the file
     long fileOffset = mmioSeek(file, 0, SEEK_CUR);
     if (fileOffset < 0) {
-        // Weird error
+        // weird error
         mmioClose(file, 0);
         return Error::InvalidFileFormat;
     }
 
-    // Everything worked, commit data
+    // everything worked commit data
 
     m_fileHandle = file;
     m_dataSegmentOffset = fileOffset;
@@ -113,9 +113,9 @@ ysAudioFile::Error ysWindowsAudioWaveFile::GenericRead(SampleOffset offset, Samp
 
     mmioSeek(m_fileHandle, fileOffset, SEEK_SET);
 
-    // Read the waveform-audio data subchunk. 
+    // read the waveform-audio data subchunk
     if (mmioRead(m_fileHandle, (HPSTR)buffer, (DWORD)fileSize) != (DWORD)fileSize) {
-        // Failed
+        // failed
         return Error::FileReadError;
     }
 

@@ -77,4 +77,4 @@ protected:
     T_Real m_f_4;
 };
 
-#endif /* ATG_ENGINE_SIM_BUTTERWORTH_LOW_PASS_FILTER_H */
+#endif /* ATG_ENGINE_SIM_BUTTERWORTH_LOW_PASS_FILTER_H  */

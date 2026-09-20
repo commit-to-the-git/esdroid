@@ -179,4 +179,4 @@ namespace dbasic {
 
 } /* namespace dbasic */
 
-#endif /* DELTA_BASIC_SHADER_STAGE_H */
+#endif /* DELTA_BASIC_SHADER_STAGE_H  */

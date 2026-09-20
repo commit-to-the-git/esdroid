@@ -139,7 +139,7 @@ void UiElement::signal(Event event) {
 }
 
 float UiElement::pixelsToUnits(float length) const {
-    return length;// m_app->pixelsToUnits(length);
+    return length;//  m_app->pixelsToUnits(length);
 }
 
 Point UiElement::pixelsToUnits(const Point &p) const {
@@ -147,7 +147,7 @@ Point UiElement::pixelsToUnits(const Point &p) const {
 }
 
 float UiElement::unitsToPixels(float x) const {
-    return x; // m_app->unitsToPixels(x);
+    return x; //  m_app->unitsToPixels(x);
 }
 
 Point UiElement::unitsToPixels(const Point &p) const {

@@ -31,4 +31,4 @@ namespace piranha {
 
 } /* namespace piranha */
 
-#endif /* PIRANHA_NODE_ALLOCATOR_H */
+#endif /* PIRANHA_NODE_ALLOCATOR_H  */

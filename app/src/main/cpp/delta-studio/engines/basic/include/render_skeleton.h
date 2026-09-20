@@ -28,10 +28,10 @@ namespace dbasic {
         ysAnimationMixer AnimationMixer;
 
     protected:
-        // Container for all nodes
+        // container for all nodes
         ysDynamicArray<RenderNode, 4> m_renderNodes;
     };
     
 } /* namespace dbasic */
 
-#endif /* DELTA_BASIC_RENDER_SKELETON_H */
+#endif /* DELTA_BASIC_RENDER_SKELETON_H  */

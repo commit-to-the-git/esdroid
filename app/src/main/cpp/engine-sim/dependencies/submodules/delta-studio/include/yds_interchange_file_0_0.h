@@ -88,4 +88,4 @@ protected:
     bool m_compilationStatus;
 };
 
-#endif /* YDS_INTERCHANGE_FILE_0_0_H */
+#endif /* YDS_INTERCHANGE_FILE_0_0_H  */

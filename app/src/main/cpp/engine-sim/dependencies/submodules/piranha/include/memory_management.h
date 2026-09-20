@@ -19,4 +19,4 @@ namespace piranha {
 
 } /* namespace piranha */
 
-#endif /* PIRANHA_MEMORY_MANAGEMENT_H */
+#endif /* PIRANHA_MEMORY_MANAGEMENT_H  */

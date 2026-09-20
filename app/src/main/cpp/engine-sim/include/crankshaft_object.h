@@ -19,4 +19,4 @@ class CrankshaftObject : public SimulationObject {
         Crankshaft *m_crankshaft;
 };
 
-#endif /* ATG_ENGINE_SIM_CRANKSHAFT_OBJECT_H */
+#endif /* ATG_ENGINE_SIM_CRANKSHAFT_OBJECT_H  */

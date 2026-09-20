@@ -32,4 +32,4 @@ namespace dphysics {
 
 } /* namespace dbasic */
 
-#endif /* DELTA_BASIC_RIGID_BODY_LINK_H */
+#endif /* DELTA_BASIC_RIGID_BODY_LINK_H  */

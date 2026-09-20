@@ -37,7 +37,7 @@ public:
         return YDS_ERROR_RETURN(ysError::None); 
     }
 
-    // OpenGL Extensions
+    // opengl extensions
     PFNGLGENBUFFERSPROC glGenBuffers = nullptr;
     PFNGLDELETEBUFFERSPROC glDeleteBuffers = nullptr;
     PFNGLDELETEVERTEXARRAYSPROC glDeleteVertexArrays = nullptr;
@@ -89,23 +89,23 @@ public:
     PFNGLGETACTIVEUNIFORMSIVPROC glGetActiveUniformsiv = nullptr;
     PFNGLGETACTIVEUNIFORMPROC glGetActiveUniform = nullptr;
 
-    // *** CRITICAL for ES 3.0 uniform-block binding ***
-    // GLSL ES 3.00 does NOT support `layout(binding = N)` on uniform blocks; every
-    // uniform block defaults to binding point 0 unless glUniformBlockBinding is
-    // called after linking. Without these, all UBO blocks alias to the same slot
-    // and the shader sees ScreenVariables data for ObjectVariables / Lighting.
+    // *** critical for es 3.0 uniform-block binding ***
+    // glsl es 3.00 does not support layoutbinding = n on uniform blocks every
+    // uniform block defaults to binding point 0 unless gluniformblockbinding is
+    // called after linking without these all ubo blocks alias to the same slot
+    // and the shader sees screenvariables data for objectvariables / lighting
     PFNGLGETACTIVEUNIFORMBLOCKNAMEPROC glGetActiveUniformBlockName = nullptr;
     PFNGLUNIFORMBLOCKBINDINGPROC glUniformBlockBinding = nullptr;
 
     PFNGLDRAWELEMENTSBASEVERTEXPROC glDrawElementsBaseVertex = nullptr;
 
-    // Textures
+    // textures
 
     PFNGLTEXIMAGE2DMULTISAMPLEPROC glTexImage2DMultisample = nullptr;
     PFNGLACTIVETEXTUREPROC glActiveTexture = nullptr;
     PFNGLGENERATEMIPMAPPROC glGenerateMipmap = nullptr;
 
-    // Buffers
+    // buffers
 
     PFNGLMAPBUFFERPROC glMapBuffer = nullptr;
     PFNGLMAPBUFFERRANGEPROC glMapBufferRange = nullptr;
@@ -140,4 +140,4 @@ protected:
     bool m_isRealContext;
 };
 
-#endif /* YDS_OPENGL_CONTEXT_H */
+#endif /* YDS_OPENGL_CONTEXT_H  */

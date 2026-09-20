@@ -11,4 +11,4 @@ namespace piranha_demo {
 
 } /* namespace piranha_demo */
 
-#endif /* PIRANHA_REFERENCE_COMPILER_UTILITIES_H */
+#endif /* PIRANHA_REFERENCE_COMPILER_UTILITIES_H  */

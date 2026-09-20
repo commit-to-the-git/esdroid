@@ -39,13 +39,13 @@ public:
 
     void AddMessageLevel(int level, const char *name);
 
-    // Get the name corresponding to a level
+    // get the name corresponding to a level
     const char *GetLevelName(int level) { return m_messageLevels[level].m_name; }
 
-    // Start the logging session
+    // start the logging session
     void Start();
 
-    // End the logging session
+    // end the logging session
     void End();
 
 protected:

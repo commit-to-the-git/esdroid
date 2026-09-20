@@ -28,14 +28,14 @@ ysError ysOpenGLWindowsContext::CreateRenderingContext(ysOpenGLDevice *device, y
 
     HDC deviceHandle = GetDC(windowsWindow->GetWindowHandle());
 
-    // Default
+    // default
     m_device = nullptr;
     m_deviceHandle = NULL;
     m_targetWindow = NULL;
     m_contextHandle = NULL;
     m_isRealContext = false;
     
-    // Create dummy context
+    // create dummy context
     WNDCLASSEX wc;
     wc.cbSize = sizeof(WNDCLASSEX);
 
@@ -105,7 +105,7 @@ ysError ysOpenGLWindowsContext::CreateRenderingContext(ysOpenGLDevice *device, y
 
     wglMakeCurrent(0, 0);
 
-    // Create a context if one doesn't already exist
+    // create a context if one doesnt already exist
     if (device->UpdateContext() == nullptr) {
         HGLRC hRC = wglCreateContextAttribsARB(deviceHandle, 0, contextAttribs);
         if (hRC == 0) return YDS_ERROR_RETURN(ysError::CouldNotCreateContext);
@@ -247,7 +247,7 @@ void ysOpenGLWindowsContext::LoadAllExtensions() {
     glVertexAttrib3f = (PFNGLVERTEXATTRIB3FPROC)wglGetProcAddress("glVertexAttrib3f");
     glVertexAttrib4f = (PFNGLVERTEXATTRIB4FPROC)wglGetProcAddress("glVertexAttrib4f");
 
-    // Shaders
+    // shaders
     glDeleteShader = (PFNGLDELETESHADERPROC)wglGetProcAddress("glDeleteShader");
     glDeleteProgram = (PFNGLDELETEPROGRAMPROC)wglGetProcAddress("glDeleteProgram");
 
@@ -291,13 +291,13 @@ void ysOpenGLWindowsContext::LoadAllExtensions() {
 
     glDrawElementsBaseVertex = (PFNGLDRAWELEMENTSBASEVERTEXPROC)wglGetProcAddress("glDrawElementsBaseVertex");
 
-    // Textures
+    // textures
     glActiveTexture = (PFNGLACTIVETEXTUREPROC)wglGetProcAddress("glActiveTexture");
     glGenerateMipmap = (PFNGLGENERATEMIPMAPPROC)wglGetProcAddress("glGenerateMipmap");
 
     glTexImage2DMultisample = (PFNGLTEXIMAGE2DMULTISAMPLEPROC)wglGetProcAddress("glTexImage2DMultisample");
 
-    // Buffers
+    // buffers
     glGenRenderbuffers = (PFNGLGENRENDERBUFFERSPROC)wglGetProcAddress("glGenRenderbuffers");
     glDeleteRenderbuffers = (PFNGLDELETERENDERBUFFERSPROC)wglGetProcAddress("glDeleteRenderbuffers");
     glBindRenderbuffer = (PFNGLBINDRENDERBUFFERPROC)wglGetProcAddress("glBindRenderbuffer");
@@ -315,7 +315,7 @@ void ysOpenGLWindowsContext::LoadAllExtensions() {
 
     glBlitFramebuffer = (PFNGLBLITFRAMEBUFFERPROC)wglGetProcAddress("glBlitFramebuffer");
 
-    // Blending
+    // blending
     glBlendEquation = (PFNGLBLENDEQUATIONPROC)wglGetProcAddress("glBlendEquation");
 
     wglMakeContextCurrent = (PFNWGLMAKECONTEXTCURRENTARBPROC)wglGetProcAddress("wglMakeContextCurrentARB");

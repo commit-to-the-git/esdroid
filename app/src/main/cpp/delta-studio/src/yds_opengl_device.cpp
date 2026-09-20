@@ -23,7 +23,7 @@ extern "C" void esdroid_wtflog(const char*,...);
 
 #include <codecvt>
 #include <locale>
-#include <cstring>  // for strcmp in LinkProgram's uniform-block name lookup
+#include <cstring>  // for strcmp in linkprograms uniform-block name lookup
 
 ysOpenGLDevice::ysOpenGLDevice() : ysDevice(DeviceAPI::OpenGL4_0) {
     m_deviceCreated = false;
@@ -54,7 +54,7 @@ ysError ysOpenGLDevice::DestroyDevice() {
 }
 
 bool ysOpenGLDevice::CheckSupport() {
-    // TEMP
+    // temp
     return true;
 }
 
@@ -161,12 +161,12 @@ void ysOpenGLDevice::SetRenderingContext(ysRenderingContext *context) {
 
     m_activeContext = context;
 
-    // TEMP
+    // temp
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    // END TEMP
+    // end temp
 }
 
 ysError ysOpenGLDevice::CreateOnScreenRenderTarget(ysRenderTarget **newTarget, ysRenderingContext *context, bool depthBuffer) {
@@ -263,7 +263,7 @@ ysError ysOpenGLDevice::ResizeRenderTarget(ysRenderTarget *target, int width, in
     }
 
     if (target->GetType() == ysRenderTarget::Type::OnScreen) {
-        // Nothing needs to be done
+        // nothing needs to be done
     }
     else if (target->GetType() == ysRenderTarget::Type::OffScreen) {
         YDS_NESTED_ERROR_CALL(DestroyOpenGLRenderTarget(target));
@@ -271,7 +271,7 @@ ysError ysOpenGLDevice::ResizeRenderTarget(ysRenderTarget *target, int width, in
             target, width, height, target->GetFormat(), target->HasColorData(), target->HasDepthBuffer()));
     }
     else if (target->GetType() == ysRenderTarget::Type::Subdivision) {
-        // Nothing needs to be done
+        // nothing needs to be done
     }
 
     for (int i = 0; i < MaxRenderTargets; ++i) {
@@ -442,7 +442,7 @@ ysError ysOpenGLDevice::SetFaceCullingMode(CullMode cullMode) {
         glCullFace(GL_BACK);
         break;
     case CullMode::None:
-        glCullFace(GL_BACK); // GL_NONE not valid in GLES
+        glCullFace(GL_BACK); // gl_none not valid in gles
         break;
     default:
         return YDS_ERROR_RETURN(ysError::InvalidParameter);
@@ -451,7 +451,7 @@ ysError ysOpenGLDevice::SetFaceCullingMode(CullMode cullMode) {
     return YDS_ERROR_RETURN(ysError::None);
 }
 
-// Vertex Buffers
+// vertex buffers
 ysError ysOpenGLDevice::CreateVertexBuffer(ysGPUBuffer **newBuffer, int size, char *data, bool mirrorToRam) {
     YDS_ERROR_DECLARE("CreateVertexBuffer");
 
@@ -558,7 +558,7 @@ ysError ysOpenGLDevice::UseVertexBuffer(ysGPUBuffer *buffer, int stride, int off
     if (!CheckCompatibility(buffer)) return YDS_ERROR_RETURN(ysError::IncompatiblePlatforms);
 
     if (buffer == nullptr) {
-        // Release all bindings
+        // release all bindings
         m_realContext->glBindVertexArray(0);
         m_realContext->glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
@@ -570,7 +570,7 @@ ysError ysOpenGLDevice::UseVertexBuffer(ysGPUBuffer *buffer, int stride, int off
             m_realContext->glBindVertexArray(openglBuffer->m_vertexArrayHandle);
             m_realContext->glBindBuffer(GL_ARRAY_BUFFER, openglBuffer->m_bufferHandle);
 
-            // The input layout must be redone
+            // the input layout must be redone
             ResubmitInputLayout();
             if (openglCurrentIndexBuffer != nullptr) m_realContext->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, openglCurrentIndexBuffer->m_bufferHandle);
         }
@@ -586,7 +586,7 @@ ysError ysOpenGLDevice::UseIndexBuffer(ysGPUBuffer *buffer, int offset) {
     if (!CheckCompatibility(buffer)) return YDS_ERROR_RETURN(ysError::IncompatiblePlatforms);
 
     if (buffer == nullptr) {
-        // Release all bindings
+        // release all bindings
         m_realContext->glBindVertexArray(0);
         m_realContext->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     }
@@ -634,7 +634,7 @@ ysError ysOpenGLDevice::EditBufferDataRange(ysGPUBuffer *buffer, char *data, int
     m_realContext->glBindBuffer(target, openglBuffer->m_bufferHandle);
     m_realContext->glBufferSubData(target, offset, size, data);
 
-    // Restore Previous State
+    // restore previous state
     if (previous != buffer) {
         openglBuffer = static_cast<ysOpenGLGPUBuffer *>(previous);
         m_realContext->glBindBuffer(target, (openglBuffer) ? openglBuffer->m_bufferHandle : 0);
@@ -659,7 +659,7 @@ ysError ysOpenGLDevice::EditBufferData(ysGPUBuffer *buffer, char *data) {
     m_realContext->glBindBuffer(target, openglBuffer->m_bufferHandle);
     m_realContext->glBufferSubData(target, 0, openglBuffer->GetSize(), data);
 
-    // Restore Previous State
+    // restore previous state
     if (previous != buffer) {
         openglBuffer = static_cast<ysOpenGLGPUBuffer *>(previous);
         m_realContext->glBindBuffer(target, (openglBuffer) ? openglBuffer->m_bufferHandle : 0);
@@ -670,7 +670,7 @@ ysError ysOpenGLDevice::EditBufferData(ysGPUBuffer *buffer, char *data) {
     return YDS_ERROR_RETURN(ysError::None);
 }
 
-// Shaders
+// shaders
 ysError ysOpenGLDevice::CreateVertexShader(ysShader **newShader, const wchar_t *shaderFilename,
     const wchar_t *compiledFilename, const char *shaderName, bool compile) {
     YDS_ERROR_DECLARE("CreateVertexShader");
@@ -706,7 +706,7 @@ ysError ysOpenGLDevice::CreateVertexShader(ysShader **newShader, const wchar_t *
 
     delete[] fileBuffer;
 
-    // Check Compilation
+    // check compilation
     int shaderCompiled;
     m_realContext->glGetShaderiv(handle, GL_COMPILE_STATUS, &shaderCompiled);
 
@@ -779,7 +779,7 @@ ysError ysOpenGLDevice::CreatePixelShader(ysShader **newShader, const wchar_t *s
 
     delete[] fileBuffer;
 
-    // Check Compilation
+    // check compilation
     int shaderCompiled;
     m_realContext->glGetShaderiv(shaderHandle, GL_COMPILE_STATUS, &shaderCompiled);
 
@@ -894,7 +894,7 @@ ysError ysOpenGLDevice::LinkProgram(ysShaderProgram *program) {
         }
     }
 
-    // Dump active attributes
+    // dump active attributes
     {
         GLint nAttribs = 0;
         glGetProgramiv(openglProgram->m_handle, GL_ACTIVE_ATTRIBUTES, &nAttribs);
@@ -908,13 +908,13 @@ ysError ysOpenGLDevice::LinkProgram(ysShaderProgram *program) {
                            i, name, loc, size, (unsigned)type);
         }
     }
-    // Dump active uniforms
+    // dump active uniforms
     {
         GLint nUniforms = 0;
         glGetProgramiv(openglProgram->m_handle, GL_ACTIVE_UNIFORMS, &nUniforms);
         esdroid_wtflog("  Active uniforms: %d", nUniforms);
     }
-    // Dump active uniform blocks
+    // dump active uniform blocks
     if (m_realContext->glGetActiveUniformBlockName != nullptr) {
         GLint blockCount = 0;
         m_realContext->glGetProgramiv(openglProgram->m_handle,
@@ -925,7 +925,7 @@ ysError ysOpenGLDevice::LinkProgram(ysShaderProgram *program) {
             GLsizei nameLen = 0;
             m_realContext->glGetActiveUniformBlockName(
                 openglProgram->m_handle, (GLuint)i, 255, &nameLen, blockName);
-            // Read the binding BEFORE we set it
+            // read the binding before we set it
             GLint curBinding = -1;
             m_realContext->glGetActiveUniformsiv(openglProgram->m_handle, 1,
                 (const GLuint*)&i, GL_UNIFORM_BLOCK_BINDING, &curBinding);
@@ -935,9 +935,9 @@ ysError ysOpenGLDevice::LinkProgram(ysShaderProgram *program) {
     }
 #endif
 
-    // GLSL ES 3.00 has no layout(binding = N) for uniform blocks, so every
-    // block defaults to binding point 0. Remap the known blocks to the slots
-    // the C++ side uses after linking.
+    // glsl es 3.00 has no layoutbinding = n for uniform blocks so every
+    // block defaults to binding point 0 remap the known blocks to the slots
+    // the c++ side uses after linking
     if (m_realContext->glUniformBlockBinding != nullptr &&
         m_realContext->glGetActiveUniformBlockName != nullptr) {
         GLint blockCount = 0;
@@ -956,15 +956,15 @@ ysError ysOpenGLDevice::LinkProgram(ysShaderProgram *program) {
 
             if (nameLen <= 0) continue;
 
-            GLuint bindingPoint = 0xFFFFFFFFu;  // sentinel: unknown block
+            GLuint bindingPoint = 0xFFFFFFFFu;  // sentinel unknown block
             if (strcmp(blockName, "ScreenVariables") == 0) {
-                bindingPoint = 0;  // matches C++ SceneData slot
+                bindingPoint = 0;  // matches c++ scenedata slot
             } else if (strcmp(blockName, "ObjectVariables") == 0) {
-                bindingPoint = 1;  // matches C++ ObjectData slot
+                bindingPoint = 1;  // matches c++ objectdata slot
             } else if (strcmp(blockName, "SkinningVariables") == 0) {
-                bindingPoint = 2;  // matches C++ Skinning slot (unused on Android)
+                bindingPoint = 2;  // matches c++ skinning slot unused on android
             } else if (strcmp(blockName, "Lighting") == 0) {
-                bindingPoint = 3;  // matches C++ Lighting slot
+                bindingPoint = 3;  // matches c++ lighting slot
             }
 
             if (bindingPoint != 0xFFFFFFFFu) {
@@ -974,9 +974,9 @@ ysError ysOpenGLDevice::LinkProgram(ysShaderProgram *program) {
         }
     }
 
-    // Samplers also default to texture unit 0 in GLSL ES 3.00. Assign the
-    // known sampler uniforms to their texture units. glUniform1i needs the
-    // program active, so bind it temporarily and restore the previous one.
+    // samplers also default to texture unit 0 in glsl es 3.00 assign the
+    // known sampler uniforms to their texture units gluniform1i needs the
+    // program active so bind it temporarily and restore the previous one
     if (m_realContext->glGetUniformLocation != nullptr &&
         m_realContext->glUniform1i != nullptr &&
         m_realContext->glUseProgram != nullptr) {
@@ -1036,7 +1036,7 @@ ysError ysOpenGLDevice::CreateShaderProgram(ysShaderProgram **program) {
     return YDS_ERROR_RETURN(ysError::None);
 }
 
-// Input Layouts
+// input layouts
 ysError ysOpenGLDevice::CreateInputLayout(ysInputLayout **newInputLayout, ysShader *shader, const ysRenderGeometryFormat *format,
                       const ysRenderGeometryFormat *) {
     YDS_ERROR_DECLARE("CreateInputLayout");
@@ -1130,7 +1130,7 @@ ysError ysOpenGLDevice::CreateTexture(ysTexture **texture, const wchar_t *fname)
     else glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
     glTexImage2D(GL_TEXTURE_2D, 0, texType, newTexture->m_width, newTexture->m_height, 0, texType, GL_UNSIGNED_BYTE, pixels);
-    m_realContext->glGenerateMipmap(GL_TEXTURE_2D); // TEMP
+    m_realContext->glGenerateMipmap(GL_TEXTURE_2D); // temp
 
     stbi_image_free(pixels);
 
@@ -1304,7 +1304,7 @@ int ysOpenGLDevice::GetFormatGLType(ysRenderGeometryChannel::ChannelFormat forma
     case ysRenderGeometryChannel::ChannelFormat::R32G32B32_UINT:
         return GL_UNSIGNED_INT;
     default:
-        // No real option here
+        // no real option here
         return GL_4_BYTES;
     }
 }
@@ -1313,17 +1313,17 @@ int ysOpenGLDevice::GetFramebufferName(int slot) {
     return GL_COLOR_ATTACHMENT0 + slot;
 }
 
-// TEMP
+// temp
 void ysOpenGLDevice::Draw(int numFaces, int indexOffset, int vertexOffset) {
     if (m_activeVertexBuffer != nullptr) {
         if (m_realContext->glDrawElementsBaseVertex != nullptr) {
             m_realContext->glDrawElementsBaseVertex(GL_TRIANGLES, numFaces * 3, GL_UNSIGNED_SHORT, (void *)(indexOffset * 2), vertexOffset);
         } else {
-            // glDrawElementsBaseVertex is not available (GLES 3.0 without the
-            // GL_OES_draw_elements_base_vertex extension). Fall back to
-            // glDrawElements, which does not apply vertexOffset. The geometry
-            // generator and model loader write absolute indices, so
-            // vertexOffset is always 0 here.
+            // gldrawelementsbasevertex is not available gles 3.0 without the
+            // gl_oes_draw_elements_base_vertex extension fall back to
+            // gldrawelements which does not apply vertexoffset the geometry
+            // generator and model loader write absolute indices so
+            // vertexoffset is always 0 here
             glDrawElements(GL_TRIANGLES, numFaces * 3, GL_UNSIGNED_SHORT, (void *)(indexOffset * 2));
         }
     }
@@ -1334,7 +1334,7 @@ ysError ysOpenGLDevice::CreateOpenGLOffScreenRenderTarget(ysRenderTarget *target
 {
     YDS_ERROR_DECLARE("CreateOpenGLOffScreenRenderTarget");
 
-    // Generate the empty texture
+    // generate the empty texture
     unsigned int newTexture;
     glGenTextures(1, &newTexture);
     glBindTexture(GL_TEXTURE_2D, newTexture);
@@ -1345,7 +1345,7 @@ ysError ysOpenGLDevice::CreateOpenGLOffScreenRenderTarget(ysRenderTarget *target
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
     if (!colorData) {
-        //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+        // gltexparameterigl_texture_2d gl_texture_compare_mode gl_compare_ref_to_texture
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     }
@@ -1381,13 +1381,13 @@ ysError ysOpenGLDevice::CreateOpenGLOffScreenRenderTarget(ysRenderTarget *target
 
     glTexImage2D(GL_TEXTURE_2D, 0, glFormat, width, height, 0, pixelFormat, glType, nullptr);
 
-    // Create a framebuffer
+    // create a framebuffer
     unsigned int framebuffer;
     m_realContext->glGenFramebuffers(1, &framebuffer);
     m_realContext->glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer);
     if (colorData) m_realContext->glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, newTexture, 0);
 
-    // Create a depth buffer
+    // create a depth buffer
     unsigned int depthBufferHandle = 0;
     if (depthBuffer) {
         m_realContext->glGenRenderbuffers(1, &depthBufferHandle);

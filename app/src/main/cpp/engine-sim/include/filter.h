@@ -10,4 +10,4 @@ class Filter {
         virtual void destroy();
 };
 
-#endif /* ATG_ENGINE_SIM_FILTER_H */
+#endif /* ATG_ENGINE_SIM_FILTER_H  */

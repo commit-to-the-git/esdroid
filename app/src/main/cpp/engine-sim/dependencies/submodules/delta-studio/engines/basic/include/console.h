@@ -12,14 +12,14 @@
 
 namespace dbasic {
 
-    // Class name declarations
+    // class name declarations
     class DeltaEngine;
 
     class Console : public ysObject {
     public:
         static const int BufferWidth = 175;
         static const int BufferHeight = 75;
-        static const int BufferSize = BufferWidth * BufferHeight; // Maximum of 4096 characters displayed at once
+        static const int BufferSize = BufferWidth * BufferHeight; // maximum of 4096 characters displayed at once
 
     public:
         Console();
@@ -44,21 +44,21 @@ namespace dbasic {
         Font *GetFont() const { return m_font; }
 
     protected:
-        // Settings
+        // settings
         std::wstring m_defaultFontDirectory;
 
     protected:
-        // Window metrics
+        // window metrics
         int m_bufferWidth;
         int m_bufferHeight;
 
     protected:
-        // ----------------------------------------------------
-        // GUI Drawing Tools
         //
-        // SYSTEM
+        // gui drawing tools
         //
-        // ----------------------------------------------------
+        // system
+        //
+        //
 
         void RealignLocation() { m_actualLocation = m_nominalLocation; }
 
@@ -73,14 +73,14 @@ namespace dbasic {
         char *m_buffer;
 
     public:
-        // ----------------------------------------------------
-        // GUI Drawing Tools
         //
-        // INTERFACE
+        // gui drawing tools
         //
-        // ----------------------------------------------------
+        // interface
+        //
+        //
 
-        // Drawing Text
+        // drawing text
         ysError SetCharacter(char character);
 
         void Clear();
@@ -92,19 +92,19 @@ namespace dbasic {
 
         int GetTotalNotWhitespace() const;
 
-        // Drawing Shapes
+        // drawing shapes
         void DrawLineRectangle(int width, int height);
         void DrawHorizontalLine(int length);
         void DrawVerticalLine(int length);
 
-        // Utilities
+        // utilities
         static int FindEndOfNextWord(const char *text, int location);
         static inline bool IsWhiteSpace(char c) {
             if (c == '\t' || c == '\n' || c == ' ') { return true; }
             return false;
         }
 
-        // Navigation
+        // navigation
         void MoveDownLine(int n = 1);
         void MoveToLocation(const GuiPoint &location);
         void MoveToOrigin();
@@ -112,4 +112,4 @@ namespace dbasic {
 
 } /* namespace dbasic */
 
-#endif /* DELTA_BASIC_CONSOLE_H */
+#endif /* DELTA_BASIC_CONSOLE_H  */

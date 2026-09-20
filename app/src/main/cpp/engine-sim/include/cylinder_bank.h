@@ -54,4 +54,4 @@ class CylinderBank {
         double m_y;
 };
 
-#endif /* ATG_ENGINE_SIM_CYLINDER_BANK_H */
+#endif /* ATG_ENGINE_SIM_CYLINDER_BANK_H  */

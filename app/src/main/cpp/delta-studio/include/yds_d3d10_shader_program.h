@@ -15,4 +15,4 @@ protected:
     ysD3D10Shader *GetShader(ysShader::ShaderType type);
 };
 
-#endif /* YDS_D3D10_SHADER_PROGRAM_H */
+#endif /* YDS_D3D10_SHADER_PROGRAM_H  */

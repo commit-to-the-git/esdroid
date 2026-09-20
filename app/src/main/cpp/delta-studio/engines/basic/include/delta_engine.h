@@ -107,7 +107,7 @@ public:
     DeltaEngine();
     ~DeltaEngine();
 
-    // Physics Interface
+    // physics interface
     dphysics::MassSpringSystem PhysicsSystem;
     dphysics::RigidBodySystem RBSystem;
 
@@ -169,7 +169,7 @@ public:
     void SetWindowSize(int width, int height);
     void SetConsoleColor(const ysVector &v);
 
-    // Input Device
+    // input device
     bool IsKeyDown(ysKey::Code key);
     bool ProcessKeyDown(ysKey::Code key);
     bool ProcessKeyUp(ysKey::Code key);
@@ -259,7 +259,7 @@ protected:
     ysKeyboard *m_mainKeyboard;
     ysMouse *m_mainMouse;
 
-    // Shader Controls
+    // shader controls
     ShaderSet *m_shaderSet;
 
     ysGPUBuffer *m_consoleShaderObjectVariablesBuffer;
@@ -285,13 +285,13 @@ protected:
     ysInputLayout *m_consoleInputLayout;
     ysInputLayout *m_saqInputLayout;
 
-    // Text Support
+    // text support
     UiRenderer m_uiRenderer;
     Console m_console;
 
     bool m_initialized;
 
-    // Timing
+    // timing
     ysTimingSystem *m_timingSystem;
     ysBreakdownTimer m_breakdownTimer;
 
@@ -299,16 +299,16 @@ protected:
     size_t AllocateObjectData(int objectDataSize);
 
 protected:
-    // Settings
+    // settings
     float m_clearColor[4];
     bool m_consoleEnabled;
 
-    // Cursor
+    // cursor
     bool m_cursorPositionLocked;
     bool m_cursorHidden;
 
 protected:
-    // Initialization Routines
+    // initialization routines
     ysError InitializeGeometry();
     ysError InitializeShaders(const wchar_t *shaderDirectory,
                               const wchar_t *shaderCompiledDirectory,
@@ -317,7 +317,7 @@ protected:
     ysError InitializeBreakdownTimer(const wchar_t *loggingDirectory);
 
 protected:
-    // Drawing queues
+    // drawing queues
     ysExpandingArray<DrawCall, 256> *m_drawQueue;
 
     char *m_objectDataBuffer;
@@ -332,4 +332,4 @@ protected:
 
 }// namespace dbasic
 
-#endif /* DELTA_BASIC_DELTA_ENGINE_H */
+#endif /* DELTA_BASIC_DELTA_ENGINE_H  */

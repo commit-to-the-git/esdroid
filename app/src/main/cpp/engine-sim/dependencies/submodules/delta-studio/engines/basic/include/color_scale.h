@@ -9,4 +9,4 @@ namespace dbasic {
 
 } /* namespace dbasic */
 
-#endif /* DELTA_BASIC_COLOR_SCALE_H */
+#endif /* DELTA_BASIC_COLOR_SCALE_H  */

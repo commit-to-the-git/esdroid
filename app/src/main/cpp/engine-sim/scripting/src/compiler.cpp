@@ -104,9 +104,9 @@ bool es_script::Compiler::compile(const piranha::IrPath &path) {
 }
 
 es_script::Compiler::Output es_script::Compiler::execute() {
-    // The output is static so it survives between compiles. Clear the object
+    // the output is static so it survives between compiles clear the object
     // pointers so a script that does not call set_engine cannot hand back an
-    // engine owned by the previous run.
+    // engine owned by the previous run
     output()->engine = nullptr;
     output()->vehicle = nullptr;
     output()->transmission = nullptr;
@@ -129,7 +129,7 @@ es_script::Compiler::Output es_script::Compiler::execute() {
 #endif
 
     if (!result) {
-        // Todo: Runtime error
+        // todo runtime error
     }
 
     return *output();

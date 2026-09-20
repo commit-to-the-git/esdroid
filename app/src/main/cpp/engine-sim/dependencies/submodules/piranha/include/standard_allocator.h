@@ -23,7 +23,7 @@ namespace piranha {
         t_alloc *allocate(unsigned int n = 1, unsigned int alignment = 1) {
 #if STD_ALLOC_ENABLE_LEDGER
             m_allocationLedger++;
-#endif /* STD_ALLOC_ENABLE_LEDGER */
+#endif /* STD_ALLOC_ENABLE_LEDGER  */
 
             unsigned int usage = sizeof(t_alloc) * n;
             m_currentUsage += usage;
@@ -69,7 +69,7 @@ namespace piranha {
 #if STD_ALLOC_ENABLE_LEDGER
             m_allocationLedger--;
             assert(m_allocationLedger >= 0);
-#endif /* STD_ALLOC_ENABLE_LEDGER */
+#endif /* STD_ALLOC_ENABLE_LEDGER  */
             assert(m_currentUsage >= sizeof(t_alloc) * n);
 
             m_currentUsage -= sizeof(t_alloc) * n;
@@ -89,7 +89,7 @@ namespace piranha {
 #if STD_ALLOC_ENABLE_LEDGER
             m_allocationLedger--;
             assert(m_allocationLedger >= 0);
-#endif /* STD_ALLOC_ENABLE_LEDGER */
+#endif /* STD_ALLOC_ENABLE_LEDGER  */
             assert(m_currentUsage >= sizeof(t_alloc));
 
             m_currentUsage -= sizeof(t_alloc) * n;
@@ -107,17 +107,17 @@ namespace piranha {
         unsigned int getCurrentUsage() const { return m_currentUsage; }
 
     protected:
-        // Statistics counters
+        // statistics counters
         int m_allocationLedger;
         unsigned int m_currentUsage;
         unsigned int m_maxUsage;
 
     public:
-        // Singleton implementation
+        // singleton implementation
         static StandardAllocator *s_global;
         static StandardAllocator *Global();
     };
 
 } /* namespace piranha */
 
-#endif /* PIRANHA_STANDARD_ALLOCATOR_H */
+#endif /* PIRANHA_STANDARD_ALLOCATOR_H  */

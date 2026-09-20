@@ -38,4 +38,4 @@ protected:
     int m_curveCount;
 };
 
-#endif /* YDS_ANIMATION_ACTION_H */
+#endif /* YDS_ANIMATION_ACTION_H  */

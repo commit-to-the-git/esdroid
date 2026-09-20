@@ -76,4 +76,4 @@ namespace piranha {
 
 } /* namespace piranha */
 
-#endif /* PIRANHA_NODE_PROGRAM_H */
+#endif /* PIRANHA_NODE_PROGRAM_H  */

@@ -44,4 +44,4 @@ class Vehicle {
         double m_rollingResistance;
 };
 
-#endif /* ATG_ENGINE_SIM_VEHICLE_H */
+#endif /* ATG_ENGINE_SIM_VEHICLE_H  */

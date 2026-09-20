@@ -23,4 +23,4 @@ protected:
     int m_formatSize;
 };
 
-#endif /* YDS_RENDER_GEOMETRY_FORMAT_H */
+#endif /* YDS_RENDER_GEOMETRY_FORMAT_H  */

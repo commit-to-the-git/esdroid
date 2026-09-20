@@ -107,4 +107,4 @@ namespace piranha {
 
 } /* namespace piranha */
 
-#endif /* PIRANHA_IR_TOKEN_INFO_H */
+#endif /* PIRANHA_IR_TOKEN_INFO_H  */

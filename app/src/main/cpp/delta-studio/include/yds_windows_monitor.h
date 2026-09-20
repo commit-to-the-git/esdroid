@@ -19,4 +19,4 @@ private:
     HMONITOR m_handle;
 };
 
-#endif /* YDS_WINDOWS_MONITOR_H */
+#endif /* YDS_WINDOWS_MONITOR_H  */

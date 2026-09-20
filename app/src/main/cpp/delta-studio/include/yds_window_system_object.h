@@ -24,4 +24,4 @@ private:
     Platform m_platform;
 };
 
-#endif /* YDS_WINDOW_SYSTEM_OBJECT_H */
+#endif /* YDS_WINDOW_SYSTEM_OBJECT_H  */

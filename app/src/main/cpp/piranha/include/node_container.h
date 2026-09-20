@@ -48,4 +48,4 @@ namespace piranha {
 
 } /* namspace piranha */
 
-#endif /* PIRANHA_NODE_CONTAINER_H */
+#endif /* PIRANHA_NODE_CONTAINER_H  */

@@ -40,4 +40,4 @@ namespace piranha {
 
 } /* namespace piranha */
 
-#endif /* PIRANHA_INT_PROBE_NODE_H */
+#endif /* PIRANHA_INT_PROBE_NODE_H  */

@@ -26,4 +26,4 @@ namespace piranha {
 
 } /* namespace piranha */
 
-#endif /* PIRANHA_EXCEPTIONS_H */
+#endif /* PIRANHA_EXCEPTIONS_H  */

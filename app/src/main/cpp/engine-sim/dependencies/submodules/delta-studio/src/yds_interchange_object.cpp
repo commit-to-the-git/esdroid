@@ -56,7 +56,7 @@ void ysInterchangeObject::RipByIndexSet(std::vector<IndexSet> &indices) {
 
                 int newVertexId = next;
                 if (newVertexId == -1) {
-                    // Copy the vertex
+                    // copy the vertex
                     Vertices.push_back(Vertices[v.indices[j]]);
 
                     vertexToIndex.push_back(r.indices[j]);

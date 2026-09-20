@@ -120,7 +120,7 @@ protected:
                 Destroy();
             }
             else {
-                // Already allcoated
+                // already allcoated
                 m_objectCount = 0;
                 return;
             }
@@ -160,4 +160,4 @@ protected:
     Type *m_array;
 };
 
-#endif /* YDS_QUEUE_H */
+#endif /* YDS_QUEUE_H  */

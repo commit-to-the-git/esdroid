@@ -151,4 +151,4 @@ class Engine : public Part {
         double m_displacement;
 };
 
-#endif /* ATG_ENGINE_SIM_ENGINE_H */
+#endif /* ATG_ENGINE_SIM_ENGINE_H  */

@@ -106,11 +106,11 @@ void dbasic::InitializeFontMap() {
     FONT_MAP['"'] = 90;
     FONT_MAP['\''] = 91;
 
-    FONT_MAP[179] = 207; ///
-    FONT_MAP[180] = 213; ///
-    FONT_MAP[195] = 208; ///
-    FONT_MAP[197] = 209; ///
-    FONT_MAP[196] = 212; ///
+    FONT_MAP[179] = 207; // /
+    FONT_MAP[180] = 213; // /
+    FONT_MAP[195] = 208; // /
+    FONT_MAP[197] = 209; // /
+    FONT_MAP[196] = 212; // /
     FONT_MAP[217] = 232; //
     FONT_MAP[191] = 186; //
     FONT_MAP[218] = 185; //

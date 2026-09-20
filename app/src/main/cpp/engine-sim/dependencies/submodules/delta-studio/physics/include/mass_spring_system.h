@@ -143,7 +143,7 @@ namespace dphysics {
         bool m_enableCollisions;
         float m_radius;
 
-        // Store a running average of the velocity
+        // store a running average of the velocity
         ysVector m_averageVelocity;
         int m_averageVelocitySamples;
 
@@ -171,4 +171,4 @@ namespace dphysics {
 
 } /* namespace dbasic */
 
-#endif /* DELTA_BASIC_MASS_SPRING_SYSTEM_H */
+#endif /* DELTA_BASIC_MASS_SPRING_SYSTEM_H  */

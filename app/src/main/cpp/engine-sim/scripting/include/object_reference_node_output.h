@@ -36,4 +36,4 @@ namespace es_script {
 
 } /* namespace manta */
 
-#endif /* ATG_ENGINE_SIM_OBJECT_REFERENCE_NODE_OUTPUT_H */
+#endif /* ATG_ENGINE_SIM_OBJECT_REFERENCE_NODE_OUTPUT_H  */

@@ -73,8 +73,7 @@ bool AndroidBackend::initWindow(int w,int h) {
         m_eglContext=eglCreateContext(m_eglDisplay,m_eglConfig,EGL_NO_CONTEXT,ctx);
         if(m_eglContext==EGL_NO_CONTEXT){LOGE("eglCreateContext: 0x%x",eglGetError());esdroid_wtflog("initWindow: eglCreateContext failed 0x%x",eglGetError());return false;}
     }
-    // Recreate the surface if it was lost (app pause/resume). The context is
-    // kept alive so GL objects survive.
+    // recreate a lost surface keep the context so gl objects survive
     if(m_eglSurface==EGL_NO_SURFACE) {
         EGLint format=0;
         eglGetConfigAttrib(m_eglDisplay,m_eglConfig,EGL_NATIVE_VISUAL_ID,&format);
@@ -92,8 +91,7 @@ bool AndroidBackend::initWindow(int w,int h) {
 }
 
 void AndroidBackend::destroyWindow() {
-    // Only destroy the surface. Keeping the display and context alive means
-    // GL objects survive an app pause so rendering can continue on resume.
+    // destroy only the surface so gl objects survive a pause
     if(m_eglDisplay!=EGL_NO_DISPLAY) {
         eglMakeCurrent(m_eglDisplay,EGL_NO_SURFACE,EGL_NO_SURFACE,EGL_NO_CONTEXT);
         if(m_eglSurface!=EGL_NO_SURFACE) eglDestroySurface(m_eglDisplay,m_eglSurface);
@@ -110,8 +108,7 @@ static int32_t handle_input_event(android_app* app, AInputEvent* event) {
     int32_t type=AInputEvent_getType(event);
     auto& b=esdroid::AndroidBackend::instance();
     if(type==AINPUT_EVENT_TYPE_KEY) {
-        // While an overlay is up, BACK closes it instead of the app. An open
-        // dropdown list closes first, the menu itself on the second press.
+        // back closes an open list first then the menu
         if(AKeyEvent_getKeyCode(event)==AKEYCODE_BACK
             &&AKeyEvent_getAction(event)==AKEY_EVENT_ACTION_DOWN) {
             if(b.settingsOpen()) { b.closeSettings(); return 1; }
@@ -226,8 +223,7 @@ bool AndroidBackend::pollEvents() {
         if(source) source->process(s_app,source);
         if(s_app->destroyRequested!=0){m_shouldQuit=true;break;}
     }
-    // Input arrives through app->onInputEvent inside source->process().
-    // Typed values came in on the Java UI thread and are applied here.
+    // typed values arrive from the java ui thread and apply here
     consumePendingValueInput();
     return !m_shouldQuit;
 }
@@ -242,7 +238,7 @@ static int64_t now_ns() {
     return (int64_t)ts.tv_sec*1000000000LL+(int64_t)ts.tv_nsec;
 }
 
-// Tap toggles the latch, hold is momentary.
+// tap toggles the latch hold is momentary
 #define FN_TAP_NS 300000000LL
 
 void AndroidBackend::pressButton(TouchButton* btn,int pid) {
@@ -250,7 +246,7 @@ void AndroidBackend::pressButton(TouchButton* btn,int pid) {
     btn->held=true; btn->edge=true; btn->pointerId=pid;
     if(btn->key==VirtualKey::Fn){ m_fnHeld=true; m_fnPressNs=now_ns(); return; }
     int k=(int)effectiveKey(*btn);
-    // "1x": no key held means full speed, so drop any speed hold instead.
+    // 1x drops any speed hold
     if(k==(int)VirtualKey::None){
         for(int i=(int)VirtualKey::N1;i<=(int)VirtualKey::N5;++i) m_keyState[i]=false;
         return;
@@ -267,7 +263,7 @@ void AndroidBackend::releaseButton(TouchButton* btn) {
         return;
     }
     btn->held=false; btn->pointerId=-1;
-    // FN may have switched between press and release.
+    // fn may have switched between press and release
     int keys[2]={(int)btn->key,(int)btn->altKey};
     for(int k:keys) if(k>0&&k<(int)VirtualKey::Count) m_keyState[k]=false;
 }
@@ -275,16 +271,14 @@ void AndroidBackend::releaseButton(TouchButton* btn) {
 void AndroidBackend::releaseAllButtons(int pid, bool cancel) {
     for(auto& b:m_buttons) {
         if(b.pointerId!=pid) continue;
-        // ACTION_CANCEL is a system grab, not a finger lift, so FN must not
-        // count it as a tap.
+        // action_cancel is a system grab not a tap
         if(cancel&&b.key==VirtualKey::Fn){ m_fnHeld=false; b.held=false; b.pointerId=-1; }
         else releaseButton(&b);
     }
 }
 
-// The first finger that misses every button drives the mouse, a second
-// one starts a pinch. Extra fingers are ignored so a resting thumb cannot
-// yank the view.
+// first free finger drives the mouse second starts a pinch
+// extra fingers are ignored
 void AndroidBackend::pressEngineTouch(int pid,float x,float y) {
     if(m_touchPid==-1) {
         m_touchPid=pid;
@@ -298,8 +292,7 @@ void AndroidBackend::pressEngineTouch(int pid,float x,float y) {
     m_touchX2=x; m_touchY2=y;
     float dx=x-m_touchX1,dy=y-m_touchY1;
     m_pinchDist=sqrtf(dx*dx+dy*dy);
-    // The reported position jumps to the midpoint, so the drag has to be
-    // re-anchored there or the view would lurch.
+    // re-anchor the drag at the pinch midpoint
     m_restartPending=true; m_touchUpEdge=true;
 }
 void AndroidBackend::moveEngineTouch(int pid,float x,float y) {
@@ -307,15 +300,13 @@ void AndroidBackend::moveEngineTouch(int pid,float x,float y) {
     else if(pid==m_touchPid2){ m_touchX2=x; m_touchY2=y; }
     else return;
     if(m_touchPid2!=-1) {
-        // Zoom tracks the finger distance ratio: spreading the fingers
-        // doubles the zoom when the distance doubles.
+        // zoom tracks the finger distance ratio
         float dx=m_touchX1-m_touchX2,dy=m_touchY1-m_touchY2;
         float d=sqrtf(dx*dx+dy*dy);
         if(m_pinchDist>1.0f) m_pinchWheel+=500.0f*log2f(d/m_pinchDist);
         m_pinchDist=d;
     }
-    // Hold the position until a pending drag restart lands it on the new
-    // anchor; reporting the raw jump would yank the view.
+    // hold the position until the drag restart lands on the new anchor
     if(m_restartPending) return;
     if(m_touchPid2==-1){ m_touchX=m_touchX1; m_touchY=m_touchY1; return; }
     m_touchX=(m_touchX1+m_touchX2)*0.5f;
@@ -323,14 +314,14 @@ void AndroidBackend::moveEngineTouch(int pid,float x,float y) {
 }
 void AndroidBackend::releaseEngineTouch(int pid,bool cancel) {
     if(pid==m_touchPid2) {
-        // Pinch over, the remaining finger keeps panning.
+        // pinch over the remaining finger keeps panning
         m_touchPid2=-1; m_pinchDist=0.0f;
         if(!cancel){ m_restartPending=true; m_touchUpEdge=true; }
         return;
     }
     if(pid!=m_touchPid) return;
     if(m_touchPid2!=-1) {
-        // Engine finger left, the pinch partner takes over.
+        // engine finger left the pinch partner takes over
         m_touchPid=m_touchPid2; m_touchPid2=-1;
         m_touchX1=m_touchX2; m_touchY1=m_touchY2;
         m_pinchDist=0.0f;
@@ -338,15 +329,14 @@ void AndroidBackend::releaseEngineTouch(int pid,bool cancel) {
         return;
     }
     m_touchPid=-1; m_pinchDist=0.0f;
-    // Both fingers can lift inside one frame; a leftover restart would
-    // leave a phantom drag behind.
+    // both fingers can lift in one frame drop any leftover restart
     m_restartPending=false;
-    // A system grab must not fire a click at the last position.
+    // a system grab must not fire a click at the last position
     if(!cancel) m_touchUpEdge=true;
 }
 
-// ------------------------------------------------------------------
-// Settings panel
+//
+// settings panel
 
 static const char* kSettingLabels[esdroid::kSettingCount] = {
     "VOLUME", "CONVOLUTION", "HI FREQ GAIN", "LO FREQ NOISE",
@@ -366,9 +356,7 @@ static const char* settingUnit(int idx) {
     }
 }
 
-// Bare number, no unit suffix. The value dialog's input field is
-// pre-filled from this, so what the user edits is pure digits and the
-// parse on the way back cannot choke on a leftover " HZ" or "%".
+// bare number no unit suffix so the value dialog edits pure digits
 static void formatSettingNumber(char* out,int len,int idx,const SettingsState& s) {
     switch((SettingIndex)idx) {
     case SettingIndex::Volume:
@@ -404,8 +392,8 @@ void AndroidBackend::formatSettingValue(char* out,int len,int idx) const {
 static float clamp01f(float v) { return v<0.0f?0.0f:(v>1.0f?1.0f:v); }
 static double clampd(double v,double lo,double hi) { return v<lo?lo:(v>hi?hi:v); }
 
-// The 400 Hz..400 kHz sim frequency range is logarithmic on the slider,
-// or the whole low half of the range would sit under the knob.
+// sim frequency slider is logarithmic or the low half of the range
+// sits under the knob
 static const double kSimFreqMin=400.0, kSimFreqMax=400000.0;
 
 float AndroidBackend::settingSliderT(int idx) const {
@@ -455,7 +443,7 @@ void AndroidBackend::setSettingFromSlider(int idx,float t) {
     m_settings.dirty|= (1u<<idx);
 }
 
-// Typed input arrives in the units the panel shows: percent, Hz, RPM.
+// typed input arrives in the units the panel shows percent hz rpm
 void AndroidBackend::setSettingTyped(int idx,double typed) {
     switch((SettingIndex)idx) {
     case SettingIndex::Volume: m_settings.volume=(float)clampd(typed/100.0,0.0,1.0); break;
@@ -483,8 +471,7 @@ void AndroidBackend::openSettings() {
     m_settings.open=true;
     const bool engineTouch=(m_touchPid!=-1||m_touchPid2!=-1);
     clearAllKeys();
-    // A drag that was running under the SETTINGS button has to end with a
-    // clean lift, or the engine mouse would stay pressed forever.
+    // end a drag under the settings button with a clean lift
     if(engineTouch) m_touchUpEdge=true;
     esdroid_wtflog("settings: opened");
 }
@@ -551,7 +538,7 @@ int AndroidBackend::handleSettingsMotion(AInputEvent* event,int32_t am) {
             if(contains(L.value[i],x,y)) { requestValueInput(i); return 1; }
         for(int i=0;i<esdroid::kSettingCount;++i) {
             const float* t=L.track[i];
-            // The track is thin, so the whole row band grabs the slider.
+            // the track is thin so the whole row band grabs the slider
             if(x>=t[0]-24.0f&&x<t[0]+t[2]+24.0f
                 &&y>=t[1]-L.rowH*0.5f&&y<t[1]+t[3]+L.rowH*0.5f) {
                 m_sliderPid=pid; m_sliderIdx=i;
@@ -589,13 +576,12 @@ int AndroidBackend::handleSettingsMotion(AInputEvent* event,int32_t am) {
     return 1;
 }
 
-// ------------------------------------------------------------------
-// Import menu
+//
+// import menu
 
-// Verified against the piranha compiler on the host: every entry compiles
-// and executes with a non null engine. node holds the use_*_theme call for
-// themes and the set_engine target for old format engine files, which have
-// no main of their own.
+// every entry was compiled and run through piranha on the host
+// node holds the theme call or the set_engine target for old format
+// engine files
 static const MrAsset kImportThemes[] = {
     {"themes/default.mr", "use_default_theme", "DEFAULT"},
     {"themes/amateur.mr", "use_amateur_theme", "AMATEUR"},
@@ -688,7 +674,7 @@ void AndroidBackend::layoutImportPanel(int sw,int sh) {
     float y=py+headerH+pad;
     L.rowH=boxH;
     L.listTop=y+titleH+gap+boxH;
-    // The open list may not run past the bottom of the screen.
+    // the open list may not run past the bottom of the screen
     L.listH=(float)sh*0.55f;
     if(L.listTop+L.listH>(float)sh-pad) L.listH=(float)sh-pad-L.listTop;
     if(L.listH<boxH*2.0f) L.listH=boxH*2.0f;
@@ -707,10 +693,9 @@ void AndroidBackend::layoutImportPanel(int sw,int sh) {
     placeBtn(L.engineImport,col2X,1);
 }
 
-// Builds the main script that pairs an engine with a theme, then stages it
-// for the same full reload the file import uses. Old format engine files
-// get a main node with set_engine only; the C++ side supplies the default
-// vehicle and transmission.
+// builds the wrapper script that pairs an engine with a theme and
+// stages it for a full reload old format engine files get a main node
+// with set_engine only
 bool AndroidBackend::stageWrapperReload(const std::string& enginePath,
         const std::string& engineNode,const std::string& themePath,
         const std::string& themeNode) {
@@ -764,10 +749,10 @@ int AndroidBackend::handleImportMotion(AInputEvent* event,int32_t am) {
     importEngines(&engineCount);
     const auto& L=m_importLayout;
     auto listRect=[&](const float* box)->std::array<float,4> {
-        // Open lists draw straight below their selector box.
+        // open lists draw straight below their selector box
         return {box[0],box[1]+box[3],box[2],L.listH};
     };
-    // On open, bring the selected row into view like a desktop dropdown.
+    // on open bring the selected row into view like a desktop dropdown
     auto revealSel=[&](int sel,int count,float& scroll){
         scroll=clampListScroll(scroll,count,L.rowH,L.listH);
         if(sel<0||sel>=count) return;
@@ -796,7 +781,7 @@ int AndroidBackend::handleImportMotion(AInputEvent* event,int32_t am) {
             }
             m_import.themeListOpen=false;
             m_import.engineListOpen=false;
-            // A tap on the other selector switches lists in one touch.
+            // a tap on the other selector switches lists in one touch
             if(contains(L.themeBox,x,y)&&!themeList) {
                 m_import.themeListOpen=true;
                 revealSel(m_import.themeSel,themeCount,m_import.themeScroll);
@@ -820,7 +805,7 @@ int AndroidBackend::handleImportMotion(AInputEvent* event,int32_t am) {
         }
         if(contains(L.themeLoad,x,y)) {
             closeImportMenu();
-            // Entry 0 is DEFAULT, so this also covers a reset to stock.
+            // entry 0 is default so this also covers a reset to stock
             const MrAsset* t=&kImportThemes[
                 m_import.themeSel>0?m_import.themeSel:0];
             stageWrapperReload(m_enginePath,m_engineNode,t->path,t->node);
@@ -946,8 +931,7 @@ void AndroidBackend::layoutButtons(int sw,int sh) {
     if(sw<=0||sh<=0) return;
     const float pad=18;
     float bw=165,bh=90,gap=12;
-    // The right edge stacks 4 buttons on top of 4 buttons. On short landscape
-    // screens (< 828px) that would overlap, so buttons and gaps shrink to fit.
+    // shrink buttons on short landscape screens so 8 fit the right edge
     const float needed=8*bh+7*gap+2*pad;
     if(needed>(float)sh) {
         const float scale=((float)sh-2*pad)/(needed-2*pad);
@@ -965,8 +949,7 @@ void AndroidBackend::layoutButtons(int sw,int sh) {
     add("SHIFT +","VLYR UP",rX,lY,VirtualKey::ShiftUp,VirtualKey::ViewLayerUp);
     add("SHIFT -","VLYR DWN",rX,lY-(bh+gap),VirtualKey::ShiftDown,VirtualKey::ViewLayerDown);
     add("PAUSE","DYNO",rX,lY-2*(bh+gap),VirtualKey::Pause,VirtualKey::Dyno);
-    // ResetEngine maps to ysKey::Code::Return in the shim: run() reloads the
-    // engine script on its edge (loadScript()).
+    // resetengine maps to return in the shim which reloads the script
     add("RELOAD","DYNO HOLD",rX,lY-3*(bh+gap),VirtualKey::ResetEngine,VirtualKey::DynoHold);
     add("1x","1/200x",pad,pad,VirtualKey::None,VirtualKey::N3);
     add("1/10x","1/500x",pad,pad+(bh+gap),VirtualKey::N1,VirtualKey::N4);
@@ -975,8 +958,7 @@ void AndroidBackend::layoutButtons(int sw,int sh) {
     add("IMPORT","STEP",rX,pad,VirtualKey::Insert,VirtualKey::Right);
     add("EXIT","THR 10%",rX,pad+(bh+gap),VirtualKey::Escape,VirtualKey::Throttle10);
     add("CAMERA","THR 20%",rX,pad+2*(bh+gap),VirtualKey::Camera,VirtualKey::Throttle20);
-    // No desktop key pages the oscilloscope focus, so this button is consumed
-    // directly in EngineSimApplication::run().
+    // osc page has no desktop key so run consumes it directly
     add("OSC PAGE","ROT 0",rX,pad+3*(bh+gap),VirtualKey::OscPage,VirtualKey::F3);
 
     layoutSettingsPanel(sw,sh);
@@ -990,10 +972,8 @@ static void sl_buffer_callback(SLAndroidSimpleBufferQueueItf bq, void* ctx) {
     int bufSamps = backend->m_sampleRate / 20 * backend->m_channels; // 50ms buffer
     std::vector<int16_t>* buf = &backend->m_slBuffers[backend->m_slNextBuffer];
 
-    // Copy from ring buffer. Like desktop DirectSound: always read from ring
-    // buffer, even if underrun. Old data gets replayed briefly until new audio
-    // arrives. This is better than silence. Two memcpys instead of a per
-    // sample modulo loop: this runs on the audio thread.
+    // read from the ring even on underrun old data beats silence
+    // two memcpys run on the audio thread
     {
         std::lock_guard<std::mutex> lk(backend->m_audioMutex);
         const int rs = (int)backend->m_audioRing.size();
@@ -1069,9 +1049,7 @@ void AndroidBackend::destroyAudio() {
 }
 
 void AndroidBackend::resetAudioRing() {
-    // Silence the ring buffer and line the write head up with the read head.
-    // Called when pausing so the last second of audio does not loop forever,
-    // and when resuming so fresh audio starts playing right away.
+    // silence the ring and line the write head up with the read head
     std::lock_guard<std::mutex> lk(m_audioMutex);
     if(!m_audioRing.empty()) memset(m_audioRing.data(),0,m_audioRing.size()*sizeof(int16_t));
     m_audioWritePos=m_audioReadPos;
@@ -1083,10 +1061,9 @@ bool AndroidBackend::writeAudioSamples(const int16_t* samples,int count,int* wri
     const int rs=(int)m_audioRing.size();
     if(written)*written=count;
     if(rs<=0||count<=0) return true;
-    // A block larger than the ring keeps only its tail.
+    // a block larger than the ring keeps only its tail
     if(count>=rs){ samples+=count-rs; count=rs; m_audioWritePos=m_audioReadPos; }
-    // The writer may lap the reader; the reader then advances past exactly
-    // the overwritten samples, same as the old per-sample chase.
+    // the writer may lap the reader advance past the overwritten samples
     const int first=count<rs-m_audioWritePos?count:rs-m_audioWritePos;
     memcpy(&m_audioRing[m_audioWritePos],samples,(size_t)first*sizeof(int16_t));
     const int rest=count-first;
@@ -1143,7 +1120,7 @@ void AndroidBackend::requestMrFilePicker() {
     jmethodID method = env->GetMethodID(cls, "openFilePicker", "()V");
     if (method != nullptr) {
         env->CallVoidMethod(activity, method);
-        // Never detach with a pending exception, it is undefined behavior.
+        // never detach with a pending exception it is undefined behavior
         if (env->ExceptionCheck()) {
             esdroid_wtflog("openFilePicker threw a Java exception");
             env->ExceptionDescribe();
@@ -1181,12 +1158,9 @@ void AndroidBackend::requestThemeFilePicker() {
     if (attached) vm->DetachCurrentThread();
 }
 
-// Builds the main script for an imported engine. Community engine files
-// only contain the engine definition, so the same boilerplate main.mr uses
-// (language import, theme import, theme call, main()) is wrapped around
-// them, pairing the engine with the theme currently in use. A file that
-// already calls use_default_theme() is treated as a self contained main
-// script and loaded as is.
+// builds a main script for an imported engine community files only
+// contain the engine definition so the boilerplate gets wrapped around
+// them a file that already calls use_default_theme loads as is
 static std::string buildImportedMainScript(const std::string& enginePath,
         const std::string& themePath, const std::string& themeNode) {
     bool selfContained = false;
@@ -1208,7 +1182,7 @@ static std::string buildImportedMainScript(const std::string& enginePath,
     std::string dir = (slash == std::string::npos) ? "." : enginePath.substr(0, slash);
     size_t nameStart = (slash == std::string::npos) ? 0 : slash + 1;
     std::string base = enginePath.substr(nameStart);
-    // Strip a .mr suffix; the import line re-adds it.
+    // strip a mr suffix the import line re-adds it
     if (base.size() > 3 && base.compare(base.size() - 3, 3, ".mr") == 0)
         base = base.substr(0, base.size() - 3);
 
@@ -1242,11 +1216,8 @@ static std::string buildImportedMainScript(const std::string& enginePath,
 void AndroidBackend::onMrFilePicked(const std::string& path) {
     if (path.empty()) return;
 
-    // Stage the main script and raise the flag. The render thread picks both
-    // up on its next pass, which stops the game so android_main can rebuild
-    // it with the new script. A flag is used instead of a synthetic key press
-    // because the button list is rebuilt when the window comes back, which
-    // would eat the key edge.
+    // stage the script and raise the flag the render thread stops the
+    // game so android_main can rebuild it with the new script
     std::string mainScript = buildImportedMainScript(path, m_themePath, m_themeNode);
     {
         std::lock_guard<std::mutex> lk(m_mrMutex);
@@ -1254,17 +1225,16 @@ void AndroidBackend::onMrFilePicked(const std::string& path) {
     }
     m_scriptReloadPending = true;
     if (mainScript != path) {
-        // Wrapped import: remember it as the current engine so a later
-        // LOAD THEME keeps it. Self contained scripts own their theme.
+        // wrapped import remember it as the current engine so a later
+        // load theme keeps it
         m_enginePath = "imported";
         m_engineNode = "";
     }
     esdroid_wtflog("onMrFilePicked: %s (main script: %s)", path.c_str(), mainScript.c_str());
 }
 
-// Theme files publish a use_*_theme node; the name is parsed out of the
-// file so the wrapper can call it. Files without one fall back to the
-// default theme call.
+// theme files publish a use_*_theme node the name is parsed out of
+// the file for the wrapper call
 void AndroidBackend::onThemeFilePicked(const std::string& path) {
     if (path.empty()) return;
     std::string node = "use_default_theme";
@@ -1300,16 +1270,15 @@ void AndroidBackend::onThemeFilePicked(const std::string& path) {
 
 bool AndroidBackend::consumeScriptReloadPending() {
     if (!m_scriptReloadPending.exchange(false)) return false;
-    // Runs on the render thread only, this is the single place the active
-    // script path changes after startup.
+    // the only place the active script path changes
     std::lock_guard<std::mutex> lk(m_mrMutex);
     if (!m_pendingMrPath.empty()) m_activeMrPath = m_pendingMrPath;
     esdroid_wtflog("script reload consumed, active script: %s", m_activeMrPath.c_str());
     return true;
 }
 
-// The value entry dialog is a real Android Dialog: it owns its own window,
-// so its buttons and the IME work on top of the native input queue.
+// a real dialog owns its own window so its buttons and the ime work
+// over the native input queue
 void AndroidBackend::requestValueInput(int idx) {
     if (s_app == nullptr || s_app->activity == nullptr) return;
     JNIEnv* env = nullptr;
@@ -1394,10 +1363,8 @@ Java_com_esdroid_engine_1sim_ESDroidActivity_nativeOnValueInput(JNIEnv* env, job
 
 extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*) {
     g_javaVM=vm;
-    // Bind the java facing methods explicitly. The package name contains an
-    // underscore, which JNI name mangling encodes as _1, and a plain symbol
-    // name with a raw underscore is invisible to the VM. Registering by
-    // method name here does not depend on symbol name mangling at all.
+    // register natives by name the package underscore needs the _1
+    // mangling in exported symbols
     JNIEnv* env=nullptr;
     if (vm->GetEnv((void**)&env, JNI_VERSION_1_6)==JNI_OK && env!=nullptr) {
         jclass cls=env->FindClass("com/esdroid/engine_sim/ESDroidActivity");
@@ -1445,9 +1412,7 @@ void esdroid::AndroidBackend::resizeTouchUI() {
     if (m_touchUI) m_touchUI->resize(m_screenWidth, m_screenHeight);
 }
 
-// JNI callback from Java when a file is picked. The package name contains
-// an underscore so the exported name must encode it as _1, otherwise the
-// VM cannot find the symbol (JNI_OnLoad also registers it by name).
+// jni callback the _1 encodes the underscore in the package name
 extern "C" JNIEXPORT void JNICALL
 Java_com_esdroid_engine_1sim_ESDroidActivity_nativeOnFilePicked(JNIEnv* env, jobject thiz, jstring path) {
     if (path == nullptr) return;
@@ -1458,8 +1423,7 @@ Java_com_esdroid_engine_1sim_ESDroidActivity_nativeOnFilePicked(JNIEnv* env, job
     }
 }
 
-// Same callback for the theme picker; both run on the Java UI thread and
-// stage their work for the render thread.
+// same callback for the theme picker both run on the java ui thread
 extern "C" JNIEXPORT void JNICALL
 Java_com_esdroid_engine_1sim_ESDroidActivity_nativeOnThemePicked(JNIEnv* env, jobject thiz, jstring path) {
     if (path == nullptr) return;
@@ -1470,8 +1434,7 @@ Java_com_esdroid_engine_1sim_ESDroidActivity_nativeOnThemePicked(JNIEnv* env, jo
     }
 }
 
-// Typed value from the settings dialog. Runs on the Java UI thread, so it
-// is staged and applied by the render thread on its next poll.
+// typed value from the settings dialog staged for the render thread
 extern "C" JNIEXPORT void JNICALL
 Java_com_esdroid_engine_1sim_ESDroidActivity_nativeOnValueInput(JNIEnv* env, jobject thiz, jint index, jdouble value) {
     esdroid::AndroidBackend::instance().stageValueInput((int)index, (double)value);

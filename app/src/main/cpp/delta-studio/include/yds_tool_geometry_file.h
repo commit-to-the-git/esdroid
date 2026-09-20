@@ -9,7 +9,7 @@
 
 class ysToolGeometryFile : public ysObject {
 public:
-    // Tool File Headers
+    // tool file headers
     struct HeaderVersion000 {
         char AnimationData;
         char BoneData;
@@ -63,17 +63,17 @@ public:
         int NumFaces;
     };
 
-    // Keep track of allocations
+    // keep track of allocations
     class Allocation : public ysDynamicArrayElement {
     public:
         void *m_allocation;
     };
 
-    // File Information
+    // file information
     static const int CURRENT_FILE_VERSION = 5;
     static const unsigned int MAGIC_NUMBER = 0x50F1A;
 
-    // Software codes
+    // software codes
     enum class EditorId {
         Undefined = 0x0,
 
@@ -84,7 +84,7 @@ public:
         Count
     };
 
-    // Compilation status
+    // compilation status
     enum class CompilationStatus {
         Undefined = 0x0,
         Raw = 0x1,
@@ -142,10 +142,10 @@ protected:
     EditorId m_lastEditor;
     CompilationStatus m_compilationStatus;
 
-    // File
+    // file
     std::fstream m_file;
 
     ysDynamicArray<Allocation, 4> m_allocationTracker;
 };
 
-#endif /* YDS_TOOL_GEOMETRY_FILE_H */
+#endif /* YDS_TOOL_GEOMETRY_FILE_H  */

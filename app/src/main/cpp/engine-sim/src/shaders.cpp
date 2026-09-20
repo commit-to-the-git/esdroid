@@ -52,7 +52,7 @@ ysError Shaders::Initialize(
         dbasic::ShaderStage::ConstantBufferBinding::BufferType::SceneData,
         &m_lightingControls);
 
-    // UI Stage
+    // ui stage
     m_uiStage->SetInputLayout(inputLayout);
     m_uiStage->SetRenderTarget(uiRenderTarget);
     m_uiStage->SetShaderProgram(shaderProgram);

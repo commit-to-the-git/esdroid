@@ -27,4 +27,4 @@
 #include "rotation_friction_constraint.h"
 #include "simple_gear_constraint.h"
 
-#endif /* ATG_SIMPLE_2D_CONSTRAINT_SOLVER_SCS_H */
+#endif /* ATG_SIMPLE_2D_CONSTRAINT_SOLVER_SCS_H  */

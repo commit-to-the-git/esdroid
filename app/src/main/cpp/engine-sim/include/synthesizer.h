@@ -92,7 +92,7 @@ class Synthesizer {
         AudioParameters getAudioParameters();
         void setAudioParameters(const AudioParameters &params);
 
-    //protected:
+    // protected
         ButterworthLowPassFilter<float> m_antialiasing;
         LevelingFilter m_levelingFilter;
         InputChannel *m_inputChannels;
@@ -121,4 +121,4 @@ class Synthesizer {
         ProcessingFilters *m_filters;
 };
 
-#endif /* ATG_ENGINE_SIM_ENGINE_SYNTHESIZER_H */
+#endif /* ATG_ENGINE_SIM_ENGINE_SYNTHESIZER_H  */

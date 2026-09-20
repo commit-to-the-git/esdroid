@@ -1,5 +1,5 @@
 add_library(delta-basic STATIC
-    # Include files
+    # include files
     include/animation.h
     include/animation_export_data.h
     include/animation_export_file.h
@@ -40,7 +40,7 @@ add_library(delta-basic STATIC
     include/ui_renderer.h
     include/window_handler.h
     
-    # Source files
+    # source files
     src/animation.cpp
     src/animation_export_data.cpp
     src/animation_export_file.cpp

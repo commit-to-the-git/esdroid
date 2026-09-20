@@ -105,4 +105,4 @@ namespace dphysics {
 
 } /* namespace dbasic */
 
-#endif /* DELTA_BASIC_COLLISION_OBJECT_H */
+#endif /* DELTA_BASIC_COLLISION_OBJECT_H  */

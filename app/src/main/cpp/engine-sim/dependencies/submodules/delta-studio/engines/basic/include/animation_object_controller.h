@@ -33,4 +33,4 @@ namespace dbasic {
 
 } /* namespace dbasic */
 
-#endif /* DELTA_BASIC_ANIMATION_OBJECT_CONTROLLER_H */
+#endif /* DELTA_BASIC_ANIMATION_OBJECT_CONTROLLER_H  */

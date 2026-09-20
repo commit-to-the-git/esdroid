@@ -70,4 +70,4 @@ protected:
     CurveType m_curveType;
 };
 
-#endif /* YDS_ANIMATION_CURVE_H */
+#endif /* YDS_ANIMATION_CURVE_H  */

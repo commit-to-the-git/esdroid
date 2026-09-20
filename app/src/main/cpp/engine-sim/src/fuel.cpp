@@ -49,7 +49,7 @@ double Fuel::flameSpeed(
 }
 
 double Fuel::laminarBurningVelocity(double molecularAfr, double T, double P) const {
-    // Assuming fuel is gasoline
+    // assuming fuel is gasoline
     constexpr double er_m = 1.21;
     constexpr double B_m = units::distance(30.5, units::cm) / units::sec;
     constexpr double B_er = -units::distance(54.9, units::cm) / units::sec;

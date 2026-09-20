@@ -3,8 +3,8 @@
 
 #include <string>
 
-// Forward-declare std::filesystem::path to avoid including <filesystem>
-// which is broken on Android < API 30.
+// forward-declare std::filesystem::path to avoid including <filesystem>
+// which is broken on android < api 30
 namespace std { namespace filesystem { class path; } }
 
 namespace piranha {
@@ -36,7 +36,7 @@ namespace piranha {
         bool exists() const;
 
     protected:
-        void *m_path;  // Opaque pointer - never used on Android
+        void *m_path;  // opaque pointer - never used on android
         std::string m_pathString;
 
     protected:
@@ -45,4 +45,4 @@ namespace piranha {
 
 } /* namespace piranha */
 
-#endif /* PIRANHA_PATH_H */
+#endif /* PIRANHA_PATH_H  */

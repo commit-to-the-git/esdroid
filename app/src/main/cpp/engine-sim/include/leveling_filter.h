@@ -23,4 +23,4 @@ class LevelingFilter : public Filter {
         float p_target;
 };
 
-#endif /* ATG_ENGINE_SIM_LEVELING_FILTER_H */
+#endif /* ATG_ENGINE_SIM_LEVELING_FILTER_H  */

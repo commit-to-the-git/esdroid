@@ -11,4 +11,4 @@ public:
     virtual ~ysVulkanGPUBuffer();
 };
 
-#endif /* YDS_VULKAN_GPU_BUFFER_H */
+#endif /* YDS_VULKAN_GPU_BUFFER_H  */

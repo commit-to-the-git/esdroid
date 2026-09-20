@@ -57,4 +57,4 @@ class Crankshaft : public Part {
         double m_frictionTorque;
 };
 
-#endif /* ATG_ENGINE_SIM_CRANKSHAFT_H */
+#endif /* ATG_ENGINE_SIM_CRANKSHAFT_H  */

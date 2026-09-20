@@ -38,12 +38,12 @@ namespace piranha {
         virtual void registerInputs() {
             int inputCount = m_output.getInputCount();
             for (int i = 0; i < inputCount; i++) {
-                // Generate a standard name
+                // generate a standard name
                 std::stringstream ss;
                 if (inputCount > 1) ss << "__in" << i;
                 else ss << "__in";
 
-                // Register all inputs of the one node output
+                // register all inputs of the one node output
                 registerInput(m_output.NodeOutput::getInputConnection(i), ss.str());
             }
         }
@@ -54,4 +54,4 @@ namespace piranha {
 
 } /* namespace piranha */
 
-#endif /* PIRANHA_PIPE_NODE_H */
+#endif /* PIRANHA_PIPE_NODE_H  */

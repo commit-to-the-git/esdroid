@@ -21,27 +21,27 @@ ysDynamicAllocator::ysDynamicAllocator() : ysMemoryAllocator("DYN_ALLOCATOR") {
 ysDynamicAllocator::~ysDynamicAllocator() {
 #define REMINDER "Call Destroy() before this point."
 
-    //RaiseError(m_blockPool == NULL, "Block pool still exists after destructor called.\n" REMINDER);
-    //RaiseError(m_blocks == NULL, "Blocks still exist after destructor is called.\n" REMINDER);
-    //RaiseError(m_data == NULL, "Data buffer still exists after destructor is called.\n" REMINDER);
+    // raiseerrorm_blockpool == null block pool still exists after destructor called\n reminder
+    // raiseerrorm_blocks == null blocks still exist after destructor is called\n reminder
+    // raiseerrorm_data == null data buffer still exists after destructor is called\n reminder
 
 #undef REMINDER
 }
 
 void ysDynamicAllocator::SetParent(ysMemoryAllocator *parent) {
-    //RaiseError(!(m_data || m_blocks || m_blockPool), "Allocator has active memory. Call Destroy() before changing the parent.");
-    //RaiseError(!(m_data || m_blocks || m_blockPool), "Allocator has active memory. Call Destroy() before changing the parent.");
+    // raiseerrorm_data || m_blocks || m_blockpool allocator has active memory call destroy before changing the parent
+    // raiseerrorm_data || m_blocks || m_blockpool allocator has active memory call destroy before changing the parent
 
     m_parent = parent;
 }
 
 void *ysDynamicAllocator::AllocateBlock(int size, int numObjects) {
-    // Size of total allocation with metadata pointer
+    // size of total allocation with metadata pointer
     unsigned int totalSize = size + sizeof(BlockLink *);
 
     m_totalAllocation += totalSize;
 
-    // Get the current allocator block, or find a new one if this one is insufficient
+    // get the current allocator block or find a new one if this one is insufficient
     BlockLink *freeBlock = m_allocatorBlock;
     if (!freeBlock->Free || !freeBlock->Valid || freeBlock->Size < totalSize) freeBlock = UpdateAllocatorBlock();
     if (!freeBlock || freeBlock->Size < totalSize) return 0;
@@ -135,7 +135,7 @@ int ysDynamicAllocator::FreeBlock(void *block) {
 }
 
 void ysDynamicAllocator::CreateBuffer(int size) {
-    //RaiseError(m_data == NULL, "Allocator already has a buffer.");
+    // raiseerrorm_data == null allocator already has a buffer
 
     m_maxSize = size;
 
@@ -147,7 +147,7 @@ void ysDynamicAllocator::CreateBuffer(int size) {
     }
 
 #ifdef _DEBUG
-    // To make the buffer easier to see while debugging
+    // to make the buffer easier to see while debugging
     memset(m_data, 0, size);
 #endif
 }
@@ -203,7 +203,7 @@ void ysDynamicAllocator::Destroy() {
     m_blocks = NULL;
 }
 
-// Block Creation/Destruction
+// block creation/destruction
 
 void ysDynamicAllocator::RemoveBlock(BlockIndex index) {
     BlockLink *temp = m_blocks[index];
@@ -239,7 +239,7 @@ BlockLink *ysDynamicAllocator::UpdateAllocatorBlock() {
     else return &m_blockPool[index];
 }
 
-// Error Checking
+// error checking
 
 bool ysDynamicAllocator::CheckValid() {
     int totalSize=0;

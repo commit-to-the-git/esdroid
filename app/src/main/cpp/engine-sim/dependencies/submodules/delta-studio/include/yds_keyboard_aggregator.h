@@ -25,4 +25,4 @@ protected:
     ysExpandingArray<ysKeyboard *, 4> m_keyboards;
 };
 
-#endif /* YDS_KEYBOARD_AGGREGATOR_H */
+#endif /* YDS_KEYBOARD_AGGREGATOR_H  */

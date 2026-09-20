@@ -70,4 +70,4 @@
 #include "vector_split_node.h"
 #include "version.h"
 
-#endif /* PIRANHA_PIRANHA_H */
+#endif /* PIRANHA_PIRANHA_H  */

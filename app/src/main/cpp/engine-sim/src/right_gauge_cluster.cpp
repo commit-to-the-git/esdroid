@@ -155,7 +155,7 @@ void RightGaugeCluster::initialize(EngineSimApplication *app) {
     m_intakeCfmGauge->m_gauge->m_needleKs = 1000.0f;
     m_intakeCfmGauge->m_gauge->m_needleKd = 50.0f;
     m_intakeCfmGauge->m_gauge->setBandCount(0);
-    //Set display units
+    // set display units
     setUnits();
 }
 

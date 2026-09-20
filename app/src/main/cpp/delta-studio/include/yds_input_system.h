@@ -20,28 +20,28 @@ public:
                                      Platform platform);
     static ysError DestroyInputSystem(ysInputSystem *&inputSystem);
 
-    /* Public Functions */
+    /* public functions */
 
     ysError Initialize();
 
-    // Assign a window system to this input system.
+    // assign a window system to this input system
     ysError AssignWindowSystem(ysWindowSystem *system);
 
-    // Retrieve the current device count
+    // retrieve the current device count
     int GetDeviceCount() const { return m_inputDeviceArray.GetNumObjects(); }
 
-    // Retrieve a free ID to assign to a new device.
+    // retrieve a free id to assign to a new device
     int GetNextDeviceID(ysInputDevice::InputDeviceType type);
 
-    // Retrieve an input device based on its ID and type.
+    // retrieve an input device based on its id and type
     ysInputDevice *GetInputDevice(int id, ysInputDevice::InputDeviceType type);
 
-    // Check the current state of a device. If a device is found to no
-    // longer exist, it is either deleted or disconnected depending on
-    // whether it has any dependencies.
+    // check the current state of a device if a device is found to no
+    // longer exist it is either deleted or disconnected depending on
+    // whether it has any dependencies
     virtual ysError CheckDeviceStatus(ysInputDevice *device);
 
-    // Check the states of all devices. See CheckDeviceStatus()
+    // check the states of all devices see checkdevicestatus
     virtual ysError CheckAllDevices();
 
     ysKeyboardAggregator *GetKeyboardAggregator() {
@@ -56,12 +56,12 @@ public:
     void SetGlobalInputEnabled(bool enabled) { m_enableGlobalInput = enabled; }
 
 protected:
-    // Create and register input devices. This function must be called
-    // before any input can be processed.
+    // create and register input devices this function must be called
+    // before any input can be processed
     virtual ysError CreateDevices() = 0;
 
-    // Create a new generic device. This device will not be attached to a
-    // physical device until one is sensed at which point it will be connected.
+    // create a new generic device this device will not be attached to a
+    // physical device until one is sensed at which point it will be connected
     virtual ysInputDevice *CreateDevice(ysInputDevice::InputDeviceType type,
                                         int id) = 0;
     virtual ysInputDevice *
@@ -70,12 +70,12 @@ protected:
     void RegisterDevice(ysInputDevice *device);
     void UnregisterDevice(ysInputDevice *device);
 
-    // Disconnect a device. If the device has no dependencies (ie not in use),
-    // it will also be deleted.
+    // disconnect a device if the device has no dependencies ie not in use
+    // it will also be deleted
     virtual void DisconnectDevice(ysInputDevice *device);
 
-    // Find a generic slot. Retrieves the first device that is currently not
-    // attached to a physical device.
+    // find a generic slot retrieves the first device that is currently not
+    // attached to a physical device
     ysInputDevice *FindGenericSlot(ysInputDevice::InputDeviceType type);
 
 protected:
@@ -85,13 +85,13 @@ protected:
     ysInputDevice *m_osKeyboard;
     ysInputDevice *m_osMouse;
 
-    // Input device array
+    // input device array
     ysDynamicArray<ysInputDevice, 4> m_inputDeviceArray;
 
-    // Currently assigned window system
+    // currently assigned window system
     ysWindowSystem *m_windowSystem;
 
     bool m_enableGlobalInput;
 };
 
-#endif /* YDS_INPUT_SYSTEM_H */
+#endif /* YDS_INPUT_SYSTEM_H  */

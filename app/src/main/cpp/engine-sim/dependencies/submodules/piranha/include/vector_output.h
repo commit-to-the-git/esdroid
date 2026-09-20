@@ -28,4 +28,4 @@ namespace piranha {
 
 } /* namespace piranha */
 
-#endif /* PIRANHA_VECTOR_OUTPUT_H */
+#endif /* PIRANHA_VECTOR_OUTPUT_H  */

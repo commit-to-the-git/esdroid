@@ -86,4 +86,4 @@ protected:
     ysDepthBuffer *m_depthBuffer;
 };
 
-#endif /* YDS_RENDER_TARGET_H */
+#endif /* YDS_RENDER_TARGET_H  */

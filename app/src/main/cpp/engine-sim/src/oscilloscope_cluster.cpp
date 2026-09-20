@@ -50,7 +50,7 @@ void OscilloscopeCluster::initialize(EngineSimApplication *app) {
     m_cylinderMoleculesScope = addElement<Oscilloscope>(this);
     m_pvScope = addElement<Oscilloscope>(this);
 
-    // Torque
+    // torque
     m_torqueScope->setBufferSize(100);
     m_torqueScope->m_xMin = 0.0f;
     m_torqueScope->m_yMin = 0.0f;
@@ -60,7 +60,7 @@ void OscilloscopeCluster::initialize(EngineSimApplication *app) {
     m_torqueScope->m_dynamicallyResizeX = true;
     m_torqueScope->i_color = m_app->getOrange();
 
-    // Power
+    // power
     m_powerScope->setBufferSize(100);
     m_powerScope->m_xMin = 0.0f;
     m_powerScope->m_yMin = 0.0f;
@@ -70,7 +70,7 @@ void OscilloscopeCluster::initialize(EngineSimApplication *app) {
     m_powerScope->m_dynamicallyResizeX = true;
     m_powerScope->i_color = m_app->getPink();
 
-    // Total exhaust flow
+    // total exhaust flow
     m_totalExhaustFlowScope->setBufferSize(1024);
     m_totalExhaustFlowScope->m_xMin = 0.0f;
     m_totalExhaustFlowScope->m_xMax = constants::pi * 4;
@@ -80,7 +80,7 @@ void OscilloscopeCluster::initialize(EngineSimApplication *app) {
     m_totalExhaustFlowScope->m_drawReverse = false;
     m_totalExhaustFlowScope->i_color = m_app->getOrange();
 
-    // Exhaust flow
+    // exhaust flow
     m_exhaustFlowScope->setBufferSize(1024);
     m_exhaustFlowScope->m_xMin = 0.0f;
     m_exhaustFlowScope->m_xMax = constants::pi * 4;
@@ -90,7 +90,7 @@ void OscilloscopeCluster::initialize(EngineSimApplication *app) {
     m_exhaustFlowScope->m_drawReverse = false;
     m_exhaustFlowScope->i_color = m_app->getOrange();
 
-    // Intake flow
+    // intake flow
     m_intakeFlowScope->setBufferSize(1024);
     m_intakeFlowScope->m_xMin = 0.0f;
     m_intakeFlowScope->m_xMax = constants::pi * 4;
@@ -100,7 +100,7 @@ void OscilloscopeCluster::initialize(EngineSimApplication *app) {
     m_intakeFlowScope->m_drawReverse = false;
     m_intakeFlowScope->i_color = m_app->getBlue();
 
-    // Cylinder molcules
+    // cylinder molcules
     m_cylinderMoleculesScope->setBufferSize(1024);
     m_cylinderMoleculesScope->m_xMin = 0.0f;
     m_cylinderMoleculesScope->m_xMax = constants::pi * 4;
@@ -110,7 +110,7 @@ void OscilloscopeCluster::initialize(EngineSimApplication *app) {
     m_cylinderMoleculesScope->m_drawReverse = false;
     m_cylinderMoleculesScope->i_color = m_app->getForegroundColor();
 
-    // Audio waveform scope
+    // audio waveform scope
     m_audioWaveformScope->setBufferSize(44100 / 50);
     m_audioWaveformScope->m_xMin = 0.0f;
     m_audioWaveformScope->m_xMax = 44100 / 10;
@@ -120,7 +120,7 @@ void OscilloscopeCluster::initialize(EngineSimApplication *app) {
     m_audioWaveformScope->m_drawReverse = false;
     m_audioWaveformScope->i_color = m_app->getBlue();
 
-    // Valve lift scopes
+    // valve lift scopes
     m_exhaustValveLiftScope->setBufferSize(1024);
     m_exhaustValveLiftScope->m_xMin = 0.0f;
     m_exhaustValveLiftScope->m_xMax = constants::pi * 4;
@@ -139,7 +139,7 @@ void OscilloscopeCluster::initialize(EngineSimApplication *app) {
     m_intakeValveLiftScope->m_drawReverse = false;
     m_intakeValveLiftScope->i_color = m_app->getBlue();
 
-    // Cylinder pressure scope
+    // cylinder pressure scope
     m_cylinderPressureScope->setBufferSize(1024);
     m_cylinderPressureScope->m_xMin = 0.0f;
     m_cylinderPressureScope->m_xMax = constants::pi * 4;
@@ -149,7 +149,7 @@ void OscilloscopeCluster::initialize(EngineSimApplication *app) {
     m_cylinderPressureScope->m_drawReverse = false;
     m_cylinderPressureScope->i_color = m_app->getOrange();
 
-    // Pressure volume scope
+    // pressure volume scope
     m_pvScope->setBufferSize(1024);
     m_pvScope->m_xMin = 0.0f;
     m_pvScope->m_xMax = units::volume(0.1, units::L);
@@ -160,7 +160,7 @@ void OscilloscopeCluster::initialize(EngineSimApplication *app) {
     m_pvScope->i_color = m_app->getOrange();
     m_pvScope->m_dynamicallyResizeX = true;
 
-    // Spark advance scope
+    // spark advance scope
     m_sparkAdvanceScope->setBufferSize(1024);
     m_sparkAdvanceScope->m_xMin = 0.0f;
     m_sparkAdvanceScope->m_xMax = units::rpm(10000);
@@ -366,9 +366,9 @@ void OscilloscopeCluster::setSimulator(Simulator *simulator) {
 }
 
 void OscilloscopeCluster::nextFocusScope() {
-    // Scope groups that are focused together, exactly matching the click
-    // handling in signal(). The first entry of each group is the identity
-    // used to find the current position.
+    // scope groups that are focused together exactly matching the click
+    // handling in signal the first entry of each group is the identity
+    // used to find the current position
     static constexpr int GroupCount = 8;
     Oscilloscope *groups[GroupCount][MaxLayeredScopes] = {
         { m_audioWaveformScope, nullptr },

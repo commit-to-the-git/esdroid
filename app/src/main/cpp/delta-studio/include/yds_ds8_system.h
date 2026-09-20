@@ -31,4 +31,4 @@ protected:
     GUID m_primaryDeviceGuid;
 };
 
-#endif /* YDS_DS8_SYSTEM_H */
+#endif /* YDS_DS8_SYSTEM_H  */

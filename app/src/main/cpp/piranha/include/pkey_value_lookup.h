@@ -78,4 +78,4 @@ namespace piranha {
 
 } /* namespace piranha */
 
-#endif /* PIRANHA_PKEY_VALUE_LOOKUP_H */
+#endif /* PIRANHA_PKEY_VALUE_LOOKUP_H  */

@@ -18,4 +18,4 @@ protected:
     double m_speedControl;
 };
 
-#endif /* ATG_ENGINE_SIM_THROTTLE_H */
+#endif /* ATG_ENGINE_SIM_THROTTLE_H  */

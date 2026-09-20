@@ -95,7 +95,7 @@ void piranha::IrCompilationUnit::resolveAll() {
 
     resolveDefinitions();
 
-    // Check for circular definitions
+    // check for circular definitions
     const int definitionCount = getNodeDefinitionCount();
     for (int i = 0; i < definitionCount; i++) {
         getNodeDefinition(i)->checkCircularDefinitions();
@@ -172,7 +172,7 @@ piranha::IrNodeDefinition *piranha::IrCompilationUnit::resolveNodeDefinition(
     piranha::IrNodeDefinition *firstDefinition = nullptr;
     const std::string typeName = name;
 
-    // First search local node definitions if a library is not specified
+    // first search local node definitions if a library is not specified
     if (libraryName.empty()) {
         int localCount = 0;
         IrNodeDefinition *localDefinition = 
@@ -182,13 +182,13 @@ piranha::IrNodeDefinition *piranha::IrCompilationUnit::resolveNodeDefinition(
         if (localDefinition != nullptr) return localDefinition;
     }
 
-    // Search dependencies
+    // search dependencies
     const int dependencyCount = getImportStatementCount();
     for (int i = 0; i < dependencyCount; i++) {
         int secondaryCount = 0;
         IrImportStatement *importStatement = getImportStatement(i);
 
-        // Skip the import statement if it already failed
+        // skip the import statement if it already failed
         if (importStatement->getUnit() == nullptr) continue;
 
         const bool libraryNameMatches = importStatement->hasShortName()
@@ -196,18 +196,18 @@ piranha::IrNodeDefinition *piranha::IrCompilationUnit::resolveNodeDefinition(
             : false;
 
         if (libraryName.empty() || libraryNameMatches) {
-            // Skip the import statement if it can't be accessed
+            // skip the import statement if it cant be accessed
             if (external && !importStatement->allowsExternalAccess()) continue;
 
-            // The external access flag must be set to true since the libraries are being accessed
-            // externally                                                                        ----
-            IrNodeDefinition *definition =                                                       ////
+            // the external access flag must be set to true since the libraries are being accessed
+            // externally ----
+            IrNodeDefinition *definition =                                                       // //
                 importStatement->getUnit()->resolveNodeDefinition(typeName, &secondaryCount, "", true);
             if (definition != nullptr) {
                 (*count) += secondaryCount;
 
-                // Make sure to not overwrite the result definition
-                // The first definition to be found must be returned
+                // make sure to not overwrite the result definition
+                // the first definition to be found must be returned
                 if (firstDefinition == nullptr) {
                     firstDefinition = definition;
                 }
@@ -248,7 +248,7 @@ piranha::IrNodeDefinition *piranha::IrCompilationUnit::resolveBuiltinNodeDefinit
     piranha::IrNodeDefinition *firstDefinition = nullptr;
     const std::string typeName = builtinName;
 
-    // First search local node definitions if a library is not specified
+    // first search local node definitions if a library is not specified
     int localCount = 0;
     IrNodeDefinition *localDefinition = 
         resolveLocalBuiltinNodeDefinition(typeName, &localCount, external);
@@ -256,22 +256,22 @@ piranha::IrNodeDefinition *piranha::IrCompilationUnit::resolveBuiltinNodeDefinit
 
     if (localDefinition != nullptr) return localDefinition;
 
-    // Search dependencies
+    // search dependencies
     const int dependencyCount = getImportStatementCount();
     for (int i = 0; i < dependencyCount; i++) {
         IrImportStatement *importStatement = getImportStatement(i);
 
-        // Skip the import statement if it already failed
+        // skip the import statement if it already failed
         if (importStatement->getUnit() == nullptr) continue;
 
-        // Skip if the import statement cannot be accessed
+        // skip if the import statement cannot be accessed
         if (external && !importStatement->allowsExternalAccess()) continue;
 
         int secondaryCount = 0;
 
-        // The external access flag must be set to true since the libraries are being accessed
-        // externally                                                                           ----
-        IrNodeDefinition *definition =                                                          ////
+        // the external access flag must be set to true since the libraries are being accessed
+        // externally ----
+        IrNodeDefinition *definition =                                                          // //
             importStatement->getUnit()->resolveBuiltinNodeDefinition(typeName, &secondaryCount, true);
         if (definition != nullptr) {
             (*count) += secondaryCount;

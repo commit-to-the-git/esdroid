@@ -37,4 +37,4 @@ protected:
     bool m_mirrorToRAM;
 };
 
-#endif /* YDS_GPU_BUFFER_H */
+#endif /* YDS_GPU_BUFFER_H  */

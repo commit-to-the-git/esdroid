@@ -42,4 +42,4 @@ class Transmission {
         double m_clutchPressure;
 };
 
-#endif /* ATG_ENGINE_SIM_TRANSMISSION_H */
+#endif /* ATG_ENGINE_SIM_TRANSMISSION_H  */

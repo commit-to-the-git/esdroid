@@ -15,7 +15,7 @@ public:
     ysWindowsWindow();
     virtual ~ysWindowsWindow();
 
-    // Overrides
+    // overrides
 
     virtual ysError InitializeWindow(ysWindow *parent, const wchar_t *title,
                                      WindowStyle style, int x, int y, int width,
@@ -39,7 +39,7 @@ public:
     virtual int GetScreenHeight() const override;
 
 public:
-    // Windows Specific
+    // windows specific
 
     inline void SetInstance(HINSTANCE instance) { m_instance = instance; }
     inline HINSTANCE GetInstance() const { return m_instance; }
@@ -51,7 +51,7 @@ public:
     static int GetWindowsState(WindowState state);
 
 protected:
-    // Abstraction Layer
+    // abstraction layer
 
     virtual void Close() override;
     virtual void SetTitle(const wchar_t *title) override;
@@ -68,4 +68,4 @@ protected:
     int m_previousCmdShow;
 };
 
-#endif /* YDS_WINDOWS_WINDOW_H */
+#endif /* YDS_WINDOWS_WINDOW_H  */

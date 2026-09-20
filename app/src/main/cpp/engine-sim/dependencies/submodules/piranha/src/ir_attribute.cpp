@@ -92,7 +92,7 @@ void piranha::IrAttribute::_checkTypes(IrContextTree *context) {
             if (refAsNode != nullptr) {
                 IrNodeDefinition *definition = refAsNode->getDefinition()->getAliasType();
                 if (definition == nullptr) return;
-                if (definition == typeDefinition) return; // Type is confirmed to be correct
+                if (definition == typeDefinition) return; // type is confirmed to be correct
             }
         }
 
@@ -103,7 +103,7 @@ void piranha::IrAttribute::_checkTypes(IrContextTree *context) {
             : finalReference->getImmediateChannelType();
         const ChannelType *expectedType = typeDefinition->getChannelType();
 
-        if (type == expectedType && expectedType != nullptr) return; // No conversion necessary
+        if (type == expectedType && expectedType != nullptr) return; // no conversion necessary
 
         const bool validConversion = m_rules->checkConversion(type, expectedType);
         if (validConversion) return;

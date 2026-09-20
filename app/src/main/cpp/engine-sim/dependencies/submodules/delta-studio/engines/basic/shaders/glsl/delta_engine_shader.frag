@@ -74,7 +74,7 @@ float f_specular(vec3 i, vec3 o, vec3 h, vec3 normal, float F0, float power, flo
 
 	if (intensity < 0) return 0;
 
-	// Fresnel approximation
+	// fresnel approximation
 	float F0_scaled = 0.08 * F0;
 	float o_dot_h = dot(o, h);
 	float s = pow5(1 - o_dot_h);
@@ -84,7 +84,7 @@ float f_specular(vec3 i, vec3 o, vec3 h, vec3 normal, float F0, float power, flo
 }
 
 float f_specular_ambient(vec3 o, vec3 normal, float F0, float power) {
-	// Fresnel approximation
+	// fresnel approximation
 	float F0_scaled = 0.08 * F0;
 	float o_dot_n = dot(o, normal);
 	float s = pow5(1 - o_dot_n);
@@ -186,7 +186,7 @@ void main(void) {
 				metallic = f_specular(i, o, h, normal, FullSpecular, 1, SpecularPower) * Lights[li].Color.rgb * baseColor.rgb;
 			}
 
-			// Spotlight calculation
+			// spotlight calculation
 			float spotCoherence = -dot(i, Lights[li].Direction.xyz);
 			float spotAttenuation = 1.0;
 			if (spotCoherence > Lights[li].Attenuation0) spotAttenuation = 1.0;

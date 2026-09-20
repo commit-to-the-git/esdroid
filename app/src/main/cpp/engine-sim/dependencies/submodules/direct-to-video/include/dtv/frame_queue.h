@@ -36,4 +36,4 @@ private:
 };
 } /* namespace atg_dtv */
 
-#endif /* ATG_DIRECT_TO_VIDEO_FRAME_QUEUE_H */
+#endif /* ATG_DIRECT_TO_VIDEO_FRAME_QUEUE_H  */

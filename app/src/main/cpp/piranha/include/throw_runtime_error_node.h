@@ -29,7 +29,7 @@ namespace piranha {
                 throwError("Planned error");
             }
             else {
-                // Do nothing
+                // do nothing
             }
         }
 
@@ -47,4 +47,4 @@ namespace piranha {
 
 } /* namespace piranha */
 
-#endif /* PIRANHA_THROW_RUNTIME_ERROR_NODE_H */
+#endif /* PIRANHA_THROW_RUNTIME_ERROR_NODE_H  */

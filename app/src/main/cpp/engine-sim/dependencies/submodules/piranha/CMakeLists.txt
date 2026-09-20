@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-# Enable group projects in folders
+# enable group projects in folders
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER "cmake")
 
@@ -8,8 +8,8 @@ project(piranha)
 
 set(CMAKE_CXX_STANDARD 17)
 
-# =========================================================
-# GTEST
+#
+# gtest
 
 include(FetchContent)
 FetchContent_Declare(
@@ -25,8 +25,8 @@ set_property(TARGET gmock_main PROPERTY FOLDER "gtest")
 set_property(TARGET gtest PROPERTY FOLDER "gtest")
 set_property(TARGET gtest_main PROPERTY FOLDER "gtest")
 
-# =========================================================
-# FLEX BISON
+#
+# flex bison
 
 find_package(FLEX REQUIRED)
 find_package(BISON REQUIRED)
@@ -49,7 +49,7 @@ include_directories(dependencies/libraries/flex/include)
 include_directories(include)
 
 add_library(piranha STATIC
-    # Source files
+    # source files
     src/assembly.cpp
     src/channel_node.cpp
     src/channel_type.cpp
@@ -86,7 +86,7 @@ add_library(piranha STATIC
     src/string_conversions.cpp
     src/vector_constructor.cpp
 
-    # Header files
+    # header files
     include/piranha.h
     include/add_operation_output.h
     include/assembly.h
@@ -156,18 +156,18 @@ add_library(piranha STATIC
     include/vector_split_node.h
     include/version.h
 
-    # Autogen
+    # autogen
     ${BISON_parser_OUTPUTS}
     ${FLEX_lexer_OUTPUTS}
 )
 
 add_executable(piranha_reference_compiler
-    # Source files
+    # source files
     demos/main.cpp
     demos/reference_language_rules.cpp
     demos/utilities.cpp
 
-    # Include files
+    # include files
     demos/utilities.h
     demos/reference_language_rules.h
 )

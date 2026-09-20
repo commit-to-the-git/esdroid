@@ -11,7 +11,7 @@ ysInputDevice::ysInputDevice() : ysWindowSystemObject("INPUT DEVICE", Platform::
 
     m_deviceID = -1;
 
-    // Clear specific pointers
+    // clear specific pointers
     m_genericData = nullptr;
 }
 
@@ -26,7 +26,7 @@ ysInputDevice::ysInputDevice(Platform platform, InputDeviceType type) : ysWindow
 
     m_deviceID = -1;
 
-    // Clear specific pointers
+    // clear specific pointers
     m_genericData = nullptr;
 }
 
@@ -42,10 +42,10 @@ void ysInputDevice::Destroy() {
         delete m_mouse;
     }
     else if (m_type == InputDeviceType::CUSTOM) {
-        // Delete custom
+        // delete custom
     }
 
-    // Clear specific pointer
+    // clear specific pointer
     m_generic = 0;
 }
 
@@ -64,20 +64,20 @@ void ysInputDevice::SetType(ysInputDevice::InputDeviceType type) {
         m_mouse = new ysMouse;
     }
     else if (m_type == InputDeviceType::CUSTOM) {
-        // New custom
+        // new custom
     }
 }
 
 ysKeyboard *ysInputDevice::GetAsKeyboard() {
     if (m_type == InputDeviceType::KEYBOARD) return m_keyboard;
 
-    //RaiseError(false, "Illegal access of keyboard.\n");
+    // raiseerrorfalse illegal access of keyboard\n
     return nullptr;
 }
 
 ysMouse *ysInputDevice::GetAsMouse() {
     if (m_type == InputDeviceType::MOUSE) return m_mouse;
 
-    //RaiseError(false, "Illegal access of mouse.\n");
+    // raiseerrorfalse illegal access of mouse\n
     return nullptr;
 }

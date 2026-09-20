@@ -75,9 +75,9 @@ namespace piranha {
         std::vector<Node *> m_dependencyChain;
     };
 
-    // Type to reduce confusion
+    // type to reduce confusion
     typedef NodeOutput * pNodeInput;
 
 } /* namespace piranha */
 
-#endif /* PIRANHA_NODE_OUTPUT_H */
+#endif /* PIRANHA_NODE_OUTPUT_H  */

@@ -42,7 +42,7 @@ namespace piranha {
         static bool hasEnding(std::string const &fullString, std::string const &ending);
 
     protected:
-        // Build steps
+        // build steps
         void resolve();
         void validate();
 
@@ -58,4 +58,4 @@ namespace piranha {
 
 } /* namespace piranha */
 
-#endif /* PIRANHA_COMPILER_H */
+#endif /* PIRANHA_COMPILER_H  */

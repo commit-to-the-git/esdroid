@@ -16,4 +16,4 @@ class DerivativeFilter : public Filter {
         float m_previous;
 };
 
-#endif /* ATG_ENGINE_SIM_DERIVATIVE_FILTER_H */
+#endif /* ATG_ENGINE_SIM_DERIVATIVE_FILTER_H  */

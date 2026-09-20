@@ -53,8 +53,8 @@ struct TouchButton {
     int pointerId;
 };
 
-// One row in the settings panel. The desktop wheel combos tune these
-// (Z/X/C/V/B/N/G + wheel) plus the touch THROTTLE button's percentage.
+// one row in the settings panel the desktop wheel combos tune these
+// z/x/c/v/b/n/g + wheel plus the touch throttle buttons percentage
 enum class SettingIndex : int {
     Volume=0, Convolution, HiFreqGain, LoFreqNoise, HiFreqNoise,
     SimFrequency, DynoSpeed, Throttle, Count
@@ -63,17 +63,17 @@ constexpr int kSettingCount=(int)SettingIndex::Count;
 
 struct SettingsState {
     bool open=false;
-    // audio mixer, 0..1
+    // audio mixer 0 to 1
     float volume=1.0f, convolution=1.0f, hiFreqGain=0.01f;
     float loFreqNoise=1.0f, hiFreqNoise=0.5f;
-    double simFrequency=44100.0;   // Hz, 400..400000
+    double simFrequency=44100.0;   // hz 400 to 400000
     double dynoSpeedRpm=0.0;       // engine range
     double dynoMinRpm=0.0, dynoMaxRpm=8000.0;
-    float throttlePct=100.0f;      // what the THROTTLE button does
-    unsigned dirty=0;              // bit per SettingIndex, app consumes
+    float throttlePct=100.0f;      // what the throttle button does
+    unsigned dirty=0;              // bit per setting the app consumes
 };
 
-// Screen-space rects shared by the renderer and the touch hit-tests.
+// screen-space rects shared by the renderer and the touch hit-tests
 struct SettingsLayout {
     float panel[4]={0,0,0,0};
     float close[4]={0,0,0,0};
@@ -82,17 +82,17 @@ struct SettingsLayout {
     float rowH=0.0f;
 };
 
-// One pickable entry in the import menu. Every entry in both tables below
-// was compiled and executed through piranha on the host.
+// one pickable entry in the import menu every entry in both tables below
+// was compiled and executed through piranha on the host
 struct MrAsset {
     const char* path;   // import path relative to the assets root
-    const char* node;   // theme node, or the engine node for old format files
+    const char* node;   // theme node or the engine node for old format files
     const char* name;   // dropdown label
 };
 
 struct ImportMenuState {
     bool open=false;
-    int themeSel=0, engineSel=0;      // 0 = DEFAULT (stock pair)
+    int themeSel=0, engineSel=0;      // 0 = default stock pair
     bool themeListOpen=false, engineListOpen=false;
     float themeScroll=0.0f, engineScroll=0.0f;
     int scrollPid=-1;                 // finger driving an open list
@@ -130,9 +130,8 @@ public:
     void pressButton(TouchButton* btn,int pid);
     void releaseButton(TouchButton* btn);
     void releaseAllButtons(int pid, bool cancel=false);
-    // Engine touch: the first finger that misses every button drives the
-    // mouse, a second free finger turns the drag into a pinch. Button
-    // touches never reach these.
+    // engine touch first free finger drives the mouse second starts
+    // a pinch button touches never reach these
     void pressEngineTouch(int pid,float x,float y);
     void moveEngineTouch(int pid,float x,float y);
     void releaseEngineTouch(int pid,bool cancel);
@@ -141,8 +140,7 @@ public:
     bool consumeEngineTouchDown() { bool e=m_touchDownEdge; m_touchDownEdge=false; return e; }
     bool consumeEngineTouchUp() {
         bool e=m_touchUpEdge; m_touchUpEdge=false;
-        // The reported position teleported (pinch started or ended), so the
-        // drag restarts at the new anchor or the view would jump.
+        // a teleport restarts the drag at the new anchor
         if(e&&m_restartPending){
             m_restartPending=false;
             if(m_touchPid2!=-1){ m_touchX=(m_touchX1+m_touchX2)*0.5f; m_touchY=(m_touchY1+m_touchY2)*0.5f; }
@@ -151,7 +149,7 @@ public:
         }
         return e;
     }
-    // Pinch zoom as wheel scroll; whole units out, the fraction stays.
+    // pinch zoom as wheel scroll whole units out the fraction stays
     int consumePinchScroll() { int s=(int)m_pinchWheel; m_pinchWheel-=(float)s; return s; }
     std::vector<TouchButton>& buttons() { return m_buttons; }
     bool fnActive() const { return m_fnLatched||m_fnHeld; }
@@ -161,8 +159,8 @@ public:
         return b.key;
     }
     void layoutButtons(int sw,int sh);
-    // Settings panel: values live here, the app applies them through the
-    // dirty bits, the UI (and only the UI) mutates the values.
+    // settings panel values live here the app applies them through
+    // the dirty bits
     SettingsState& settings() { return m_settings; }
     const SettingsState& settings() const { return m_settings; }
     const SettingsLayout& settingsLayout() const { return m_settingsLayout; }
@@ -177,8 +175,7 @@ public:
     void setSettingFromSlider(int idx,float t);
     void setSettingTyped(int idx,double typed);
     void stageValueInput(int idx,double value);
-    // Import menu: engine and theme picks from the bundled assets plus the
-    // custom file pickers. Runs on the render thread like the settings.
+    // import menu engine and theme picks plus the custom file pickers
     ImportMenuState& importMenu() { return m_import; }
     const ImportLayout& importLayout() const { return m_importLayout; }
     bool importMenuOpen() const { return m_import.open; }
@@ -188,8 +185,7 @@ public:
     int handleImportMotion(AInputEvent* event,int32_t actionMasked);
     static const MrAsset* importThemes(int* count);
     static const MrAsset* importEngines(int* count);
-    // The info cluster publishes the title box every rendered frame; the
-    // SETTINGS button lives in its bottom-right corner.
+    // the settings button lives in the info cluster title box corner
     void setSettingsButtonRect(float x,float y,float w,float h) {
         m_settingsButtonRect[0]=x;m_settingsButtonRect[1]=y;
         m_settingsButtonRect[2]=w;m_settingsButtonRect[3]=h;
@@ -222,7 +218,7 @@ public:
     void initTouchUI();
     void renderTouchUI();
     void resizeTouchUI();
-    // Public for audio callback access
+    // public for audio callback access
     int m_sampleRate=44100, m_channels=1;
     std::vector<int16_t> m_slBuffers[2];
     int m_slNextBuffer=0;
@@ -258,7 +254,7 @@ private:
     SettingsLayout m_settingsLayout;
     ImportMenuState m_import;
     ImportLayout m_importLayout;
-    // What is currently loaded, so the next pick only swaps one half.
+    // what is currently loaded so the next pick only swaps one half
     std::string m_themePath="themes/default.mr";
     std::string m_themeNode="use_default_theme";
     std::string m_enginePath="engines/atg-video-2/01_subaru_ej25_eh.mr";
@@ -270,8 +266,7 @@ private:
     bool m_settingsButtonValid=false;
     int m_sliderPid=-1;
     int m_sliderIdx=-1;
-    // Typed values arrive on the Java UI thread and are staged for the
-    // render thread, which owns the settings state.
+    // typed values staged for the render thread
     std::mutex m_valueInputMutex;
     int m_pendingValueIdx=-1;
     double m_pendingValue=0.0;
@@ -283,12 +278,12 @@ private:
     std::atomic<bool> m_shouldQuit{false};
     std::atomic<bool> m_scriptReloadPending{false};
     std::string m_activeMrPath="assets/main.mr";
-    // The path picked in Java is staged here and only moved into
-    // m_activeMrPath by the render thread when it consumes the reload flag.
+    // the picked path waits here until the render thread consumes
+    // the reload flag
     std::mutex m_mrMutex;
     std::string m_pendingMrPath;
     TouchUI* m_touchUI=nullptr;
 };
 
 } // namespace esdroid
-#endif // ESDROID_ANDROID_BACKEND_H
+#endif //  ESDROID_ANDROID_BACKEND_H

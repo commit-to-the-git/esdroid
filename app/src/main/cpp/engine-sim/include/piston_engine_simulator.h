@@ -70,4 +70,4 @@ class PistonEngineSimulator : public Simulator {
         int m_fluidSimulationSteps;
 };
 
-#endif /* ATG_ENGINE_SIM_PISTON_ENGINE_SIMULATOR_H */
+#endif /* ATG_ENGINE_SIM_PISTON_ENGINE_SIMULATOR_H  */

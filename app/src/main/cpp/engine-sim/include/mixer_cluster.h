@@ -37,4 +37,4 @@ class MixerCluster : public UiElement {
             *m_noise1Gauge;
 };
 
-#endif /* ATG_ENGINE_SIM_MIXER_CLUSTER_H */
+#endif /* ATG_ENGINE_SIM_MIXER_CLUSTER_H  */

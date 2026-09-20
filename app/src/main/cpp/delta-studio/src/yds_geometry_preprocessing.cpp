@@ -99,7 +99,7 @@ void ysGeometryPreprocessing::CreateAutomaticSmoothingGroups(ysObjectData *objec
 
     object->m_extendedSmoothingGroups.Allocate(object->m_objectStatistics.NumFaces);
 
-    // Temporary extended smoothing group designation
+    // temporary extended smoothing group designation
     for (int i = 0; i < object->m_objectStatistics.NumFaces; i++) {
         object->m_extendedSmoothingGroups[i] = object->m_objectStatistics.NumFaces + i;
     }
@@ -143,7 +143,7 @@ void ysGeometryPreprocessing::SpreadSmoothingGroup(ysObjectData *object, int fac
     for (int cmpFace = 0; cmpFace < object->m_objectStatistics.NumFaces; cmpFace++) {
         if (cmpFace == face) continue;
 
-        // Check to make sure the faces are in different smoothing groups
+        // check to make sure the faces are in different smoothing groups
         if (object->m_smoothingGroups[face] & object->m_smoothingGroups[cmpFace]) continue;
 
         if (!ConnectedFaces(object, face, cmpFace)) continue;
@@ -165,7 +165,7 @@ void ysGeometryPreprocessing::SeparateBySmoothingGroups(ysObjectData *object) {
     ysExpandingArray<ysExpandingArray<int, 4>> sharingCache;
     sharingCache.Allocate(object->m_objectStatistics.NumVertices);
 
-    // Cache vertex connections
+    // cache vertex connections
     for (int face = 0; face < object->m_objectStatistics.NumFaces; face++) {
         for (int vertIndex = 0; vertIndex < 3; vertIndex++) {
             int vert = object->m_vertexIndexSet[face].indices[vertIndex];
@@ -179,7 +179,7 @@ void ysGeometryPreprocessing::SeparateBySmoothingGroups(ysObjectData *object) {
         groups.Preallocate(16);
 
         for (int face = 0; face < sharingCache[vert].GetNumObjects(); face++) {
-            // Find which group this face belongs to
+            // find which group this face belongs to
             int faceGroup = -1;
             for (int l = 0; l < groups.GetNumObjects(); l++) {
                 for (int i = 0; i < groups[l].GetNumObjects(); i++) {
@@ -199,10 +199,10 @@ void ysGeometryPreprocessing::SeparateBySmoothingGroups(ysObjectData *object) {
         }
 
         for (int l = 1; l < groups.GetNumObjects(); l++) {
-            // Create a copy of the vertex
+            // create a copy of the vertex
             int newVertex = ysGeometryPreprocessing::CreateVertexCopy(object, vert);
 
-            // Adjust indicies for faces
+            // adjust indicies for faces
             for (int face = 0; face < groups[l].GetNumObjects(); face++) {
                 for (int facevert = 0; facevert < 3; facevert++) {
                     if (object->m_vertexIndexSet[groups[l][face]].indices[facevert] == vert) {
@@ -226,7 +226,7 @@ void ysGeometryPreprocessing::SeparateByUVGroups(ysObjectData *object, int mapCh
     ysExpandingArray<ysExpandingArray<int, 4>> sharingCache;
     sharingCache.Allocate(object->m_objectStatistics.NumVertices);
 
-    // Cache vertex connections
+    // cache vertex connections
     for (int face = 0; face < object->m_objectStatistics.NumFaces; face++) {
         for (int vertIndex = 0; vertIndex < 3; vertIndex++) {
             int vert = object->m_vertexIndexSet[face].indices[vertIndex];
@@ -257,10 +257,10 @@ void ysGeometryPreprocessing::SeparateByUVGroups(ysObjectData *object, int mapCh
         }
 
         for (int l = 1; l < leaders.GetNumObjects(); l++) {
-            // Create a copy of the vertex
+            // create a copy of the vertex
             int newVertex = ysGeometryPreprocessing::CreateVertexCopy(object, vert);
 
-            // Adjust indicies for faces
+            // adjust indicies for faces
             for (int face = 0; face < leaders[l].GetNumObjects(); face++) {
                 for (int facevert = 0; facevert < 3; facevert++) {
                     if (object->m_vertexIndexSet[leaders[l][face]].indices[facevert] == vert) {
@@ -311,7 +311,7 @@ void ysGeometryPreprocessing::CalculateNormals(ysObjectData *object) {
     ysVector *tempNormals = CalculateHardNormals(object);
     ysVector *accum = (ysVector *)_aligned_malloc(sizeof(__m128) * object->m_objectStatistics.NumVertices, 16);
 
-    // Clear accum
+    // clear accum
     for (int i = 0; i < object->m_objectStatistics.NumVertices; i++) {
         accum[i] = ysMath::Constants::Zero;
     }
@@ -323,7 +323,7 @@ void ysGeometryPreprocessing::CalculateNormals(ysObjectData *object) {
         }
     }
 
-    // Normalize
+    // normalize
     for (int i = 0; i < object->m_objectStatistics.NumVertices; i++) {
         ysVector normalSum = ysMath::Normalize(accum[i]);
         object->m_normals[i] = ysMath::GetVector3(normalSum);
@@ -371,20 +371,20 @@ ysVector *ysGeometryPreprocessing::CalculateHardTangents(ysObjectData *object, i
         ysMatrix TB_m = ysMath::MatMult(st_inv_m, Q_m);
 
         ysVector T = TB_m.rows[0];
-        ysVector B = TB_m.rows[1]; // Only care about direction
+        ysVector B = TB_m.rows[1]; // only care about direction
         T = ysMath::Mul(T, stDet);
 
-        // Find Handedness
+        // find handedness
         ysVector B_c = ysMath::Cross(T, hardNormals[face]);
         ysVector B_c_dot_B = ysMath::Dot(B_c, B);
 
         int handedness = 1;
         if (ysMath::GetX(B_c_dot_B) < 0) handedness = -1;
 
-        // Orthogonalize
+        // orthogonalize
         T = ysMath::Sub(T, ysMath::Mul(ysMath::Dot(hardNormals[face], T), hardNormals[face]));
 
-        // Add Handedness
+        // add handedness
         T = ysMath::Mask(T, ysMath::Constants::MaskOffW);
         tempTangents[face] = ysMath::Normalize(T);
 
@@ -397,7 +397,7 @@ ysVector *ysGeometryPreprocessing::CalculateHardTangents(ysObjectData *object, i
 void ysGeometryPreprocessing::CalculateTangents(ysObjectData *object, int mapChannel) {
     ysVector *tempTangents = CalculateHardTangents(object, mapChannel);
 
-    // Separate Faces With Discontinuous Tangents
+    // separate faces with discontinuous tangents
     ysExpandingArray<int, 4> m_discontinuousFaces;
 
     for (int f1 = 0; f1 < object->m_objectStatistics.NumFaces; f1++) {
@@ -416,7 +416,7 @@ void ysGeometryPreprocessing::CalculateTangents(ysObjectData *object, int mapCha
             int vert = object->m_vertexIndexSet[f1].indices[facevert];
             int copy = -1;
 
-            // Separate faces
+            // separate faces
             for (int f2 = 0; f2 < m_discontinuousFaces.GetNumObjects(); f2++) {
                 if (ysGeometryPreprocessing::IncludesVertex(object, f2, vert)) {
                     if (copy == -1) copy = ysGeometryPreprocessing::CreateVertexCopy(object, vert);
@@ -426,15 +426,15 @@ void ysGeometryPreprocessing::CalculateTangents(ysObjectData *object, int mapCha
         }
     }
 
-    // FROM HERE
+    // from here
 
     object->m_objectStatistics.NumVertices = object->m_vertices.GetNumObjects();
 
-    // Find smoothed tangents
+    // find smoothed tangents
     object->m_tangents.Allocate(object->m_vertices.GetNumObjects());
     ysVector *accum = (ysVector *)_aligned_malloc(sizeof(__m128) * object->m_objectStatistics.NumVertices, 16);
 
-    // Clear accum
+    // clear accum
     for (int i = 0; i < object->m_objectStatistics.NumVertices; i++) {
         accum[i] = ysMath::Constants::Zero;
     }
@@ -444,13 +444,13 @@ void ysGeometryPreprocessing::CalculateTangents(ysObjectData *object, int mapCha
             int vert = object->m_vertexIndexSet[f1].indices[facevert];
             accum[vert] = ysMath::Add(accum[vert], tempTangents[f1]);
 
-            // Append handedness
+            // append handedness
             accum[vert] = ysMath::Mask(accum[vert], ysMath::Constants::MaskOffW);
             accum[vert] = ysMath::Add(accum[vert], ysMath::Mask(tempTangents[f1], ysMath::Constants::MaskKeepW));
         }
     }
 
-    // Normalize Accumulators
+    // normalize accumulators
     for (int i = 0; i < object->m_objectStatistics.NumVertices; i++) {
         ysVector vec = ysMath::Mask(accum[i], ysMath::Constants::MaskOffW);
         vec = ysMath::Normalize(vec);
@@ -486,7 +486,7 @@ void ysGeometryPreprocessing::SortBoneWeights(ysObjectData *object, bool normali
                 object->m_boneWeights[i].m_boneIndices[includedBone] = heaviestBone;
             }
 
-            // Normalize Bones Weights
+            // normalize bones weights
 
             if (normalize) {
                 float totalWeight = 0.0f;

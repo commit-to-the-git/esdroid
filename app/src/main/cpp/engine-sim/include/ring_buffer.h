@@ -148,4 +148,4 @@ private:
     size_t m_start;
 };
 
-#endif /* ATG_ENGINE_SIM_RING_BUFFER_H */
+#endif /* ATG_ENGINE_SIM_RING_BUFFER_H  */

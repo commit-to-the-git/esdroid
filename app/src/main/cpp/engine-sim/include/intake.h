@@ -8,31 +8,31 @@
 class Intake : public Part {
     public:
         struct Parameters {
-            // Plenum volume
+            // plenum volume
             double volume;
 
-            // Plenum dimensions
+            // plenum dimensions
             double CrossSectionArea;
 
-            // Input flow constant
+            // input flow constant
             double InputFlowK;
 
-            // Idle-circuit flow constant
+            // idle-circuit flow constant
             double IdleFlowK;
 
-            // Flow rate from plenum to runner
+            // flow rate from plenum to runner
             double RunnerFlowRate;
 
-            // Molecular air fuel ratio (defaults to ideal for octane)
+            // molecular air fuel ratio defaults to ideal for octane
             double MolecularAfr = (25.0 / 2.0);
 
-            // Throttle plate position at idle
+            // throttle plate position at idle
             double IdleThrottlePlatePosition = 0.975;
 
-            // Runner volume
+            // runner volume
             double RunnerLength = units::distance(4.0, units::inch);
 
-            // Velocity decay factor
+            // velocity decay factor
             double VelocityDecay = 0.5;
         };
 
@@ -71,4 +71,4 @@ class Intake : public Part {
         GasSystem m_atmosphere;
 };
 
-#endif /* ATG_ENGINE_SIM_INTAKE_H */
+#endif /* ATG_ENGINE_SIM_INTAKE_H  */

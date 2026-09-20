@@ -210,8 +210,8 @@ inline double GasSystem::dynamicPressure(double dx, double dy) const {
     const double c_squared = staticPressure * hcr / density;
     const double machNumber_squared = v * v / c_squared;
 
-    // Below is equivalent to:
-    // staticPressure * pow(1 + ((hcr - 1) / 2) * machNumber * machNumber, hcr / (hcr - 1)) - 1)
+    // below is equivalent to
+    // staticpressure * pow1 + hcr - 1 / 2 * machnumber * machnumber hcr / hcr - 1 - 1
 
     const double x = 1 + ((hcr - 1) / 2) * machNumber_squared;
     double x_d;
@@ -283,4 +283,4 @@ inline double GasSystem::heatCapacityRatio() const {
     return heatCapacityRatio(m_degreesOfFreedom);
 }
 
-#endif /* ATG_ENGINE_SIM_GAS_SYSTEM_H */
+#endif /* ATG_ENGINE_SIM_GAS_SYSTEM_H  */

@@ -24,4 +24,4 @@ class ConnectingRodObject : public SimulationObject {
             m_pins;
 };
 
-#endif /* ATG_ENGINE_SIM_CONNECTING_ROD_OBJECT_H */
+#endif /* ATG_ENGINE_SIM_CONNECTING_ROD_OBJECT_H  */

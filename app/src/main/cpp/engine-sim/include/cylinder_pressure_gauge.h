@@ -23,4 +23,4 @@ class CylinderPressureGauge : public UiElement {
         std::vector<Gauge *> m_gauges;
 };
 
-#endif /* ATG_ENGINE_SIM_UI_CYLINDER_PRESSURE_GAUGE_H */
+#endif /* ATG_ENGINE_SIM_UI_CYLINDER_PRESSURE_GAUGE_H  */

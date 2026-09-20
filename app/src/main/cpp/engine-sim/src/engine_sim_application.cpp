@@ -4,10 +4,16 @@
 #include "android_backend.h"
 #include <cstdarg>
 #include <cstdio>
+#include <thread>
+#include <atomic>
+#include <unistd.h>
 #define LOGE(...) ((void)__android_log_print(ANDROID_LOG_ERROR,"ESDroid",__VA_ARGS__))
 extern "C" void esdroid_wtflog(const char* fmt, ...);
 extern "C" const char *esdroid_get_files_dir();
 extern "C" void esdroid_invalidate_ui_rects();
+extern "C" void esdroid_render_loading_frame();
+extern "C" void esdroid_draw_loading_overlay(float alpha);
+#include <chrono>
 #endif
 #include "../include/engine_sim_application.h"
 #include "esdroid_render_log.h"
@@ -142,8 +148,8 @@ void EngineSimApplication::initialize(void *instance, ysContextObject::DeviceAPI
     settings.WindowHeight = 1080;
 
     {ysError _e = m_engine.CreateGameWindow(settings); if(_e != ysError::None) { esdroid_wtflog("CreateGameWindow FAILED: error=%d", (int)_e); return; } else { esdroid_wtflog("CreateGameWindow OK"); }}
-    // Everything below this point assumes the device and window system exist.
-    // destroy() relies on this flag to skip teardown for a failed initialize.
+    // everything below this point assumes the device and window system exist
+    // destroy relies on this flag to skip teardown for a failed initialize
     m_coreReady = true;
 
     m_engine.GetDevice()->CreateSubRenderTarget(
@@ -180,6 +186,11 @@ void EngineSimApplication::initialize(void *instance, ysContextObject::DeviceAPI
 
 void EngineSimApplication::initialize() {
     m_shaders.SetClearColor(ysColor::srgbiToLinear(0x34, 0x98, 0xdb));
+#if defined(__ANDROID__)
+    // the asset compile runs before loadScript so the loading screen
+    // goes up first
+    esdroid_render_loading_frame();
+#endif
     std::string ap = m_assetPath + "/assets"; std::wstring wap; for(char c:ap) wap.push_back((wchar_t)c);
     {ysError _e = m_assetManager.CompileInterchangeFile(wap.c_str(), 1.0f, true);
     }
@@ -211,10 +222,10 @@ void EngineSimApplication::initialize() {
     m_audioSource->SetVolume(1.0f);
 
 #ifdef ATG_ENGINE_SIM_DISCORD_ENABLED
-    // Create a global instance of discord-rpc
+    // create a global instance of discord-rpc
     CDiscord::CreateInstance();
 
-    // Enable it, this needs to be set via a config file of some sort. 
+    // enable it this needs to be set via a config file of some sort
     GetDiscordManager()->SetUseDiscord(true);
     DiscordRichPresence passMe = { 0 };
 
@@ -223,7 +234,7 @@ void EngineSimApplication::initialize() {
         : "Broken Engine";
 
     GetDiscordManager()->SetStatus(passMe, engineName, s_buildVersion);
-#endif /* ATG_ENGINE_SIM_DISCORD_ENABLED */
+#endif /* ATG_ENGINE_SIM_DISCORD_ENABLED  */
 }
 
 void EngineSimApplication::process(float frame_dt) {
@@ -268,7 +279,7 @@ void EngineSimApplication::process(float frame_dt) {
     while (m_simulator->simulateStep()) {
         m_oscCluster->sample();
 #if defined(__ANDROID__)
-        // Poll Android events every 256 iterations to prevent ANR.
+        // poll android events every 256 iterations to prevent anr
         if ((++simIter & 0x3F) == 0) {
             int events; android_poll_source* source;
             while (ALooper_pollAll(0, nullptr, &events, reinterpret_cast<void**>(&source)) >= 0) {
@@ -389,6 +400,11 @@ float EngineSimApplication::unitsToPixels(float units) const {
 
 void EngineSimApplication::run() {
     int frameCount = 0;
+#if defined(__ANDROID__)
+    // the loading screen fades out over the first engine frames
+    std::chrono::steady_clock::time_point fadeStart;
+    bool fadeStarted = false;
+#endif
     while (true) {
         m_engine.StartFrame();
 
@@ -399,10 +415,8 @@ void EngineSimApplication::run() {
 
         bool reloadScript = m_engine.ProcessKeyDown(ysKey::Code::Return);
 #if defined(__ANDROID__)
-        // A file picked through the IMPORT button stops the game so it can be
-        // rebuilt from scratch with the new script. The main loop in
-        // android_main creates a fresh application, which avoids reloading
-        // the engine while it is still being rendered.
+        // a picked file stops the game so android_main can rebuild a
+        // fresh application with the new script
         if (esdroid::AndroidBackend::instance().consumeScriptReloadPending()) {
             esdroid_wtflog("run(): import detected, stopping the game for a full reload");
             m_restartRequested = true;
@@ -423,9 +437,8 @@ void EngineSimApplication::run() {
         }
 
 #if defined(__ANDROID__)
-        // The OSC PAGE touch button pages the oscilloscope focus. No engine
-        // key does this (Right only steps one frame while paused), so it is
-        // consumed straight from the Android backend instead of the keyboard.
+        // the osc page button has no engine key so it is consumed straight
+        // from the android backend
         if (esdroid::AndroidBackend::instance().processKeyDown(esdroid::VirtualKey::OscPage)) {
             if (m_oscCluster != nullptr) m_oscCluster->nextFocusScope();
         }
@@ -477,9 +490,18 @@ void EngineSimApplication::run() {
         m_uiManager.update(m_engine.GetFrameLength());
 
 #if defined(__ANDROID__)
-        // Skip GL work while the window is gone (file picker, app switch)
+        // skip gl work while the window is gone
         if (esdroid::AndroidBackend::instance().isWindowReady()) {
             renderScene();
+            if (!fadeStarted) {
+                fadeStarted = true;
+                fadeStart = std::chrono::steady_clock::now();
+            }
+            // fade the loading screen out over 800 ms
+            const double elapsed = std::chrono::duration<double>(
+                std::chrono::steady_clock::now() - fadeStart).count();
+            if (elapsed < 0.8)
+                esdroid_draw_loading_overlay((float)(1.0 - elapsed / 0.8));
         }
 #else
         renderScene();
@@ -501,8 +523,8 @@ void EngineSimApplication::run() {
 }
 
 void EngineSimApplication::destroy() {
-    // If CreateGameWindow failed during initialize() nothing was created,
-    // tearing down the engine here would dereference a null device.
+    // a failed initialize leaves nothing behind skip the teardown or it
+    // would dereference a null device
     if (!m_coreReady) { esdroid_wtflog("destroy(): skipped, initialize() never completed"); return; }
 
     m_shaderSet.Destroy();
@@ -593,7 +615,7 @@ void EngineSimApplication::loadEngine(
 
     m_simulator->startAudioRenderingThread();
 
-    // Set audio to Loop mode after simulator is created.
+    // set audio to loop mode after simulator is created
     if (m_audioSource != nullptr) {
         m_audioSource->SetMode(ysAudioSource::Mode::Loop);
     }
@@ -717,43 +739,65 @@ void EngineSimApplication::loadScript() {
     es_script::Compiler compiler;
     compiler.initialize();
     #if defined(__ANDROID__)
-    // Use the active MR path (set by the file picker, or default to main.mr)
+    // the active mr path set by the import menu or the file picker
     std::string mrPath = esdroid::AndroidBackend::instance().activeMrPath();
     if (mrPath.empty() || mrPath == "assets/main.mr") {
         mrPath = m_assetPath + "/main.mr";
     }
-    // Poll Android events to prevent ANR during long compilation
-    {
-        int events; android_poll_source* source;
-        while (ALooper_pollAll(0, nullptr, &events, reinterpret_cast<void**>(&source)) >= 0) {
-            if (source) source->process(esdroid::AndroidBackend::instance().getAndroidApp(), source);
-            else break;
-        }
-    }
     bool compiled = false;
-    try {
-        compiled = compiler.compile(piranha::Path(mrPath));
-    } catch (const std::bad_alloc& e) {
-        esdroid_wtflog("loadScript: bad_alloc in compile: %s", e.what());
-    } catch (...) {
-        esdroid_wtflog("loadScript: unknown exception in compile");
+    bool loaded = false;
+    es_script::Compiler::Output output;
+    // the compile and execute run on a worker thread while this thread keeps
+    // pumping android events so a heavy engine cannot trigger an anr
+    {
+        std::atomic<bool> done{false};
+        // the loading screen is up before the worker starts
+        esdroid_render_loading_frame();
+        std::thread worker([&]() {
+            try {
+                try {
+                    compiled = compiler.compile(piranha::Path(mrPath));
+                } catch (const std::bad_alloc& e) {
+                    esdroid_wtflog("loadScript: bad_alloc in compile: %s", e.what());
+                } catch (...) {
+                    esdroid_wtflog("loadScript: unknown exception in compile");
+                }
+                if (compiled) {
+                    try {
+                        output = compiler.execute();
+                        loaded = true;
+                        esdroid_wtflog("loadScript: execute returned, engine=%p", (void*)output.engine);
+                    } catch (const std::bad_alloc& e) {
+                        esdroid_wtflog("loadScript: bad_alloc in execute: %s", e.what());
+                    } catch (...) {
+                        esdroid_wtflog("loadScript: unknown exception in execute");
+                    }
+                }
+            } catch (...) {
+                esdroid_wtflog("loadScript: unknown exception in worker");
+            }
+            done = true;
+        });
+        while (!done) {
+            esdroid::AndroidBackend::instance().pollEvents();
+            // the loading screen spins while the worker compiles
+            esdroid_render_loading_frame();
+            usleep(4000);
+        }
+        worker.join();
+        // leave the loading screen as the last frame until run() takes over
+        esdroid_render_loading_frame();
     }
 #else
     const bool compiled = compiler.compile(piranha::Path("../assets/main.mr"));
+    bool loaded = false;
+    es_script::Compiler::Output output;
+    if (compiled) { output = compiler.execute(); loaded = true; }
 #endif
     if (compiled) {
-        es_script::Compiler::Output output;
-    try {
-        esdroid_wtflog("loadScript: calling execute");
-        output = compiler.execute();
-        esdroid_wtflog("loadScript: execute returned, engine=%p", (void*)output.engine);
-    } catch (const std::bad_alloc& e) {
-        esdroid_wtflog("loadScript: bad_alloc in execute: %s", e.what());
-    } catch (...) {
-        esdroid_wtflog("loadScript: unknown exception in execute");
-    }
         configure(output.applicationSettings);
-
+    }
+    if (loaded) {
         engine = output.engine;
         vehicle = output.vehicle;
         transmission = output.transmission;
@@ -775,7 +819,7 @@ void EngineSimApplication::loadScript() {
         esdroid_wtflog("loadScript: unknown exception");
         engine = nullptr; vehicle = nullptr; transmission = nullptr;
     }
-#endif /* ATG_ENGINE_SIM_PIRANHA_ENABLED */
+#endif /* ATG_ENGINE_SIM_PIRANHA_ENABLED  */
 
     if (vehicle == nullptr) {
         Vehicle::Parameters vehParams;
@@ -805,8 +849,7 @@ void EngineSimApplication::loadScript() {
     refreshUserInterface();
 
 #if defined(__ANDROID__)
-    // A fresh engine means fresh mixer defaults; the settings panel shows
-    // what the engine actually runs, not what the last engine ran.
+    // a fresh engine means fresh mixer defaults
     if (m_simulator != nullptr) {
         auto& settings = esdroid::AndroidBackend::instance().settings();
         const Synthesizer::AudioParameters audioParams =
@@ -935,8 +978,8 @@ void EngineSimApplication::processEngineInput() {
 
     const double prevTargetThrottle = m_targetSpeedSetting;
 #if defined(__ANDROID__)
-    // Settings panel: apply what the user dragged or typed. The dirty bits
-    // are set by the touch UI and cleared here, the single consumer.
+    // apply what the user dragged or typed the dirty bits are set by
+    // the touch ui and cleared here
     {
         auto& settings = esdroid::AndroidBackend::instance().settings();
         m_androidThrottleScale = settings.throttlePct * 0.01;
@@ -987,8 +1030,8 @@ void EngineSimApplication::processEngineInput() {
     }
     else if (m_engine.IsKeyDown(ysKey::Code::R)) {
 #if defined(__ANDROID__)
-        // The touch THROTTLE button lands here; the settings panel decides
-        // how much throttle it actually applies.
+        // the touch throttle button lands here the settings panel decides
+        // how much it applies
         m_targetSpeedSetting = m_androidThrottleScale;
 #else
         m_targetSpeedSetting = 1.0;
@@ -1132,8 +1175,8 @@ void EngineSimApplication::processEngineInput() {
     m_simulator->getTransmission()->setClutchPressure(m_clutchPressure);
 
 #if defined(__ANDROID__)
-    // Touch has no scroll wheel: the FN zoom buttons and the pinch gesture
-    // drive the same EngineView zoom path the desktop wheel uses.
+    // touch has no scroll wheel the fn zoom buttons and the pinch
+    // gesture drive the same zoom path
     if (m_engineView != nullptr) {
         int zoomScroll = 0;
         if (esdroid::AndroidBackend::instance().isKeyDown(esdroid::VirtualKey::ZoomIn)) zoomScroll += 900;
@@ -1141,8 +1184,8 @@ void EngineSimApplication::processEngineInput() {
         if (zoomScroll != 0) m_engineView->onMouseScroll((int)(zoomScroll * dt));
         const int pinchScroll = esdroid::AndroidBackend::instance().consumePinchScroll();
         if (pinchScroll != 0) {
-            // The reported touch position is the pinch midpoint; zooming
-            // there keeps the part between the fingers in place.
+            // the reported touch position is the pinch midpoint so the
+            // part between the fingers stays in place
             int mx = 0, my = 0;
             m_engine.GetOsMousePos(&mx, &my);
             m_engineView->onPinchZoom(pinchScroll, Point { (float)mx, (float)my });
@@ -1153,8 +1196,8 @@ void EngineSimApplication::processEngineInput() {
 
 void EngineSimApplication::renderScene() {
 #if defined(__ANDROID__)
-    // UI rects published by the clusters go stale unless re-published this
-    // frame; an unpublished button must not stay tappable.
+    // ui rects published by the clusters go stale unless re-published
+    // an unpublished button must not stay tappable
     esdroid_invalidate_ui_rects();
 #endif
     getShaders()->ResetBaseColor();
@@ -1311,7 +1354,7 @@ void EngineSimApplication::startRecording() {
 #ifdef ATG_ENGINE_SIM_VIDEO_CAPTURE
     atg_dtv::Encoder::VideoSettings settings{};
 
-    // Output filename
+    // output filename
     settings.fname = "../workspace/video_capture/engine_sim_video_capture.mp4";
     settings.inputWidth = m_engine.GetScreenWidth();
     settings.inputHeight = m_engine.GetScreenHeight();
@@ -1322,7 +1365,7 @@ void EngineSimApplication::startRecording() {
     settings.bitRate = 40000000;
 
     m_encoder.run(settings, 2);
-#endif /* ATG_ENGINE_SIM_VIDEO_CAPTURE */
+#endif /* ATG_ENGINE_SIM_VIDEO_CAPTURE  */
 }
 
 void EngineSimApplication::updateScreenSizeStability() {
@@ -1353,7 +1396,7 @@ void EngineSimApplication::stopRecording() {
 #ifdef ATG_ENGINE_SIM_VIDEO_CAPTURE
     m_encoder.commit();
     m_encoder.stop();
-#endif /* ATG_ENGINE_SIM_VIDEO_CAPTURE */
+#endif /* ATG_ENGINE_SIM_VIDEO_CAPTURE  */
 }
 
 void EngineSimApplication::recordFrame() {
@@ -1364,5 +1407,5 @@ void EngineSimApplication::recordFrame() {
     }
 
     m_encoder.submitFrame();
-#endif /* ATG_ENGINE_SIM_VIDEO_CAPTURE */
+#endif /* ATG_ENGINE_SIM_VIDEO_CAPTURE  */
 }

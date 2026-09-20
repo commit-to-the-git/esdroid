@@ -68,4 +68,4 @@ class ConnectingRod : public Part {
         int m_rodJournalCount;
 };
 
-#endif /* ATG_ENGINE_SIM_CONNECTING_ROD_H */
+#endif /* ATG_ENGINE_SIM_CONNECTING_ROD_H  */

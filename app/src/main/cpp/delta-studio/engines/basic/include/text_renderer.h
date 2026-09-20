@@ -10,7 +10,7 @@
 
 namespace dbasic {
 
-    // Class name declarations
+    // class name declarations
     class DeltaEngine;
 
     class TextRenderer : public ysObject {
@@ -41,16 +41,16 @@ namespace dbasic {
         ysVector m_currentColor;
 
     public:
-        // Drawing Text
+        // drawing text
         void RenderText(const std::string &s, float x, float y, float h);
         void RenderMonospaceText(const std::string &s, float x, float y, float h, float w);
 
         float CalculateWidth(const std::string &s, float h) const;
 
-        // Utilities
+        // utilities
         static bool IsWhitespace(char c);
     };
 
 } /* namespace dbasic */
 
-#endif /* DELTA_BASIC_CONSOLE_H */
+#endif /* DELTA_BASIC_CONSOLE_H  */

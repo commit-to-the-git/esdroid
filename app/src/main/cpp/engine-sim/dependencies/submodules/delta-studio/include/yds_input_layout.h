@@ -15,11 +15,11 @@ public:
     virtual ~ysInputLayout();
 
 protected:
-    // The format used to create this input layout
+    // the format used to create this input layout
     ysRenderGeometryFormat *m_format;
 
-    // The shader used to create this input layout
+    // the shader used to create this input layout
     ysShader *m_shader;
 };
 
-#endif /* YDS_INPUT_LAYOUT_H */
+#endif /* YDS_INPUT_LAYOUT_H  */

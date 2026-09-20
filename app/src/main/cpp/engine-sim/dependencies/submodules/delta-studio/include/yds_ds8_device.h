@@ -32,4 +32,4 @@ private:
     IDirectSound8 *m_device;
 };
 
-#endif /* YDS_DS8_DEVICE_H */
+#endif /* YDS_DS8_DEVICE_H  */

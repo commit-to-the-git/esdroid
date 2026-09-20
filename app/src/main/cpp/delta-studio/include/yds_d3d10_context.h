@@ -6,9 +6,9 @@
 
 #include <D3D10.h>
 
-// --------------------------------------------------------
-// Direct3D10 Context
-// --------------------------------------------------------
+//
+// direct3d10 context
+//
 
 class ysD3D10Context : public ysRenderingContext
 {

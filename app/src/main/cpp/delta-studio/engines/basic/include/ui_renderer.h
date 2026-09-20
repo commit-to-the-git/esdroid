@@ -82,7 +82,7 @@ namespace dbasic {
         int m_vertexOffset;
         int m_indexOffset;
 
-        // Vertex buffer
+        // vertex buffer
         ConsoleVertex *m_vertexBuffer;
         unsigned short *m_indexBuffer;
 
@@ -91,4 +91,4 @@ namespace dbasic {
 
 } /* namespace dbasic */
 
-#endif /* DELTA_BASIC_UI_RENDERER_H */
+#endif /* DELTA_BASIC_UI_RENDERER_H  */

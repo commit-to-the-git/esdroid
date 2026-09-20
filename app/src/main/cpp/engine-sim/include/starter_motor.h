@@ -20,4 +20,4 @@ public:
     bool m_enabled;
 };
 
-#endif /* ATG_ENGINE_SIM_STARTER_MOTOR_H */
+#endif /* ATG_ENGINE_SIM_STARTER_MOTOR_H  */

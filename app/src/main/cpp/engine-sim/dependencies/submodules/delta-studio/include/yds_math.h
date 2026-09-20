@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <string.h>
 
-// Extra Definitions
+// extra definitions
 
 #ifndef _mm_replicate_x_ps
 #define _mm_replicate_x_ps(v) \
@@ -27,7 +27,7 @@
     _mm_add_ps(_mm_mul_ps((a), (b)), (c));
 #endif
 
-// Main Arithmetic Data Types
+// main arithmetic data types
 typedef __m128 ysVector;
 typedef __m128 ysQuaternion;
 typedef __m128 ysGeneric;
@@ -49,7 +49,7 @@ struct ysMatrix {
 };
 
 
-// Storage Data Types
+// storage data types
 
 struct ysVector2 {
     ysVector2() : x(0.0f), y(0.0f) { /* void */ }
@@ -128,11 +128,11 @@ namespace ysMath {
 
     namespace Constants {
 
-        // ----------------------------------------------------
-        // Constants
-        // ----------------------------------------------------
+        //
+        // constants
+        //
 
-        // Masks
+        // masks
         YS_MATH_CONST ysVectorMask MaskOffW = { (int)0xFFFFFFFF,(int)0xFFFFFFFF,(int)0xFFFFFFFF, (int)0x00000000 };
         YS_MATH_CONST ysVectorMask MaskOffZ = { (int)0xFFFFFFFF, (int)0xFFFFFFFF, (int)0x00000000, (int)0xFFFFFFFF };
         YS_MATH_CONST ysVectorMask MaskOffY = { (int)0xFFFFFFFF, (int)0x00000000, (int)0xFFFFFFFF, (int)0xFFFFFFFF };
@@ -143,12 +143,12 @@ namespace ysMath {
         YS_MATH_CONST ysVectorMask MaskKeepY = { (int)0x00000000, (int)0xFFFFFFFF, (int)0x00000000, (int)0x00000000 };
         YS_MATH_CONST ysVectorMask MaskKeepX = { (int)0xFFFFFFFF, (int)0x00000000, (int)0x00000000, (int)0x00000000 };
 
-        // Axes
+        // axes
         YS_MATH_CONST ysVector XAxis = { 1.0f, 0.0f, 0.0f, 0.0f };
         YS_MATH_CONST ysVector YAxis = { 0.0f, 1.0f, 0.0f, 0.0f };
         YS_MATH_CONST ysVector ZAxis = { 0.0f, 0.0f, 1.0f, 0.0f };
 
-        // Constants
+        // constants
         YS_MATH_CONST ysVector IdentityRow1 = { 1.0f, 0.0f, 0.0f, 0.0f };
         YS_MATH_CONST ysVector IdentityRow2 = { 0.0f, 1.0f, 0.0f, 0.0f };
         YS_MATH_CONST ysVector IdentityRow3 = { 0.0f, 0.0f, 1.0f, 0.0f };
@@ -169,26 +169,26 @@ namespace ysMath {
             IdentityRow3, 
             IdentityRow4 };
 
-        // Numeral Constants
+        // numeral constants
         YS_MATH_CONST float PI = 3.141592654f;
         YS_MATH_CONST float TWO_PI = 6.2831853071795864769252866f;
         YS_MATH_CONST float SQRT_2 = 1.41421356237f;
 
-        // Quaternions
+        // quaternions
         YS_MATH_CONST ysQuaternion QuatIdentity = { 1.0f, 0.0f, 0.0f, 0.0f };
 
-    } /* namespace Constants */
+    } /* namespace constants */
 
-    // ----------------------------------------------------
-    // Math Functions
-    // ----------------------------------------------------
+    //
+    // math functions
+    //
 
-    // Math functions
+    // math functions
     ysVector UniformRandom4(float range = (float)1.0);
     float UniformRandom(float range = (float)1.0);
     int UniformRandomInt(int range);
 
-    // Vector/General Quaternion
+    // vector/general quaternion
     __forceinline ysGeneric LoadScalar(float s) {
         return _mm_set_ps(s, s, s, s);
     }
@@ -334,14 +334,14 @@ namespace ysMath {
         return _mm_and_ps(cmp_mask, Constants::One);
     }
 
-    // Quaternion
+    // quaternion
     ysQuaternion QuatInvert(const ysQuaternion &q);
     ysQuaternion QuatMultiply(const ysQuaternion &q1, const ysQuaternion &q2);
     ysQuaternion QuatTransform(const ysQuaternion &q, const ysVector &v);
     ysQuaternion QuatTransformInverse(const ysQuaternion &q, const ysVector &v);
     ysQuaternion QuatAddScaled(const ysQuaternion &q, const ysVector &vec, float scale);
 
-    // Matrices
+    // matrices
     ysMatrix LoadIdentity();
     ysMatrix LoadMatrix(const ysVector &r1, const ysVector &r2, const ysVector &r3, const ysVector &r4);
     ysMatrix LoadMatrix(const ysQuaternion &quat);
@@ -375,7 +375,7 @@ namespace ysMath {
     ysMatrix MatConvert3x3(const ysMatrix &m);
     ysMatrix MatNormalize(const ysMatrix &m);
 
-    // Common Matrix Calculations
+    // common matrix calculations
     ysMatrix FrustrumPerspective(float fovy, float aspect, float near, float far);
     ysMatrix OrthographicProjection(float width, float height, float near, float far);
     ysMatrix CameraTarget(const ysVector &eye, const ysVector &target, const ysVector &up);
@@ -394,8 +394,8 @@ namespace ysMath {
 
     bool IsValid(const ysVector &v);
 
-} /* namespace ysMath */
+} /* namespace ysmath */
 
 ysVector4::ysVector4(const ysVector &v) { *this = ysMath::GetVector4(v); }
 
-#endif /* YDS_MATH_H */
+#endif /* YDS_MATH_H  */

@@ -19,25 +19,25 @@ bool piranha::CompilationError::isInstantiationError() const {
     return (m_instantiation != nullptr && !m_instantiation->isEmpty());
 }
 
-// Error definitions --------------------------------------
+// error definitions --------------------------------------
 
-// Helper macro
+// helper macro
 #define ERR(tag) const piranha::ErrorCode_struct piranha::ErrorCode::tag
 
-// [IO] - IO Errors
+// io - io errors
 ERR(FileOpenFailed) =           { "IO", "0010", "Could not open file" };
 
-// [S] - Scanning errors
+// s - scanning errors
 ERR(UnidentifiedToken) =        { "S", "0010", "Unidentified token" };
 
-// [P] - Parsing errors
+// p - parsing errors
 ERR(UnexpectedToken) =          { "P", "0010", "Unexpected token" };
 
-// [E] - Expansion errors
+// e - expansion errors
 ERR(InvalidOperandTypes) =      { "E", "0010", "Invalid operand types" };
 ERR(CircularDefinition) =       { "E", "0020", "Circular definition detected" };
 
-// [R] - Resolution errors
+// r - resolution errors
 ERR(UndefinedNodeType) =        { "R", "0010", "Undefined node type" };
 ERR(ArgumentPositionOutOfBounds) =
                                 { "R", "0020", "Argument position out of bounds" };
@@ -49,7 +49,7 @@ ERR(AccessingInternalMember) =  { "R", "0061", "Invalid reference to an internal
 ERR(CannotFindDefaultValue) =   { "R", "0070", "Cannot find default value" };
 ERR(CircularReference) =        { "R", "0080", "Circular reference detected" };
 
-// [V] - Validation errors
+// v - validation errors
 ERR(InputSpecifiedMultipleTimes) = 
                                 { "V", "0010", "Input specified multiple times" };
 ERR(SymbolUsedMultipleTimes) =  { "V", "0030", "Symbol used multiple times" };
@@ -70,7 +70,7 @@ ERR(ModifyAttributeMismatch) =  { "V", "0090", "Input modify flag doesn't match 
 ERR(ToggleAttributeMismatch) =  { "V", "0100", "Input toggle flag doesn't match builtin port" };
 ERR(AliasAttributeMismatch) =   { "V", "0110", "Alias flag doesn't match builtin port" };
 
-// [T] - Type errors
+// t - type errors
 ERR(IncompatibleType) =         { "T", "0010", "Argument with incompatible type specified; valid conversion not found" };
 ERR(IncompatibleDefaultType) =  { "T", "0011", "Default with incompatible type specified; valid conversion not found" };
 ERR(IncompatibleOutputDefinitionType) =    

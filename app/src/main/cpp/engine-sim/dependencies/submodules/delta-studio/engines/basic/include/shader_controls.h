@@ -79,4 +79,4 @@ namespace dbasic {
 
 } /* namespace dbasic */
 
-#endif /* DELTA_BASIC_SHADER_CONTROLS_H */
+#endif /* DELTA_BASIC_SHADER_CONTROLS_H  */

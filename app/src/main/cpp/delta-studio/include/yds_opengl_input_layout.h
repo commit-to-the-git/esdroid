@@ -27,4 +27,4 @@ protected:
     ysDynamicArray<ysOpenGLLayoutChannel, 16> m_channels;
 };
 
-#endif /* YDS_OPENGL_INPUT_LAYOUT_H */
+#endif /* YDS_OPENGL_INPUT_LAYOUT_H  */

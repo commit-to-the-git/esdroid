@@ -145,4 +145,4 @@ namespace dbasic {
 
 } /* namespace dbasic */
 
-#endif /* DELTA_BASIC_DEFAULT_SHADERS_H */
+#endif /* DELTA_BASIC_DEFAULT_SHADERS_H  */

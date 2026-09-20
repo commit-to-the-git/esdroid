@@ -25,4 +25,4 @@ namespace dphysics {
 
 } /* namesapce dbasic */
 
-#endif /* DELTA_BASIC_COLLISION_DETECTOR_H */
+#endif /* DELTA_BASIC_COLLISION_DETECTOR_H  */

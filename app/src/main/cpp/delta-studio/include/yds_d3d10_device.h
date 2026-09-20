@@ -5,9 +5,9 @@
 
 #include <D3D10.h>
 
-// --------------------------------------------------------
-// Direct3D10 Device
-// --------------------------------------------------------
+//
+// direct3d10 device
+//
 
 class ysD3D10Device : public ysDevice {
     friend ysDevice;
@@ -17,16 +17,16 @@ protected:
     virtual ~ysD3D10Device();
 
 public:
-    // Setup
+    // setup
     virtual ysError InitializeDevice();
     virtual ysError DestroyDevice();
     virtual bool CheckSupport();
 
-    // State
+    // state
     virtual ysError SetFaceCulling(bool faceCulling);
     virtual ysError SetFaceCullingMode(CullMode cullMode);
 
-    // Rendering Contexts
+    // rendering contexts
     virtual ysError
     CreateRenderingContext(ysRenderingContext **renderingContext,
                            ysWindow *window);
@@ -55,7 +55,7 @@ public:
     virtual ysError ClearBuffers(const float *clearColor);
     virtual ysError Present();
 
-    // GPU Buffers
+    // gpu buffers
     virtual ysError CreateVertexBuffer(ysGPUBuffer **newBuffer, int size,
                                        char *data, bool mirrorToRam = false);
     virtual ysError CreateIndexBuffer(ysGPUBuffer **newBuffer, int size,
@@ -71,7 +71,7 @@ public:
     virtual ysError EditBufferData(ysGPUBuffer *buffer, char *data);
     virtual ysError DestroyGPUBuffer(ysGPUBuffer *&buffer);
 
-    // Shaders
+    // shaders
     virtual ysError CreateVertexShader(ysShader **newShader,
                                        const wchar_t *shaderFilename,
                                        const wchar_t *compiledFilename,
@@ -84,7 +84,7 @@ public:
                                       bool compile) override;
     virtual ysError DestroyShader(ysShader *&shader) override;
 
-    // Shader Programs
+    // shader programs
     virtual ysError CreateShaderProgram(ysShaderProgram **newProgram);
     virtual ysError DestroyShaderProgram(ysShaderProgram *&shader,
                                          bool destroyShaders = false);
@@ -93,7 +93,7 @@ public:
     virtual ysError LinkProgram(ysShaderProgram *program);
     virtual ysError UseShaderProgram(ysShaderProgram *);
 
-    // Input Layouts
+    // input layouts
     virtual ysError
     CreateInputLayout(ysInputLayout **newLayout, ysShader *shader,
                       const ysRenderGeometryFormat *format,
@@ -101,7 +101,7 @@ public:
     virtual ysError UseInputLayout(ysInputLayout *layout);
     virtual ysError DestroyInputLayout(ysInputLayout *&layout);
 
-    // Textures
+    // textures
     virtual ysError CreateTexture(ysTexture **texture, const wchar_t *fname);
     virtual ysError CreateTexture(ysTexture **texture, int width, int height,
                                   const unsigned char *buffer);
@@ -115,11 +115,11 @@ public:
 
     virtual void Draw(int numFaces, int indexOffset, int vertexOffset);
 
-    // TEMP
+    // temp
     ID3D10RasterizerState *m_rasterizerState;
 
 public:
-    // Non-standard interface
+    // non-standard interface
 
     void GetDXGIDevice(IDXGIDevice **device);
     IDXGIFactory *GetDXGIFactory() { return m_DXGIFactory; }
@@ -133,7 +133,7 @@ protected:
     IDXGIFactory *m_DXGIFactory;
 
 protected:
-    // Hidden functionality
+    // hidden functionality
     ysError CreateD3D10DepthBuffer(ID3D10DepthStencilView **newDepthStencil,
                                    int width, int height, int count,
                                    int quality);
@@ -150,4 +150,4 @@ protected:
     ysError DestroyD3D10RenderTarget(ysRenderTarget *target);
 };
 
-#endif /* YDS_D3D10_DEVICE_H */
+#endif /* YDS_D3D10_DEVICE_H  */

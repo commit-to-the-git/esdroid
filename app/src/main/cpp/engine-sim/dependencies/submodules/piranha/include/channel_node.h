@@ -13,4 +13,4 @@ namespace piranha {
 
 } /* namespace piranha */
 
-#endif /* PIRANHA_CHANNEL_NODE_H */
+#endif /* PIRANHA_CHANNEL_NODE_H  */

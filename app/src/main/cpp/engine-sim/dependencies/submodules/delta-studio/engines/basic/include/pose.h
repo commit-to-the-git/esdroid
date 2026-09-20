@@ -24,4 +24,4 @@ namespace dbasic {
 
 } /* namespace dbasic */
 
-#endif /* DELTA_BASIC_POSE_H */
+#endif /* DELTA_BASIC_POSE_H  */

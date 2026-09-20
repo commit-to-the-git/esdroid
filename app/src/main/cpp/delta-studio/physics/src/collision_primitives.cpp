@@ -162,22 +162,22 @@ bool dphysics::Collision::IsSameAs(Collision *other) const {
 void dphysics::Collision::CalculateDesiredDeltaVelocity(float timestep) {
     const static float VelocityLimit = 0.25f;
 
-    // Calculate the acceleration induced velocity accumulated this frame
-    //real velocityFromAcc = body[0]->getLastFrameAcceleration() * duration * contactNormal;
+    // calculate the acceleration induced velocity accumulated this frame
+    // real velocityfromacc = body0->getlastframeacceleration * duration * contactnormal
     float velocityFromAcc = ysMath::GetScalar(ysMath::Dot(m_bodies[0]->GetAcceleration(), m_normal)) * timestep;
 
     if (m_bodies[1] != nullptr) {
         velocityFromAcc -= ysMath::GetScalar(ysMath::Dot(m_bodies[1]->GetAcceleration(), m_normal)) * timestep;;
     }
 
-    // If the velocity is very slow, limit the restitution
+    // if the velocity is very slow limit the restitution
     float thisRestitution = m_restitution;
     if (std::abs(ysMath::GetX(m_contactVelocity)) < VelocityLimit) {
         thisRestitution = 0.0f;
     }
 
-    // Combine the bounce velocity with the removed
-    // acceleration velocity.
+    // combine the bounce velocity with the removed
+    // acceleration velocity
     m_desiredDeltaVelocity =
         -ysMath::GetX(m_contactVelocity)
         - thisRestitution * (ysMath::GetX(m_contactVelocity) - velocityFromAcc);

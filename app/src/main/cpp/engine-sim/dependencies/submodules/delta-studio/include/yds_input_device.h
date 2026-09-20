@@ -62,7 +62,7 @@ private:
     int m_deviceID;
     int m_dependencyCount;
 
-    // Specific
+    // specific
     union {
         ysKeyboard *m_keyboard;
         ysMouse *m_mouse;
@@ -75,4 +75,4 @@ private:
     bool m_virtual;
 };
 
-#endif /* YDS_INPUT_DEVICE_H */
+#endif /* YDS_INPUT_DEVICE_H  */

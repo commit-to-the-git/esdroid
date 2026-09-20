@@ -99,7 +99,7 @@ public:
 
         m_array[m_nObjects] = new TYPE;
 
-        // Cast to a standard array element
+        // cast to a standard array element
         ysDynamicArrayElement *sElement = static_cast<ysDynamicArrayElement *>(m_array[m_nObjects]);
         sElement->SetAlignment(0);
         sElement->SetIndex(m_nObjects);
@@ -115,7 +115,7 @@ public:
 
         m_array[m_nObjects] = type;
 
-        // Cast to a standard array element
+        // cast to a standard array element
         ysDynamicArrayElement *sElement = static_cast<ysDynamicArrayElement *>(m_array[m_nObjects]);
         sElement->SetIndex(m_nObjects);
 
@@ -128,7 +128,7 @@ public:
 
         if (m_nObjects >= m_maxSize) Extend();
 
-        // Make room
+        // make room
         for (int i=m_nObjects; i > offset; i--)
         {
 
@@ -138,7 +138,7 @@ public:
 
         m_array[offset] = type;
 
-        // Cast to a standard array element
+        // cast to a standard array element
         ysDynamicArrayElement *sElement = static_cast<ysDynamicArrayElement *>(m_array[offset]);
         sElement->SetIndex(offset);
 
@@ -162,7 +162,7 @@ public:
 
         else m_array[m_nObjects] = static_cast<TYPE *>(new DYN_TYPE);
 
-        // Cast to a standard array element
+        // cast to a standard array element
         ysDynamicArrayElement *sElement = static_cast<ysDynamicArrayElement *>(m_array[m_nObjects]);
         sElement->SetAlignment(alignment);
         sElement->SetIndex(m_nObjects);
@@ -224,7 +224,7 @@ public:
 
                 }
 
-                // Just as a precaution
+                // just as a precaution
                 m_array[m_nObjects - 1] = NULL;
 
             }
@@ -238,7 +238,7 @@ public:
 
         }
 
-        // Cast to a standard array element
+        // cast to a standard array element
         if (m_array[index])
         {
 

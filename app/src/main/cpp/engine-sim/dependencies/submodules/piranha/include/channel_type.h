@@ -30,4 +30,4 @@ namespace piranha {
 
 } /* namespace piranha */
 
-#endif /* PIRANHA_CHANNEL_TYPE_H */
+#endif /* PIRANHA_CHANNEL_TYPE_H  */

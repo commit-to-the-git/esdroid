@@ -42,8 +42,8 @@ bool GeometryGenerator::generateFilledCircle(
     float radius,
     float maxEdgeLength)
 {
-    // edge_length = (sin(theta) * radius) * 2
-    // theta = arcsin(edge_length / (2 * radius))
+    // edge_length = sintheta * radius * 2
+    // theta = arcsinedge_length / 2 * radius
 
     const float angle = std::asinf(maxEdgeLength / (2 * radius));
     const float steps = ysMath::Constants::TWO_PI / angle;
@@ -82,7 +82,7 @@ bool GeometryGenerator::generateFilledFanPolygon(
         return false;
     }
 
-    // Generate center vertex
+    // generate center vertex
     dbasic::Vertex *centerVertex = writeVertex();
     centerVertex->Normal = ysMath::GetVector4(normal);
     centerVertex->Pos = ysMath::GetVector4(center);
@@ -122,8 +122,8 @@ bool GeometryGenerator::generateFilledFanPolygon(
 bool GeometryGenerator::generateLineRing(
     const LineRingParameters &params)
 {
-    // edge_length = (sin(theta) * radius) * 2
-    // theta = arcsin(edge_length / (2 * radius))
+    // edge_length = sintheta * radius * 2
+    // theta = arcsinedge_length / 2 * radius
 
     startSubshape();
 
@@ -152,7 +152,7 @@ bool GeometryGenerator::generateLineRing(
         return false;
     }
 
-    // Generate center vertex
+    // generate center vertex
     const float angleStep = (actualEndAngle - actualStartAngle) / segmentCount;
 
     const ysVector right = ysMath::Cross(up, params.normal);
@@ -475,8 +475,8 @@ fail:
 }
 
 bool GeometryGenerator::generateRing2d(const Ring2dParameters &params) {
-    // edge_length = (sin(theta) * radius) * 2
-    // theta = arcsin(edge_length / (2 * radius))
+    // edge_length = sintheta * radius * 2
+    // theta = arcsinedge_length / 2 * radius
 
     startSubshape();
 
@@ -561,9 +561,9 @@ bool GeometryGenerator::generateRing2d(const Ring2dParameters &params) {
 }
 
 bool GeometryGenerator::generateCircle2d(const Circle2dParameters &params) {
-    // edge_length = (sin(theta) * radius) * 2
-    // theta = arcsin(edge_length / (2 * radius))
-    // theta2 = PI - theta
+    // edge_length = sintheta * radius * 2
+    // theta = arcsinedge_length / 2 * radius
+    // theta2 = pi - theta
 
     startSubshape();
 
@@ -585,7 +585,7 @@ bool GeometryGenerator::generateCircle2d(const Circle2dParameters &params) {
         return false;
     }
 
-    // Generate center vertex
+    // generate center vertex
     dbasic::Vertex *centerVertex = writeVertex();
     centerVertex->Normal = ysMath::Constants::ZAxis;
     centerVertex->Pos = ysMath::LoadVector(params.center_x, params.center_y);
@@ -616,9 +616,9 @@ bool GeometryGenerator::generateCircle2d(const Circle2dParameters &params) {
 }
 
 bool GeometryGenerator::generateCam(const Cam2dParameters &params) {
-    // edge_length = (sin(theta) * radius) * 2
-    // theta = arcsin(edge_length / (2 * radius))
-    // theta2 = PI - theta
+    // edge_length = sintheta * radius * 2
+    // theta = arcsinedge_length / 2 * radius
+    // theta2 = pi - theta
 
     startSubshape();
 
@@ -640,7 +640,7 @@ bool GeometryGenerator::generateCam(const Cam2dParameters &params) {
         return false;
     }
 
-    // Generate center vertex
+    // generate center vertex
     dbasic::Vertex *centerVertex = writeVertex();
     centerVertex->Normal = ysMath::Constants::ZAxis;
     centerVertex->Pos = ysMath::LoadVector(params.center_x, params.center_y);
@@ -981,11 +981,11 @@ void GeometryGenerator::startShape() {
 
 void GeometryGenerator::endShape(GeometryIndices *indices) {
     *indices = m_state.currentShape;
-    // Indices written by writeFace() are absolute (they already include
-    // currentShape.BaseVertex), so the draw-time BaseVertex offset must be 0.
-    // Needed for GLES 3.0 drivers without
-    // GL_OES_draw_elements_base_vertex, where the fallback glDrawElements
-    // drops vertexOffset.
+    // indices written by writeface are absolute they already include
+    // currentshape.basevertex so the draw-time basevertex offset must be 0
+    // needed for gles 3.0 drivers without
+    // gl_oes_draw_elements_base_vertex where the fallback gldrawelements
+    // drops vertexoffset
     indices->BaseVertex = 0;
 }
 
@@ -995,10 +995,10 @@ void GeometryGenerator::startSubshape() {
 
 void GeometryGenerator::writeFace(unsigned short i0, unsigned short i1, unsigned short i2) {
     if (m_state.indexPointer + 2 < m_indexBufferSize) {
-        // Write absolute indices (include currentShape.BaseVertex) so the
-        // draw-time vertexOffset can be 0. Needed for GLES 3.0 drivers
-        // without GL_OES_draw_elements_base_vertex, where the fallback
-        // glDrawElements drops vertexOffset.
+        // write absolute indices include currentshape.basevertex so the
+        // draw-time vertexoffset can be 0 needed for gles 3.0 drivers
+        // without gl_oes_draw_elements_base_vertex where the fallback
+        // gldrawelements drops vertexoffset
         unsigned short base = (unsigned short)m_state.currentShape.BaseVertex;
         m_indexData[m_state.indexPointer + 0] = i0 + m_state.subshapeVertexPointer + base;
         m_indexData[m_state.indexPointer + 1] = i1 + m_state.subshapeVertexPointer + base;

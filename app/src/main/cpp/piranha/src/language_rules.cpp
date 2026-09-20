@@ -163,7 +163,7 @@ void piranha::LanguageRules::registerUnaryOperator(
 }
 
 
-// Explicit specializations - defined outside class scope for GCC compatibility
+// explicit specializations - defined outside class scope for gcc compatibility
 template<> std::string piranha::LanguageRules::getLiteralBuiltinName<piranha::native_bool>() const { return *m_literalRules.lookup(LiteralType::Boolean); }
 template<> std::string piranha::LanguageRules::getLiteralBuiltinName<piranha::native_string>() const { return *m_literalRules.lookup(LiteralType::String); }
 template<> std::string piranha::LanguageRules::getLiteralBuiltinName<piranha::native_int>() const { return *m_literalRules.lookup(LiteralType::Integer); }

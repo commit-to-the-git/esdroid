@@ -23,11 +23,11 @@ es_script::LanguageRules::~LanguageRules() {
 }
 
 void es_script::LanguageRules::registerBuiltinNodeTypes() {
-    // ====================================================
-    // Builtin types
-    // ====================================================
+    //
+    // builtin types
+    //
 
-    // Channels
+    // channels
     registerBuiltinType<piranha::ChannelNode>(
         "__engine_sim__float", &piranha::FundamentalType::FloatType);
     registerBuiltinType<piranha::ChannelNode>(
@@ -75,7 +75,7 @@ void es_script::LanguageRules::registerBuiltinNodeTypes() {
     registerBuiltinType<piranha::ChannelNode>(
         "__engine_sim__throttle_channel", &es_script::ObjectChannel::ThrottleChannel);
 
-    // Literals
+    // literals
     registerBuiltinType<piranha::DefaultLiteralFloatNode>(
         "__engine_sim__literal_float", &piranha::FundamentalType::FloatType);
     registerBuiltinType<piranha::DefaultLiteralStringNode>(
@@ -85,7 +85,7 @@ void es_script::LanguageRules::registerBuiltinNodeTypes() {
     registerBuiltinType<piranha::DefaultLiteralBoolNode>(
         "__engine_sim__literal_bool", &piranha::FundamentalType::BoolType);
 
-    // Conversions
+    // conversions
     registerBuiltinType<piranha::IntToFloatConversionNode>(
         "__engine_sim__int_to_float");
     registerBuiltinType<piranha::IntToStringConversionNode>(
@@ -93,7 +93,7 @@ void es_script::LanguageRules::registerBuiltinNodeTypes() {
     registerBuiltinType<piranha::StringToIntConversionNode>(
         "__engine_sim__string_to_int");
 
-    // Float operations
+    // float operations
     registerBuiltinType<piranha::NumNegateOperationNode<piranha::native_float>>(
         "__engine_sim__float_negate");
     registerBuiltinType<piranha::OperationNodeSpecialized<
@@ -112,7 +112,7 @@ void es_script::LanguageRules::registerBuiltinNodeTypes() {
         piranha::native_float,
         piranha::SubtractOperationNodeOutput>>("__engine_sim__float_subtract");
 
-    // Int operations
+    // int operations
     registerBuiltinType<piranha::OperationNodeSpecialized<
         piranha::native_int,
         piranha::MultiplyOperationNodeOutput>>("__engine_sim__int_multiply");
@@ -128,7 +128,7 @@ void es_script::LanguageRules::registerBuiltinNodeTypes() {
     registerBuiltinType<piranha::NumNegateOperationNode<
         piranha::native_int>>("__engine_sim__int_negate");
 
-    // Actions
+    // actions
     registerBuiltinType<SetEngineNode>("__engine_sim__set_engine");
     registerBuiltinType<AddRodJournalNode>("__engine_sim__add_rod_journal");
     registerBuiltinType<AddSlaveJournalNode>("__engine_sim__add_slave_journal");
@@ -148,7 +148,7 @@ void es_script::LanguageRules::registerBuiltinNodeTypes() {
     registerBuiltinType<SetTransmissionNode>("__engine_sim__set_transmission");
     registerBuiltinType<AddGearNode>("__engine_sim__add_gear");
 
-    // Objects
+    // objects
     registerBuiltinType<EngineNode>("__engine_sim__engine");
     registerBuiltinType<RodJournalNode>("__engine_sim__rod_journal");
     registerBuiltinType<CrankshaftNode>("__engine_sim__crankshaft");
@@ -171,14 +171,14 @@ void es_script::LanguageRules::registerBuiltinNodeTypes() {
     registerBuiltinType<DirectThrottleLinkageNode>("__engine_sim__direct_throttle_linkage");
     registerBuiltinType<GovernorNode>("__engine_sim__governor");
 
-    // String operations
+    // string operations
     registerBuiltinType<piranha::OperationNodeSpecialized<
         piranha::native_string,
         piranha::AddOperationNodeOutput>>("__engine_sim__string_add");
 
-    // ====================================================
-    // Conversions
-    // ====================================================
+    //
+    // conversions
+    //
 
     registerConversion(
         { &piranha::FundamentalType::IntType, &piranha::FundamentalType::FloatType },
@@ -193,13 +193,13 @@ void es_script::LanguageRules::registerBuiltinNodeTypes() {
         "__engine_sim__string_to_int"
     );
 
-    // Literals
+    // literals
     registerLiteralType(piranha::LiteralType::Float, "__engine_sim__literal_float");
     registerLiteralType(piranha::LiteralType::String, "__engine_sim__literal_string");
     registerLiteralType(piranha::LiteralType::Integer, "__engine_sim__literal_int");
     registerLiteralType(piranha::LiteralType::Boolean, "__engine_sim__literal_bool");
 
-    // Operations
+    // operations
     registerUnaryOperator(
         {
             piranha::IrUnaryOperator::Operator::NumericNegate,

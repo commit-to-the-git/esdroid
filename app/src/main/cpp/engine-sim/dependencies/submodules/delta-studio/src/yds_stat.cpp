@@ -14,7 +14,7 @@ bool ysStat::Decide(float frequency, float timePassed) {
     return ysStat::Decide(frequency * timePassed);
 }
 
-// Stolen from Wikipedia
+// stolen from wikipedia
 float ysStat::NormalRandomNumber(float variance) {
     static bool spareAvailable = false;
     static float rand1, rand2;

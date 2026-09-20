@@ -101,7 +101,7 @@ namespace piranha {
 
         ErrorList *m_errorList = nullptr;
 
-        // Resolution stage
+        // resolution stage
     public:
         IrNodeDefinition *resolveLocalNodeDefinition(
             const std::string &name, int *count, bool external = false);
@@ -113,11 +113,11 @@ namespace piranha {
         IrNodeDefinition *resolveBuiltinNodeDefinition(
             const std::string &builtinName, int *count, bool external = false);
 
-        // Validation stage
+        // validation stage
     protected:
         virtual void _validate();
     };
 
 } /* namespace piranha */
 
-#endif /* PIRANHA_IR_COMPILATION_UNIT_H */
+#endif /* PIRANHA_IR_COMPILATION_UNIT_H  */

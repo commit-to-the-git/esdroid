@@ -42,4 +42,4 @@ protected:
     ysAudioDevice *m_primaryDevice;
 };
 
-#endif /* YDS_AUDIO_SYSTEM_H */
+#endif /* YDS_AUDIO_SYSTEM_H  */

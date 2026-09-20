@@ -108,4 +108,4 @@ private:
 };
 } /* namespace atg_dtv */
 
-#endif /* ATG_DIRECT_TO_VIDEO_ENCODER_H */
+#endif /* ATG_DIRECT_TO_VIDEO_ENCODER_H  */

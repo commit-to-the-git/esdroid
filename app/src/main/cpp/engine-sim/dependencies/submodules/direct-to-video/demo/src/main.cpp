@@ -8,22 +8,22 @@ int main() {
     atg_dtv::Encoder encoder;
     atg_dtv::Encoder::VideoSettings settings{};
 
-    // Output filename
+    // output filename
     settings.fname = "direct_to_video_sample_output.mp4";
 
-    // Input dimensions
+    // input dimensions
     settings.inputWidth = 2560;
     settings.inputHeight = 1440;
 
-    // Output dimensions
+    // output dimensions
     settings.width = 2560;
     settings.height = 1440;
 
-    // Encoder settings
+    // encoder settings
     settings.hardwareEncoding = true;
     settings.bitRate = 16000000;
 
-    // Audio settings
+    // audio settings
     settings.audio = true;
 
     const int VideoLengthSeconds = 10;

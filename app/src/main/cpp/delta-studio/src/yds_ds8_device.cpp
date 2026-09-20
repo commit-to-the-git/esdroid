@@ -77,15 +77,15 @@ ysError ysDS8Device::CreateBuffer(const ysAudioParameters *parameters,
 
     *target = nullptr;
 
-    // --------------------------------------------------------
-    // TEMP
-    // --------------------------------------------------------
+    //
+    // temp
+    //
     WAVEFORMATEX wfx;
     DSBUFFERDESC dsbdesc;
-    //LPDIRECTSOUNDBUFFER pDsb = NULL;
+    // lpdirectsoundbuffer pdsb = null
     HRESULT hr;
 
-    // Set up WAV format structure.
+    // set up wav format structure
 
     memset(&wfx, 0, sizeof(WAVEFORMATEX));
     wfx.wFormatTag = WAVE_FORMAT_PCM;
@@ -96,7 +96,7 @@ ysError ysDS8Device::CreateBuffer(const ysAudioParameters *parameters,
     wfx.nAvgBytesPerSec = wfx.nSamplesPerSec * wfx.nBlockAlign;
     wfx.wBitsPerSample = parameters->m_bitsPerSample;
 
-    // Set up DSBUFFERDESC structure.
+    // set up dsbufferdesc structure
 
     memset(&dsbdesc, 0, sizeof(DSBUFFERDESC));
     dsbdesc.dwSize = sizeof(DSBUFFERDESC);
@@ -106,7 +106,7 @@ ysError ysDS8Device::CreateBuffer(const ysAudioParameters *parameters,
     dsbdesc.dwBufferBytes = parameters->GetSizeFromSamples(size);
     dsbdesc.lpwfxFormat = &wfx;
 
-    // Create buffer.
+    // create buffer
     IDirectSoundBuffer *buffer = nullptr;
     hr = m_device->CreateSoundBuffer(&dsbdesc, &buffer, NULL);
     if (SUCCEEDED(hr)) {

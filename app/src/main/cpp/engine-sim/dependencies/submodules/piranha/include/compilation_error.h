@@ -17,22 +17,22 @@ namespace piranha {
     };
 
     namespace ErrorCode {
-        // List of all error codes
+        // list of all error codes
 
-        // [IO] - IO errors
+        // io - io errors
         extern const ErrorCode_struct FileOpenFailed;
 
-        // [S] - Scanning errors
+        // s - scanning errors
         extern const ErrorCode_struct UnidentifiedToken;
 
-        // [P] - Parsing errors
+        // p - parsing errors
         extern const ErrorCode_struct UnexpectedToken;
 
-        // [E] - Expansion errors
+        // e - expansion errors
         extern const ErrorCode_struct InvalidOperandTypes;
         extern const ErrorCode_struct CircularDefinition;
 
-        // [R] - Resolution Errors
+        // r - resolution errors
         extern const ErrorCode_struct UndefinedNodeType;
         extern const ErrorCode_struct ArgumentPositionOutOfBounds;
         extern const ErrorCode_struct PortNotFound;
@@ -43,7 +43,7 @@ namespace piranha {
         extern const ErrorCode_struct CannotFindDefaultValue;
         extern const ErrorCode_struct CircularReference;
 
-        // [V] - Validation errors
+        // v - validation errors
         extern const ErrorCode_struct InputSpecifiedMultipleTimes;
         extern const ErrorCode_struct SymbolUsedMultipleTimes;
         extern const ErrorCode_struct InputNotConnected;
@@ -59,7 +59,7 @@ namespace piranha {
         extern const ErrorCode_struct ToggleAttributeMismatch;
         extern const ErrorCode_struct AliasAttributeMismatch;
 
-        // [T] - Type errors
+        // t - type errors
         extern const ErrorCode_struct IncompatibleType;
         extern const ErrorCode_struct IncompatibleDefaultType;
         extern const ErrorCode_struct IncompatibleOutputDefinitionType;
@@ -93,4 +93,4 @@ namespace piranha {
 
 } /* namespace piranha */
 
-#endif /* PIRANHA_COMPILATION_ERROR_H */
+#endif /* PIRANHA_COMPILATION_ERROR_H  */

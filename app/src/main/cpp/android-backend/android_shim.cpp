@@ -70,9 +70,8 @@ ysAndroidWindowSystem *ysAndroidWindowSystem::s_instance=nullptr;
 ysAndroidWindowSystem::ysAndroidWindowSystem() : ysWindowSystem(Platform::Android) { s_instance=this; }
 ysAndroidWindowSystem::~ysAndroidWindowSystem() {
     s_instance=nullptr;
-    // DeleteAllWindows only marks open windows closed, it does not free
-    // them. Free whatever is left so repeated engine restarts do not leak
-    // one window object per cycle.
+    // deleteallwindows only marks windows closed free what is left or
+    // restarts leak
     while (GetWindowCount() > 0) {
         DeleteWindow(GetWindow(GetWindowCount() - 1));
     }
@@ -86,8 +85,7 @@ int ysAndroidWindow::GetScreenWidth() const { return esdroid::AndroidBackend::in
 int ysAndroidWindow::GetScreenHeight() const { return esdroid::AndroidBackend::instance().screenHeight(); }
 const int ysAndroidWindow::GetGameWidth() const { return esdroid::AndroidBackend::instance().screenWidth(); }
 const int ysAndroidWindow::GetGameHeight() const { return esdroid::AndroidBackend::instance().screenHeight(); }
-// Touch coords are y-down from the top-left; the UI element bounds are
-// y-up from the bottom-left, like the desktop client-to-local flip.
+// flip touch y-down to the ui y-up like the desktop client-to-local
 void ysAndroidWindow::ScreenToLocal(int &x, int &y) const {
     y = GetScreenHeight() - y;
 }
@@ -129,10 +127,7 @@ ysError ysAndroidAudioSource::UnlockBufferSegments(void *s1, SampleOffset sz1, v
     return YDS_ERROR_RETURN(ysError::None);
 }
 SampleOffset ysAndroidAudioSource::GetWP() const {
-    // Return the READ position of the ring buffer (how much audio has been
-    // consumed by OpenSL ES). This is what the desktop version's write
-    // position represents, the playback position. The app uses this to
-    // calculate how much new audio to produce.
+    // the read position of the ring how much audio opensl es consumed
     return (SampleOffset)esdroid::AndroidBackend::instance().getAudioReadPos();
 }
 ysError ysAndroidAudioSource::SetMode(Mode m) { return ysAudioSource::SetMode(m); }
@@ -153,8 +148,7 @@ public:
         SetConnected(true); SetGeneric(false);
     }
     virtual ~ysAndroidInputDevice() {
-        // Base class destructor deletes m_keyboard/m_mouse via Destroy().
-        // Null the derived pointers to avoid a double free.
+        // null the derived pointers the base destructor deletes them
         m_androidKb = nullptr;
         m_androidMouse = nullptr;
     }
@@ -172,9 +166,8 @@ ysInputDevice *ysAndroidInputSystem::CreateVirtualDevice(ysInputDevice::InputDev
 
 ysAndroidKeyboard::ysAndroidKeyboard() : ysKeyboard() {}
 ysAndroidKeyboard::~ysAndroidKeyboard() {}
-// Key state is fixed at press time, so flipping FN mid hold cannot
-// reassign a held button to its other function. Unmapped keys return 0,
-// which is also ysKey::Code::Back, so they never match.
+// key state is fixed at press time so flipping fn mid hold cannot
+// reassign a held button
 bool ysAndroidKeyboard::IsKeyDown(ysKey::Code key) {
     auto& backend = esdroid::AndroidBackend::instance();
     for(int vk=1;vk<(int)esdroid::VirtualKey::Count;++vk) {
@@ -205,8 +198,7 @@ int ysAndroidMouse::GetOsPositionY() const {
 }
 int ysAndroidMouse::GetX() const { return GetOsPositionX(); }
 int ysAndroidMouse::GetY() const { return GetOsPositionY(); }
-// UiManager polls DownTransition then UpTransition every frame; the backend
-// edges are pulled into the state machine here so each fires exactly once.
+// pull the backend edges into the state machine so each fires once
 bool ysAndroidMouse::ProcessMouseButton(Button button, ButtonState state) {
     if(button==Button::Left) {
         auto& backend = esdroid::AndroidBackend::instance();
@@ -216,7 +208,7 @@ bool ysAndroidMouse::ProcessMouseButton(Button button, ButtonState state) {
     return ysMouse::ProcessMouseButton(button,state);
 }
 
-// ysWindowsAudioWaveFile - portable WAV reader
+// yswindowsaudiowavefile - portable wav reader
 #pragma pack(push,1)
 struct WaveHeader { char riff[4]; uint32_t riffSize; char wave[4]; char fmtId[4]; uint32_t fmtSize;
     uint16_t audioFormat,numChannels; uint32_t sampleRate,byteRate; uint16_t blockAlign,bitsPerSample;
@@ -231,10 +223,10 @@ ysAudioFile::Error ysWindowsAudioWaveFile::OpenFile(const wchar_t *fname) {
     for(;i<sizeof(path)-1&&fname[i];++i) path[i]=(char)(fname[i]&0xFF);
     path[i]=0;
     void* buf=nullptr; long sz=0;
-    // Try multiple path prefixes since the impulse response filenames
-    // are relative (e.g. "smooth/smooth_39.wav").
+    // try multiple path prefixes the impulse response filenames are
+    // relative
     const char* prefixes[] = {
-        "",  // as-is (full path or already correct)
+        "",  // as-is full path or already correct
         "sound-library/",  // assets/sound-library/
         "es/sound-library/",  // assets/es/sound-library/
     };

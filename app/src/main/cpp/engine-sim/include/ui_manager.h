@@ -33,4 +33,4 @@ class UiManager {
         EngineSimApplication *m_app;
 };
 
-#endif /* ATG_ENGINE_SIM_UI_MANAGER_H */
+#endif /* ATG_ENGINE_SIM_UI_MANAGER_H  */

@@ -55,23 +55,23 @@ public:
     const void *GetBuffer() const { return m_buffer; }
 
 protected:
-    // General Read Functions
+    // general read functions
     virtual Error GenericRead(SampleOffset offset, SampleOffset size, void *target);
 
     ysAudioParameters m_audioParameters;
 
-    // Audio Data Parameters
+    // audio data parameters
     SampleOffset m_sampleCount;
 
-    // Software Buffer
+    // software buffer
     ysAudioBuffer *m_externalBuffer;
 
-    // Internal Buffer
+    // internal buffer
     SampleOffset m_maxBufferSamples;
     SampleOffset m_bufferDataSamples;
     char *m_buffer;
 
-    // Streaming
+    // streaming
     SampleOffset m_currentReadingOffset;
 
 protected:
@@ -79,4 +79,4 @@ protected:
     bool m_fileOpen;
 };
 
-#endif /* YDS_AUDIO_FILE_H */
+#endif /* YDS_AUDIO_FILE_H  */

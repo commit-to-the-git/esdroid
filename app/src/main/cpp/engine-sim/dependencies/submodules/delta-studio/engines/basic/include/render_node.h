@@ -16,7 +16,7 @@ namespace dbasic {
         RenderNode();
         ~RenderNode();
 
-        // Rigid body component
+        // rigid body component
         ysTransform Transform;
 
         void SetParent(RenderNode *node);
@@ -53,27 +53,27 @@ namespace dbasic {
         SceneObjectAsset *GetSceneAsset() const { return m_sceneAsset; }
 
     protected:
-        // Node name
+        // node name
         char m_name[64];
 
-        // Convenient reference to the asset ID this node is derived from
+        // convenient reference to the asset id this node is derived from
         int m_assetID;
 
-        // Parent node
+        // parent node
         RenderNode *m_parent;
 
-        // Parent render skeleton
+        // parent render skeleton
         RenderSkeleton *m_renderSkeleton;
 
-        // Model asset
+        // model asset
         ModelAsset *m_modelAsset;
 
-        // Scene object reference
+        // scene object reference
         SceneObjectAsset *m_sceneAsset;
 
         bool m_bone;
 
-        // Animation targets
+        // animation targets
         TransformTarget m_locationTarget;
         TransformTarget m_rotationTarget;
 
@@ -84,4 +84,4 @@ namespace dbasic {
 
 } /* namespace dbasic */
 
-#endif /* DELTA_BASIC_RENDER_NODE_H */
+#endif /* DELTA_BASIC_RENDER_NODE_H  */

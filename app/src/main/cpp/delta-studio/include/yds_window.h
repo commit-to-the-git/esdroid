@@ -28,7 +28,7 @@ public:
     ysWindow(Platform platform);
     virtual ~ysWindow();
 
-    /* Interface */
+    /* interface */
     virtual ysError
     InitializeWindow(ysWindow *parent, const wchar_t *title, WindowStyle style,
                      int x, int y, int width, int height, ysMonitor *monitor,
@@ -101,7 +101,7 @@ public:
     inline ysVector GetBackgroundColor() const { return m_backgroundColor; }
 
 public:
-    // Handlers
+    // handlers
     void OnMoveWindow(int x, int y);
     void OnResizeWindow(int w, int h);
     void OnActivate();
@@ -110,46 +110,46 @@ public:
     void OnKeyDown(int key);
 
 protected:
-    // Abstraction Layer
+    // abstraction layer
     virtual void AL_SetSize(int width, int height);
     virtual void AL_SetLocation(int x, int y);
 
 protected:
-    // Window size
+    // window size
     int m_width;
     int m_height;
 
-    // Window location
+    // window location
     int m_locationx;
     int m_locationy;
 
-    // Windowed size
+    // windowed size
     int m_windowedWidth;
     int m_windowedHeight;
 
-    // Window location
+    // window location
     int m_windowedLocationx;
     int m_windowedLocationy;
 
-    // Title
+    // title
     wchar_t m_title[MAX_NAME_LENGTH];
 
-    // Current Window State
+    // current window state
     WindowState m_windowState;
 
-    // Window Style
+    // window style
     WindowStyle m_windowStyle;
 
-    // Parent Window
+    // parent window
     ysWindow *m_parent;
 
-    // The attached monitor for use in fullscreen
+    // the attached monitor for use in fullscreen
     ysMonitor *m_monitor;
 
-    // Window Active
+    // window active
     bool m_active;
 
-    // Status flag indicating whether the window is resizing
+    // status flag indicating whether the window is resizing
     bool m_resizing;
 
     float m_gameResolutionScaleHorizontal;
@@ -158,8 +158,8 @@ protected:
     ysVector m_backgroundColor;
 
 protected:
-    // Event handler
+    // event handler
     ysWindowEventHandler *m_eventHandler;
 };
 
-#endif /* YDS_WINDOW_H */
+#endif /* YDS_WINDOW_H  */

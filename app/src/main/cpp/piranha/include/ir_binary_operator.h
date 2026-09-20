@@ -46,4 +46,4 @@ namespace piranha {
 
 } /* namespace piranha */
 
-#endif /* PIRANHA_IR_BINARY_OPERATOR_H */
+#endif /* PIRANHA_IR_BINARY_OPERATOR_H  */

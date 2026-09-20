@@ -10,4 +10,4 @@ public:
     virtual ~ysDepthBuffer();
 };
 
-#endif /* YDS_DEPTH_BUFFER_H */
+#endif /* YDS_DEPTH_BUFFER_H  */

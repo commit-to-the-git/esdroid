@@ -44,4 +44,4 @@ class PerformanceCluster : public UiElement {
         Simulator *m_simulator;
 };
 
-#endif /* ATG_ENGINE_SIM_PERFORMANCE_CLUSTER_H */
+#endif /* ATG_ENGINE_SIM_PERFORMANCE_CLUSTER_H  */

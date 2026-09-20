@@ -39,4 +39,4 @@ protected:
     ysWindowSystem::Platform m_platform;
 };
 
-#endif /* YDS_RENDERING_CONTEXT_H */
+#endif /* YDS_RENDERING_CONTEXT_H  */

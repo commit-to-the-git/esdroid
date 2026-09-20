@@ -107,4 +107,4 @@ namespace piranha {
 
 } /* namespace piranha */
 
-#endif /* PIRANHA_FLOAT_CONVERSIONS_H */
+#endif /* PIRANHA_FLOAT_CONVERSIONS_H  */

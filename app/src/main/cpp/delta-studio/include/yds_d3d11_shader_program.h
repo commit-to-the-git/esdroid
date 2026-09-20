@@ -15,4 +15,4 @@ protected:
     ysD3D11Shader *GetShader(ysShader::ShaderType type);
 };
 
-#endif /* YDS_D3D11_SHADER_PROGRAM_H */
+#endif /* YDS_D3D11_SHADER_PROGRAM_H  */

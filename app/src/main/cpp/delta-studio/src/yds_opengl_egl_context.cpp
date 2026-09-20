@@ -5,7 +5,7 @@
 #include <android/native_window.h>
 #define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO,"ESDroid",__VA_ARGS__))
 
-// Forward-declare the AndroidBackend swapBuffers
+// forward-declare the androidbackend swapbuffers
 namespace esdroid { class AndroidBackend; }
 extern "C" void esdroid_swap_buffers();
 
@@ -28,7 +28,7 @@ ysError ysOpenGLEglContext::CreateRenderingContext(ysOpenGLDevice *device) {
 
 ysError ysOpenGLEglContext::Present() {
     YDS_ERROR_DECLARE("Present");
-    // Swap the EGL surface buffer to the screen.
+    // swap the egl surface buffer to the screen
     esdroid_swap_buffers();
     return YDS_ERROR_RETURN(ysError::None);
 }
@@ -80,8 +80,8 @@ void ysOpenGLEglContext::LoadAllExtensions() {
     glGetActiveUniformName=+[](GLuint p,GLuint i,GLsizei b,GLsizei*l,GLchar*n){::glGetActiveUniform(p,i,b,l,nullptr,nullptr,n);};
     glGetActiveUniformsiv=load_gl("glGetActiveUniformsiv",&::glGetActiveUniformsiv);
     glGetActiveUniform=load_gl("glGetActiveUniform",&::glGetActiveUniform);
-    // Load the uniform block binding entry points so the per-stage UBO
-    // slots (0/1/3) can be remapped after linking.
+    // load the uniform block binding entry points so the per-stage ubo
+    // slots 0/1/3 can be remapped after linking
     glGetActiveUniformBlockName=load_gl("glGetActiveUniformBlockName",&::glGetActiveUniformBlockName);
     glUniformBlockBinding=load_gl("glUniformBlockBinding",&::glUniformBlockBinding);
     glDrawElementsBaseVertex=reinterpret_cast<PFNGLDRAWELEMENTSBASEVERTEXPROC>(eglGetProcAddress("glDrawElementsBaseVertex"));
@@ -111,9 +111,9 @@ void ysOpenGLEglContext::LoadAllExtensions() {
     glBlendEquation=load_gl("glBlendEquation",&::glBlendEquation);
     wglMakeContextCurrent=nullptr; wglCreateContextAttribsARB=nullptr; wglChoosePixelFormatARB=nullptr;
     LOGI("GL ES pointers loaded");
-    // Log at startup whether glDrawElementsBaseVertex loaded. If null, the
-    // GLES 3.0 driver lacks GL_OES_draw_elements_base_vertex and the
-    // absolute-index fallback is used instead.
+    // log at startup whether gldrawelementsbasevertex loaded if null the
+    // gles 3.0 driver lacks gl_oes_draw_elements_base_vertex and the
+    // absolute-index fallback is used instead
     LOGI("ESDroid: glDrawElementsBaseVertex = %p", (void*)glDrawElementsBaseVertex);
     LOGI("ESDroid: glUniformBlockBinding = %p", (void*)glUniformBlockBinding);
 }
