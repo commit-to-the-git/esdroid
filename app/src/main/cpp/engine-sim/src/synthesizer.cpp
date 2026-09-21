@@ -14,7 +14,6 @@ Synthesizer::Synthesizer() {
     m_inputChannelCount = 0;
     m_inputBufferSize = 0;
     m_inputWriteOffset = 0.0;
-    m_inputSamplesRead = 0;
 
     m_audioBufferSize = 0;
 
@@ -37,15 +36,12 @@ Synthesizer::~Synthesizer() {
 void Synthesizer::initialize(const Parameters &p) {
     m_inputChannelCount = p.inputChannelCount;
     m_inputBufferSize = p.inputBufferSize;
-    m_inputWriteOffset = p.inputBufferSize;
+    m_inputWriteOffset = 0;
     m_audioBufferSize = p.audioBufferSize;
     m_inputSampleRate = p.inputSampleRate;
     m_audioSampleRate = p.audioSampleRate;
     m_audioParameters = p.initialAudioParameters;
 
-    m_inputSamplesRead = 0;
-
-    m_inputWriteOffset = 0;
     m_processed = true;
 
     m_audioBuffer.initialize(p.audioBufferSize);
@@ -167,6 +163,10 @@ void Synthesizer::waitProcessed() {
 }
 
 void Synthesizer::writeInput(const double *data) {
+    // arm has no total store order so the ring heads go behind the same
+    // lock the render thread reads under
+    std::lock_guard<std::mutex> lk(m_lock0);
+
     m_inputWriteOffset += (double)m_audioSampleRate / m_inputSampleRate;
     if (m_inputWriteOffset >= (double)m_inputBufferSize) {
         m_inputWriteOffset -= (double)m_inputBufferSize;
@@ -196,17 +196,17 @@ void Synthesizer::writeInput(const double *data) {
 }
 
 void Synthesizer::endInputBlock() {
-    std::unique_lock<std::mutex> lk(m_inputLock); 
-
-    for (int i = 0; i < m_inputChannelCount; ++i) {
-        m_inputChannels[i].data.removeBeginning(m_inputSamplesRead);
-    }
+    // the frame is complete so the render thread may take another block
+    // removal stays with the render thread so a count can never go stale
+    // and get applied twice when it sleeps past a frame
+    std::unique_lock<std::mutex> lk(m_lock0);
 
     if (m_inputChannelCount != 0) {
         m_latency = m_inputChannels[0].data.size();
     }
-    
-    m_inputSamplesRead = 0;
+
+    // the flag and the notify both sit under the cv mutex so a wakeup
+    // can not slip between the flag flip and the wait
     m_processed = false;
 
     lk.unlock();
@@ -226,19 +226,22 @@ void Synthesizer::renderAudio() {
     m_cv0.wait(lk0, [this] {
         const bool inputAvailable =
             m_inputChannels[0].data.size() > 0
-            && m_audioBuffer.size() < 2000;
+            && m_audioBuffer.size() < 6000;
         return !m_run || (inputAvailable && !m_processed);
     });
 
+    // up to 136ms per pass so low frame rates can still render realtime
     const int n = std::min(
-        std::max(0, 2000 - (int)m_audioBuffer.size()),
+        std::max(0, 6000 - (int)m_audioBuffer.size()),
         (int)m_inputChannels[0].data.size());
 
     for (int i = 0; i < m_inputChannelCount; ++i) {
         m_inputChannels[i].data.read(n, m_inputChannels[i].transferBuffer);
+        // drop what was copied in the same hold so the heads move as one
+        // with the copy and never past unread data
+        m_inputChannels[i].data.removeBeginning(n);
     }
-    
-    m_inputSamplesRead = n;
+
     m_processed = true;
 
     lk0.unlock();
@@ -250,7 +253,10 @@ void Synthesizer::renderAudio() {
     }
 
     for (int i = 0; i < n; ++i) {
-        m_audioBuffer.write(renderAudio(i));
+        const int16_t sample = renderAudio(i);
+        // the pump pulls this ring under the lock so each push takes it too
+        std::lock_guard<std::mutex> lk(m_lock0);
+        m_audioBuffer.write(sample);
     }
 
     m_cv0.notify_one();

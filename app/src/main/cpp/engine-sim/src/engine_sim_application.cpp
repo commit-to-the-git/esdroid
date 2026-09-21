@@ -270,7 +270,14 @@ void EngineSimApplication::process(float frame_dt) {
 
     m_simulator->setSimulationSpeed(speed);
 
+#if defined(__ANDROID__)
+    // below 30fps the 30 floor would make the sim produce audio slower
+    // than real time so the fifo starves and clicks on android the floor
+    // sits lower so heavy engines still feed the stream at real rate
+    const double avgFramerate = clamp(m_engine.GetAverageFramerate(), 25.0f, 1000.0f);
+#else
     const double avgFramerate = clamp(m_engine.GetAverageFramerate(), 30.0f, 1000.0f);
+#endif
     m_simulator->startFrame(1 / avgFramerate);
 
     auto proc_t0 = std::chrono::steady_clock::now();
@@ -300,6 +307,42 @@ void EngineSimApplication::process(float frame_dt) {
             (duration.count() / 1E9) / iterationCount);
     }
 
+#if defined(__ANDROID__)
+    // audio is pulled from the fifo by the audio thread
+    // the fill target adapts so weak devices grow a margin and strong
+    // ones relax toward the floor
+    auto& backend = esdroid::AndroidBackend::instance();
+    backend.updateAudioRegulator();
+    const int targetFill = backend.audioFillTarget();
+    const int fill = backend.getAudioFill();
+    // keep the fifo close to the target so a stalled stream cannot pile up audio
+    if (fill > targetFill + 44100 / 50) backend.dropOldestAudio(fill - targetFill);
+    const int want = targetFill - backend.getAudioFill();
+    if (want > 0) {
+        // one buffer for the whole run so the pump does not churn the heap
+        // every frame
+        if ((int)m_audioPumpBuffer.size() < want) m_audioPumpBuffer.resize(want);
+        int16_t *samples = m_audioPumpBuffer.data();
+        const int readSamples = m_simulator->readAudioOutput(want, samples);
+        for (SampleOffset i = 0; i < (SampleOffset)readSamples; ++i) {
+            const int16_t sample = samples[i];
+            if (m_oscillatorSampleOffset % 4 == 0) {
+                m_oscCluster->getAudioWaveformOscilloscope()->addDataPoint(
+                    m_oscillatorSampleOffset,
+                    sample / (float)(INT16_MAX));
+            }
+
+            m_oscillatorSampleOffset = (m_oscillatorSampleOffset + 1) % (44100 / 10);
+        }
+
+        if (readSamples > 0) backend.writeAudioSamples(samples, readSamples, nullptr);
+    }
+
+    m_performanceCluster->addInputBufferUsageSample(
+        (double)m_simulator->getSynthesizerInputLatency() / m_simulator->getSynthesizerInputLatencyTarget());
+    m_performanceCluster->addAudioLatencySample(
+        (double)backend.getAudioFill() / (44100 * 0.1));
+#else
     SampleOffset safeWritePosition = 0; m_audioSource->GetCurrentWritePosition(&safeWritePosition);
     const SampleOffset writePosition = m_audioBuffer.m_writePointer;
 
@@ -359,6 +402,7 @@ void EngineSimApplication::process(float frame_dt) {
         (double)m_simulator->getSynthesizerInputLatency() / m_simulator->getSynthesizerInputLatencyTarget());
     m_performanceCluster->addAudioLatencySample(
         ({SampleOffset _wp=0; m_audioSource->GetCurrentWritePosition(&_wp); m_audioBuffer.offsetDelta(_wp, m_audioBuffer.m_writePointer);}) / (44100 * 0.1));
+#endif
 }
 
 void EngineSimApplication::render() {

@@ -20,13 +20,13 @@
 #include <android/asset_manager.h>
 #include <EGL/egl.h>
 #include <GLES3/gl3.h>
-#include <SLES/OpenSLES.h>
-#include <SLES/OpenSLES_Android.h>
 #include <string>
 #include <vector>
 #include <cstdint>
 #include <atomic>
 #include <mutex>
+
+#include "audio_stream.h"
 
 namespace esdroid {
 
@@ -198,7 +198,18 @@ public:
     void destroyAudio();
     void resetAudioRing();
     bool writeAudioSamples(const int16_t* samples,int count,int* written);
-    int getAudioReadPos() const { return m_audioReadPos; }
+    int getAudioFill() const;
+    void dropOldestAudio(int count);
+    int getAudioReadPos() const {
+        return (int)(m_audioReadPos.load(std::memory_order_relaxed)
+            & (kAudioRingSamples - 1u));
+    }
+    // copy samples out of the fifo without consuming them
+    int peekAudioSamples(int16_t* dst,int count);
+    void consumeAudioSamples(int count);
+    // adapts the fill target from underruns and restarts dead streams
+    void updateAudioRegulator();
+    int audioFillTarget() const { return m_fillTarget; }
     bool readAsset(const char* path,void** outBuf,long* outSize);
     bool readFile(const char* path,void** outBuf,long* outSize);
     std::string filesDir() const { return m_filesDir; }
@@ -218,13 +229,6 @@ public:
     void initTouchUI();
     void renderTouchUI();
     void resizeTouchUI();
-    // public for audio callback access
-    int m_sampleRate=44100, m_channels=1;
-    std::vector<int16_t> m_slBuffers[2];
-    int m_slNextBuffer=0;
-    std::vector<int16_t> m_audioRing;
-    int m_audioWritePos=0, m_audioReadPos=0;
-    std::mutex m_audioMutex;
 private:
     AndroidBackend();
     static android_app* s_app;
@@ -270,10 +274,23 @@ private:
     std::mutex m_valueInputMutex;
     int m_pendingValueIdx=-1;
     double m_pendingValue=0.0;
-    SLObjectItf m_slEngine=nullptr, m_slOutputMix=nullptr, m_slPlayer=nullptr;
-    SLEngineItf m_slEngineItf=nullptr;
-    SLPlayItf m_slPlayItf=nullptr;
-    SLAndroidSimpleBufferQueueItf m_slQueue=nullptr;
+    // audio fifo the oboe callback pulls from
+    // lock free spsc ring so the audio thread never waits on a lock
+    // the writer owns the write pos the callback owns the read pos
+    static constexpr uint32_t kAudioRingSamples = 1u << 16;
+    static constexpr uint32_t kAudioRingMask = kAudioRingSamples - 1u;
+    int m_sampleRate=44100, m_channels=1;
+    std::vector<int16_t> m_audioRing;
+    std::atomic<uint32_t> m_audioWritePos{0};
+    std::atomic<uint32_t> m_audioReadPos{0};
+    // drop count the callback folds into the read pos on its next pass
+    std::atomic<int> m_audioDropPending{0};
+    AudioStream m_audioStream;
+    // fifo fill target in samples grows on underruns shrinks when stable
+    int m_fillTarget=5292;
+    int m_stableFrames=0;
+    // frames between audio init retries after a failed first try
+    int m_audioRetryFrames=0;
     bool m_audioInited=false;
     std::atomic<bool> m_shouldQuit{false};
     std::atomic<bool> m_scriptReloadPending{false};

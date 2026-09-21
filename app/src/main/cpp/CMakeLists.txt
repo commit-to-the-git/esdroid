@@ -165,8 +165,13 @@ target_include_directories(native_app_glue PUBLIC
     ${ANDROID_NDK}/sources/android/native_app_glue
 )
 
+# oboe audio aaudio with an opensl es fallback for older devices
+add_subdirectory(third_party/oboe)
+
 add_library(android_backend STATIC
-    android-backend/android_backend.cpp android-backend/android_shim.cpp android-backend/touch_ui.cpp)
+    android-backend/android_backend.cpp android-backend/android_shim.cpp
+    android-backend/audio_stream.cpp android-backend/touch_ui.cpp)
+target_link_libraries(android_backend PUBLIC oboe)
 
 # main shared library
 add_library(esdroid SHARED
@@ -190,7 +195,7 @@ add_library(esdroid SHARED
 )
 
 target_link_libraries(esdroid PRIVATE
-    es_core es_script delta_core delta_basic delta_physics piranha csv_io scs android_backend
-    EGL GLESv3 OpenSLES android log atomic -Wl,--whole-archive native_app_glue -Wl,--no-whole-archive
+    es_core es_script delta_core delta_basic delta_physics piranha csv_io scs android_backend oboe
+    EGL GLESv3 android log atomic -Wl,--whole-archive native_app_glue -Wl,--no-whole-archive
     -flto -Wl,--lto-O3 -Wl,--icf=all
 )

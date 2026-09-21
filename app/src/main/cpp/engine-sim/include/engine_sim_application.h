@@ -197,6 +197,9 @@ class EngineSimApplication {
         AudioBuffer m_audioBuffer;
         ysAudioSource *m_audioSource;
 
+        // reused scratch so the android audio pump does not allocate per frame
+        std::vector<int16_t> m_audioPumpBuffer;
+
         int m_oscillatorSampleOffset;
         int m_screen;
 

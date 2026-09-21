@@ -69,3 +69,11 @@ Fonts bundled under app/src/main/assets/delta-engine-assets/fonts:
   Silkscreen - Kottke Silkscreen License (see directory)
   Roboto - Apache License 2.0 (see directory)
   Josefin Sans - SIL Open Font License 1.1 (see directory)
+
+------------------------------------------------------------------------------
+Oboe audio library
+Copyright 2018-2023 The Android Open Source Project
+Licensed under the Apache License, Version 2.0 (see the LICENSE file).
+Vendored from https://github.com/google/oboe release 1.9.3 with the sample
+apps, tests and docs removed.
+app/src/main/cpp/third_party/oboe

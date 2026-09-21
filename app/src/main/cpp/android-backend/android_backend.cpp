@@ -32,6 +32,7 @@ JavaVM* g_javaVM=nullptr;
 #include <math.h>
 #include <cstdio>
 #include <array>
+#include <algorithm>
 
 #define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO,"ESDroid",__VA_ARGS__))
 #define LOGW(...) ((void)__android_log_print(ANDROID_LOG_WARN,"ESDroid",__VA_ARGS__))
@@ -965,115 +966,169 @@ void AndroidBackend::layoutButtons(int sw,int sh) {
     layoutImportPanel(sw,sh);
 }
 
-static void sl_buffer_callback(SLAndroidSimpleBufferQueueItf bq, void* ctx) {
-    auto* backend = static_cast<esdroid::AndroidBackend*>(ctx);
-    if (!backend) return;
+static int audio_peek_thunk(void* ctx,int16_t* dst,int count) {
+    return static_cast<esdroid::AndroidBackend*>(ctx)->peekAudioSamples(dst,count);
+}
 
-    int bufSamps = backend->m_sampleRate / 20 * backend->m_channels; // 50ms buffer
-    std::vector<int16_t>* buf = &backend->m_slBuffers[backend->m_slNextBuffer];
+static void audio_consume_thunk(void* ctx,int count) {
+    static_cast<esdroid::AndroidBackend*>(ctx)->consumeAudioSamples(count);
+}
 
-    // read from the ring even on underrun old data beats silence
-    // two memcpys run on the audio thread
-    {
-        std::lock_guard<std::mutex> lk(backend->m_audioMutex);
-        const int rs = (int)backend->m_audioRing.size();
-        if (rs <= 0) {
-            buf->assign(bufSamps, 0);
-        } else {
-            int& rp = backend->m_audioReadPos;
-            int n = bufSamps < rs ? bufSamps : rs;
-            int first = rs - rp; if (first > n) first = n;
-            memcpy(buf->data(), &backend->m_audioRing[rp],
-                (size_t)first * sizeof(int16_t));
-            if (n > first) memcpy(buf->data() + first, &backend->m_audioRing[0],
-                (size_t)(n - first) * sizeof(int16_t));
-            if (bufSamps > n) memset(buf->data() + n, 0,
-                (size_t)(bufSamps - n) * sizeof(int16_t));
-            rp = (rp + n) % rs;
-        }
-    }
-
-    (*bq)->Enqueue(bq, buf->data(), bufSamps * sizeof(int16_t));
-    backend->m_slNextBuffer = 1 - backend->m_slNextBuffer;
+static int audio_fill_thunk(void* ctx) {
+    return static_cast<esdroid::AndroidBackend*>(ctx)->getAudioFill();
 }
 
 bool AndroidBackend::initAudio(int sr,int ch) {
     if(m_audioInited) return true;
     m_sampleRate=sr; m_channels=ch;
-    SLresult r;
-    r=slCreateEngine(&m_slEngine,0,nullptr,0,nullptr,nullptr);
-    if(r!=SL_RESULT_SUCCESS){LOGE("slCreateEngine failed");return false;}
-    (*m_slEngine)->Realize(m_slEngine,SL_BOOLEAN_FALSE);
-    (*m_slEngine)->GetInterface(m_slEngine,SL_IID_ENGINE,&m_slEngineItf);
-    (*m_slEngineItf)->CreateOutputMix(m_slEngineItf,&m_slOutputMix,0,nullptr,nullptr);
-    (*m_slOutputMix)->Realize(m_slOutputMix,SL_BOOLEAN_FALSE);
-    SLDataLocator_AndroidSimpleBufferQueue lbq={SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE,2};
-    SLDataFormat_PCM fmt={SL_DATAFORMAT_PCM,(SLuint32)ch,(SLuint32)(sr*1000),
-        SL_PCMSAMPLEFORMAT_FIXED_16,SL_PCMSAMPLEFORMAT_FIXED_16,
-        (ch==1)?SL_SPEAKER_FRONT_CENTER:(SL_SPEAKER_FRONT_LEFT|SL_SPEAKER_FRONT_RIGHT),
-        SL_BYTEORDER_LITTLEENDIAN};
-    SLDataSource src={&lbq,&fmt};
-    SLDataLocator_OutputMix lom={SL_DATALOCATOR_OUTPUTMIX,m_slOutputMix};
-    SLDataSink sink={&lom,nullptr};
-    SLInterfaceID ids[]={SL_IID_BUFFERQUEUE,SL_IID_VOLUME};
-    SLboolean req[]={SL_BOOLEAN_TRUE,SL_BOOLEAN_FALSE};
-    (*m_slEngineItf)->CreateAudioPlayer(m_slEngineItf,&m_slPlayer,&src,&sink,2,ids,req);
-    (*m_slPlayer)->Realize(m_slPlayer,SL_BOOLEAN_FALSE);
-    (*m_slPlayer)->GetInterface(m_slPlayer,SL_IID_PLAY,&m_slPlayItf);
-    (*m_slPlayer)->GetInterface(m_slPlayer,SL_IID_BUFFERQUEUE,&m_slQueue);
-    (*m_slQueue)->RegisterCallback(m_slQueue,sl_buffer_callback,this);
-    int bufSamps=sr/20*ch;
-    m_slBuffers[0].assign(bufSamps,0);
-    m_slBuffers[1].assign(bufSamps,0);
-    m_slNextBuffer=0;
-    (*m_slQueue)->Enqueue(m_slQueue,m_slBuffers[0].data(),bufSamps*sizeof(int16_t));
-    m_slNextBuffer=1;
-    (*m_slQueue)->Enqueue(m_slQueue,m_slBuffers[1].data(),bufSamps*sizeof(int16_t));
-    m_slNextBuffer=0;
-    m_audioRing.assign(sr*ch,0);
-    m_audioWritePos=0; m_audioReadPos=0;
-    (*m_slPlayItf)->SetPlayState(m_slPlayItf,SL_PLAYSTATE_PLAYING);
+    {
+        // safe to reset here the stream has not started yet
+        // so no callback can be reading the ring
+        m_audioRing.assign(kAudioRingSamples,0);
+        m_audioWritePos.store(0,std::memory_order_relaxed);
+        m_audioReadPos.store(0,std::memory_order_relaxed);
+        m_audioDropPending.store(0,std::memory_order_relaxed);
+    }
+    AudioStreamHost host;
+    host.ctx=this;
+    host.peek=audio_peek_thunk;
+    host.consume=audio_consume_thunk;
+    host.fill=audio_fill_thunk;
+    if(!m_audioStream.start(host,sr,ch)){
+        return false;
+    }
+    // start at 120ms of margin the regulator tunes it from there
+    m_fillTarget=(int)(sr*0.12);
+    m_stableFrames=0;
+    m_audioRetryFrames=0;
+    m_audioStream.takeUnderrunCount();
     m_audioInited=true;
-    LOGI("OpenSL ES audio: %dHz %dch",sr,ch);
     return true;
 }
 
 void AndroidBackend::destroyAudio() {
-    if(m_slPlayItf) (*m_slPlayItf)->SetPlayState(m_slPlayItf,SL_PLAYSTATE_STOPPED);
-    if(m_slPlayer) (*m_slPlayer)->Destroy(m_slPlayer);
-    if(m_slOutputMix) (*m_slOutputMix)->Destroy(m_slOutputMix);
-    if(m_slEngine) (*m_slEngine)->Destroy(m_slEngine);
-    m_slEngine=nullptr;m_slEngineItf=nullptr;m_slOutputMix=nullptr;
-    m_slPlayer=nullptr;m_slPlayItf=nullptr;m_slQueue=nullptr;
+    if(!m_audioInited) return;
+    m_audioStream.stop();
     m_audioInited=false;
 }
 
 void AndroidBackend::resetAudioRing() {
-    // silence the ring and line the write head up with the read head
-    std::lock_guard<std::mutex> lk(m_audioMutex);
-    if(!m_audioRing.empty()) memset(m_audioRing.data(),0,m_audioRing.size()*sizeof(int16_t));
-    m_audioWritePos=m_audioReadPos;
+    // ask the callback to drop the backlog then fade in from silence
+    // the read pos stays owned by the callback so nothing races
+    m_audioDropPending.store(0x7fffffff,std::memory_order_relaxed);
+    m_audioStream.flush();
+}
+
+void AndroidBackend::updateAudioRegulator() {
+    if(!m_audioInited) {
+        // the first try can fail while the audio service is still booting
+        // so give it another shot every few seconds
+        if(++m_audioRetryFrames<240) return;
+        m_audioRetryFrames=0;
+        initAudio(m_sampleRate,m_channels);
+        return;
+    }
+    // rebuild the stream when the device disconnected it
+    m_audioStream.tick();
+    const unsigned dry=m_audioStream.takeUnderrunCount();
+    if(dry>0){
+        // the audio thread ran dry so grow the margin 10ms per dry callback
+        // no more than 40ms per frame so a storm cannot overshoot
+        const int perDry=(int)(m_sampleRate*0.01);
+        const int capped=dry>4u?4u:dry;
+        m_fillTarget=std::min(m_fillTarget+perDry*capped,(int)(m_sampleRate*0.16));
+        m_stableFrames=0;
+        return;
+    }
+    if(m_stableFrames<240){ ++m_stableFrames; return; }
+    // four seconds clean so drift back toward the 120ms floor
+    m_fillTarget=std::max(m_fillTarget-4,(int)(m_sampleRate*0.12));
 }
 
 bool AndroidBackend::writeAudioSamples(const int16_t* samples,int count,int* written) {
     if(!m_audioInited){if(written)*written=0;return false;}
-    std::lock_guard<std::mutex> lk(m_audioMutex);
-    const int rs=(int)m_audioRing.size();
     if(written)*written=count;
-    if(rs<=0||count<=0) return true;
+    if(count<=0) return true;
     // a block larger than the ring keeps only its tail
-    if(count>=rs){ samples+=count-rs; count=rs; m_audioWritePos=m_audioReadPos; }
-    // the writer may lap the reader advance past the overwritten samples
-    const int first=count<rs-m_audioWritePos?count:rs-m_audioWritePos;
-    memcpy(&m_audioRing[m_audioWritePos],samples,(size_t)first*sizeof(int16_t));
-    const int rest=count-first;
-    if(rest>0) memcpy(&m_audioRing[0],samples+first,(size_t)rest*sizeof(int16_t));
-    const int valid=(m_audioWritePos-m_audioReadPos+rs)%rs;
-    int drop=count-(rs-valid)+1;
-    if(drop<0) drop=0;
-    m_audioWritePos=(m_audioWritePos+count)%rs;
-    if(drop>0) m_audioReadPos=(m_audioReadPos+drop)%rs;
+    if((uint32_t)count>kAudioRingSamples){
+        samples+=count-(int)kAudioRingSamples;
+        count=(int)kAudioRingSamples;
+    }
+    const uint32_t w=m_audioWritePos.load(std::memory_order_relaxed);
+    const uint32_t r=m_audioReadPos.load(std::memory_order_acquire);
+    const uint32_t space=kAudioRingSamples-(w-r);
+    // keep the newest samples when the ring is short on room
+    if((uint32_t)count>space){
+        samples+=count-(int)space;
+        count=(int)space;
+    }
+    if(count<=0) return true;
+    const uint32_t start=w&kAudioRingMask;
+    const uint32_t first=
+        (uint32_t)count<kAudioRingSamples-start
+            ?(uint32_t)count
+            :kAudioRingSamples-start;
+    memcpy(&m_audioRing[start],samples,(size_t)first*sizeof(int16_t));
+    if((uint32_t)count>first)
+        memcpy(&m_audioRing[0],samples+first,
+            (size_t)((uint32_t)count-first)*sizeof(int16_t));
+    // the pos goes up after the data so the reader never sees empty bytes
+    m_audioWritePos.store(w+(uint32_t)count,std::memory_order_release);
     return true;
+}
+
+int AndroidBackend::getAudioFill() const {
+    // samples waiting in the fifo
+    const uint32_t w=m_audioWritePos.load(std::memory_order_acquire);
+    const uint32_t r=m_audioReadPos.load(std::memory_order_acquire);
+    return (int)(uint32_t)(w-r);
+}
+
+void AndroidBackend::dropOldestAudio(int count) {
+    // the callback applies the drop on its next pass
+    // so the read pos is only ever moved by the audio thread
+    if(count<=0) return;
+    m_audioDropPending.fetch_add(count,std::memory_order_relaxed);
+}
+
+int AndroidBackend::peekAudioSamples(int16_t* dst,int count) {
+    // copy from the read pos without moving it
+    if(count<=0||!dst) return 0;
+    // fold a pending drop request in before the copy
+    const int drop=m_audioDropPending.exchange(0,std::memory_order_relaxed);
+    if(drop>0){
+        const uint32_t wd=m_audioWritePos.load(std::memory_order_acquire);
+        const uint32_t rd=m_audioReadPos.load(std::memory_order_relaxed);
+        const uint32_t availd=wd-rd;
+        const uint32_t d=
+            (uint32_t)drop>availd?availd:(uint32_t)drop;
+        if(d>0) m_audioReadPos.fetch_add(d,std::memory_order_release);
+    }
+    const uint32_t w=m_audioWritePos.load(std::memory_order_acquire);
+    const uint32_t r=m_audioReadPos.load(std::memory_order_relaxed);
+    const uint32_t avail=w-r;
+    if(avail==0) return 0;
+    if((uint32_t)count>avail) count=(int)avail;
+    const uint32_t start=r&kAudioRingMask;
+    const uint32_t first=
+        (uint32_t)count<kAudioRingSamples-start
+            ?(uint32_t)count
+            :kAudioRingSamples-start;
+    memcpy(dst,&m_audioRing[start],(size_t)first*sizeof(int16_t));
+    if((uint32_t)count>first)
+        memcpy(dst+first,&m_audioRing[0],
+            (size_t)((uint32_t)count-first)*sizeof(int16_t));
+    return count;
+}
+
+void AndroidBackend::consumeAudioSamples(int count) {
+    if(count<=0) return;
+    const uint32_t w=m_audioWritePos.load(std::memory_order_acquire);
+    const uint32_t r=m_audioReadPos.load(std::memory_order_relaxed);
+    const uint32_t avail=w-r;
+    if((uint32_t)count>avail) count=(int)avail;
+    if(count>0)
+        m_audioReadPos.fetch_add((uint32_t)count,std::memory_order_release);
 }
 
 bool AndroidBackend::readAsset(const char* path,void** outBuf,long* outSize) {

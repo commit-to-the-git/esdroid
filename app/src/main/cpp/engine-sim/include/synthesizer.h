@@ -99,7 +99,6 @@ class Synthesizer {
         AudioParameters m_audioParameters;
         int m_inputChannelCount;
         int m_inputBufferSize;
-        int m_inputSamplesRead;
         int m_latency;
         double m_inputWriteOffset;
         double m_lastInputSampleOffset;
@@ -114,7 +113,6 @@ class Synthesizer {
         std::atomic<bool> m_run;
         bool m_processed;
 
-        std::mutex m_inputLock;
         std::mutex m_lock0;
         std::condition_variable m_cv0;
 
