@@ -2,6 +2,7 @@
 extern "C" void esdroid_wtflog(const char*,...);
 #endif
 #include <string>
+#include <sstream>
 #if defined(__ANDROID__)
 extern "C" const char *esdroid_get_files_dir();
 #endif
@@ -9,6 +10,11 @@ extern "C" const char *esdroid_get_files_dir();
 #include "../include/compiler.h"
 
 es_script::Compiler::Output *es_script::Compiler::s_output = nullptr;
+std::string es_script::Compiler::s_lastErrors;
+
+const std::string &es_script::Compiler::lastErrors() {
+    return s_lastErrors;
+}
 
 es_script::Compiler::Compiler() {
     m_compiler = nullptr;
@@ -69,9 +75,21 @@ void es_script::Compiler::initialize() {
 
 bool es_script::Compiler::compile(const piranha::IrPath &path) {
     bool successful = false;
+    s_lastErrors.clear();
 
     #if defined(__ANDROID__)
-    std::ofstream file("/data/data/com.esdroid.engine_sim/wtflogs/piranha_errors.log", std::ios::out);
+    std::string errPath;
+    {
+        const char *fd = esdroid_get_files_dir();
+        if (fd != nullptr && fd[0] != 0) {
+            errPath = std::string(fd) + "/wtflogs/piranha_errors.log";
+        }
+    }
+    // the tv build lives in another package so the path follows the
+    // real files dir and a missing dir just skips the file
+    std::ofstream file(errPath.empty()
+        ? "/data/data/com.esdroid.engine_sim/wtflogs/piranha_errors.log"
+        : errPath, std::ios::out);
 #else
     std::ofstream file("error_log.log", std::ios::out);
 #endif
@@ -91,6 +109,9 @@ bool es_script::Compiler::compile(const piranha::IrPath &path) {
         else {
             for (int i = 0; i < errors->getErrorCount(); ++i) {
                 printError(errors->getCompilationError(i), file);
+                std::ostringstream text;
+                printError(errors->getCompilationError(i), text);
+                s_lastErrors += text.str();
 #if defined(__ANDROID__)
                 esdroid_wtflog("Piranha error %d/%d", i+1, errors->getErrorCount());
 #endif
@@ -119,17 +140,20 @@ es_script::Compiler::Output es_script::Compiler::execute() {
         result = m_program.execute();
     } catch (const std::bad_alloc& e) {
         esdroid_wtflog("execute: bad_alloc caught: %s", e.what());
+        s_lastErrors += std::string("execute failed: ") + e.what() + "\n";
     } catch (const std::exception& e) {
         esdroid_wtflog("execute: exception caught: %s", e.what());
+        s_lastErrors += std::string("execute failed: ") + e.what() + "\n";
     } catch (...) {
         esdroid_wtflog("execute: unknown exception caught");
+        s_lastErrors += "execute failed with an unknown exception\n";
     }
 #if defined(__ANDROID__)
     esdroid_wtflog("execute: m_program.execute() returned %d", result ? 1 : 0);
 #endif
 
     if (!result) {
-        // todo runtime error
+        if (s_lastErrors.empty()) s_lastErrors += "the script did not finish running\n";
     }
 
     return *output();
@@ -145,7 +169,7 @@ void es_script::Compiler::destroy() {
 
 void es_script::Compiler::printError(
     const piranha::CompilationError *err,
-    std::ofstream &file) const
+    std::ostream &file) const
 {
     const piranha::ErrorCode_struct &errorCode = err->getErrorCode();
     file << err->getCompilationUnit()->getPath().getStem()

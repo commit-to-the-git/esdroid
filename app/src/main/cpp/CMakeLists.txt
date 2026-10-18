@@ -170,8 +170,9 @@ add_subdirectory(third_party/oboe)
 
 add_library(android_backend STATIC
     android-backend/android_backend.cpp android-backend/android_shim.cpp
-    android-backend/audio_stream.cpp android-backend/touch_ui.cpp)
-target_link_libraries(android_backend PUBLIC oboe)
+    android-backend/audio_stream.cpp android-backend/touch_ui.cpp
+    android-backend/new_mr_droid.cpp)
+target_link_libraries(android_backend PUBLIC oboe es_script)
 
 # main shared library
 add_library(esdroid SHARED

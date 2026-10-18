@@ -9,6 +9,7 @@ VehicleDragConstraint::VehicleDragConstraint() : Constraint(1, 1) {
     m_kd = 1.0;
 
     m_vehicle = nullptr;
+    m_brake = 0.0;
 }
 
 VehicleDragConstraint::~VehicleDragConstraint() {
@@ -53,7 +54,13 @@ void VehicleDragConstraint::calculate(Output *output, atg_scs::SystemState *syst
     const double A = m_vehicle->getCrossSectionArea();
     const double rollingResistance = m_vehicle->getRollingResistance();
 
+    // the brake rides the same one sided limit so it can only slow the
+    // car down never push it along
+    const double brakeForce = m_brake * 0.9 * m_vehicle->getMass() * 9.81;
+
     output->limits[0][0] =
-        -m_vehicle->linearForceToVirtualTorque(rollingResistance + 0.5 * airDensity * v_squared * c_d * A);
+        -m_vehicle->linearForceToVirtualTorque(
+            rollingResistance + brakeForce
+            + 0.5 * airDensity * v_squared * c_d * A);
     output->limits[0][1] = 0;
 }

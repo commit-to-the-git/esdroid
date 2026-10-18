@@ -109,6 +109,9 @@ class EngineSimApplication {
         // what fraction of full throttle the touch throttle button applies
         // driven by the settings panel default 100%
         double m_androidThrottleScale = 1.0;
+
+        // brake pedal amount 0 to 1 ramps so the load lands smooth
+        double m_brakeInput = 0.0;
 #endif
 
         double m_clutchPressure = 1.0;

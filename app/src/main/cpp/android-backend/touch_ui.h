@@ -37,6 +37,7 @@ private:
     void drawDropdown(const float* box,const MrAsset* entries,int count,
         int sel,bool open,float scroll,float listTop,float listH,float rowH);
     void drawBlurredBackdrop();
+    void drawErrorDialog();
     GLuint m_program=0, m_vao=0, m_vbo=0;
     GLint m_loc_color=-1, m_loc_rect=-1, m_loc_screen=-1, m_loc_pos=-1;
     int m_screenW=0, m_screenH=0;

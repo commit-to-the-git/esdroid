@@ -7,6 +7,7 @@
 #include "piranha.h"
 
 #include <vector>
+#include <string>
 
 namespace es_script {
 
@@ -24,12 +25,16 @@ namespace es_script {
 
     private:
         static Output *s_output;
+        // readable error text from the last compile survives the app
+        // object so the load fallback can show it
+        static std::string s_lastErrors;
 
     public:
         Compiler();
         ~Compiler();
 
         static Output *output();
+        static const std::string &lastErrors();
 
         void initialize();
         bool compile(const piranha::IrPath &path);
@@ -37,7 +42,7 @@ namespace es_script {
         void destroy();
 
     private:
-        void printError(const piranha::CompilationError *err, std::ofstream &file) const;
+        void printError(const piranha::CompilationError *err, std::ostream &file) const;
 
     private:
         LanguageRules m_rules;

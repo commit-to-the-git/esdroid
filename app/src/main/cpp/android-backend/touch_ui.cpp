@@ -25,14 +25,21 @@
 
 static unsigned char* s_fontBitmap = nullptr;
 static unsigned char* s_fontBitmapBig = nullptr;
+static unsigned char* s_fontBitmapBold = nullptr;
+static unsigned char* s_fontBitmapSmall = nullptr;
 static stbtt_bakedchar s_fontChars[96];
 static stbtt_bakedchar s_fontCharsBig[96];
+static stbtt_bakedchar s_fontCharsBold[96];
+static stbtt_bakedchar s_fontCharsSmall[96];
 static GLuint s_fontTexture = 0;
 static GLuint s_fontTextureBig = 0;
+static GLuint s_fontTextureBold = 0;
+static GLuint s_fontTextureSmall = 0;
 static int s_fontLoaded = 0;
 static const int FONT_TEX_SIZE = 512;
 static const float FONT_SIZE = 20.0f;
 static const float FONT_SIZE_BIG = 28.0f;
+static const float FONT_SIZE_SMALL = 16.0f;
 static float s_settingsLabelW = 0.0f; // real settings advance set at font load
 
 // text rendering for button labels using the engines silkscreen font
@@ -52,18 +59,36 @@ static void loadTouchFont() {
         __android_log_print(ANDROID_LOG_ERROR, "ESDroid", "TouchUI: font load failed");
         return;
     }
+    // the bold face is its own ttf the error dialog title and ok label
+    // use it like the engine ui does
+    void* ttfBoldData = nullptr;
+    long ttfBoldSize = 0;
+    esdroid::AndroidBackend::instance().readAsset(
+        "delta-engine-assets/fonts/Silkscreen/slkscrb.ttf", &ttfBoldData, &ttfBoldSize);
 
     s_fontBitmap = new unsigned char[FONT_TEX_SIZE * FONT_TEX_SIZE];
     s_fontBitmapBig = new unsigned char[FONT_TEX_SIZE * FONT_TEX_SIZE];
+    s_fontBitmapBold = new unsigned char[FONT_TEX_SIZE * FONT_TEX_SIZE];
+    s_fontBitmapSmall = new unsigned char[FONT_TEX_SIZE * FONT_TEX_SIZE];
     int result = stbtt_BakeFontBitmap((unsigned char*)ttfData, 0, FONT_SIZE, s_fontBitmap,
         FONT_TEX_SIZE, FONT_TEX_SIZE, 32, 96, s_fontChars);
     int resultBig = stbtt_BakeFontBitmap((unsigned char*)ttfData, 0, FONT_SIZE_BIG,
         s_fontBitmapBig, FONT_TEX_SIZE, FONT_TEX_SIZE, 32, 96, s_fontCharsBig);
+    int resultBold = 1;
+    if (ttfBoldData != nullptr && ttfBoldSize > 0) {
+        resultBold = stbtt_BakeFontBitmap((unsigned char*)ttfBoldData, 0, FONT_SIZE,
+            s_fontBitmapBold, FONT_TEX_SIZE, FONT_TEX_SIZE, 32, 96, s_fontCharsBold);
+    }
+    int resultSmall = stbtt_BakeFontBitmap((unsigned char*)ttfData, 0, FONT_SIZE_SMALL,
+        s_fontBitmapSmall, FONT_TEX_SIZE, FONT_TEX_SIZE, 32, 96, s_fontCharsSmall);
     free(ttfData);
-    if (result <= 0 || resultBig <= 0) {
+    free(ttfBoldData);
+    if (result <= 0 || resultBig <= 0 || resultBold <= 0 || resultSmall <= 0) {
         __android_log_print(ANDROID_LOG_ERROR, "ESDroid", "TouchUI: bake failed");
         delete[] s_fontBitmap; s_fontBitmap = nullptr;
         delete[] s_fontBitmapBig; s_fontBitmapBig = nullptr;
+        delete[] s_fontBitmapBold; s_fontBitmapBold = nullptr;
+        delete[] s_fontBitmapSmall; s_fontBitmapSmall = nullptr;
         return;
     }
 
@@ -85,6 +110,18 @@ static void loadTouchFont() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, FONT_TEX_SIZE, FONT_TEX_SIZE, 0,
                  GL_RED, GL_UNSIGNED_BYTE, s_fontBitmapBig);
+    glGenTextures(1, &s_fontTextureBold);
+    glBindTexture(GL_TEXTURE_2D, s_fontTextureBold);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, FONT_TEX_SIZE, FONT_TEX_SIZE, 0,
+                 GL_RED, GL_UNSIGNED_BYTE, s_fontBitmapBold);
+    glGenTextures(1, &s_fontTextureSmall);
+    glBindTexture(GL_TEXTURE_2D, s_fontTextureSmall);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, FONT_TEX_SIZE, FONT_TEX_SIZE, 0,
+                 GL_RED, GL_UNSIGNED_BYTE, s_fontBitmapSmall);
     glBindTexture(GL_TEXTURE_2D, 0);
 
     static const char* tvs = R"ES3(#version 300 es
@@ -418,11 +455,10 @@ static void drawTouchIcon(float screenW, float screenH) {
     glUseProgram(0);
 }
 
-static void drawTouchText(const char* text, float x, float y, float screenW, float screenH,
-                           const float* color, bool big) {
-    const stbtt_bakedchar* chars = big ? s_fontCharsBig : s_fontChars;
-    const GLuint tex = big ? s_fontTextureBig : s_fontTexture;
-    const float fontSize = big ? FONT_SIZE_BIG : FONT_SIZE;
+// the core glyph drawer any baked face can ride it
+static void drawFaceText(const char* text, float x, float y, float screenW, float screenH,
+                          const float* color, const stbtt_bakedchar* chars,
+                          GLuint tex, float fontSize) {
     if (!s_fontBitmap || tex == 0 || s_textProgram == 0) return;
 
     float verts[4 * 6 * 64]; // pos.xy uv.xy per vertex 6 verts per quad max 64 chars
@@ -460,6 +496,62 @@ static void drawTouchText(const char* text, float x, float y, float screenW, flo
     glDrawArrays(GL_TRIANGLES, 0, nVerts / 4);
     glBindVertexArray(0);
     glUseProgram(0);
+}
+
+static void drawTouchText(const char* text, float x, float y, float screenW, float screenH,
+                           const float* color, bool big) {
+    if (big) {
+        drawFaceText(text, x, y, screenW, screenH, color,
+            s_fontCharsBig, s_fontTextureBig, FONT_SIZE_BIG);
+    }
+    else {
+        drawFaceText(text, x, y, screenW, screenH, color,
+            s_fontChars, s_fontTexture, FONT_SIZE);
+    }
+}
+
+// wraps text into lines that fit maxW in the given face a line also
+// never runs past the 64 glyph draw cap a word longer than the width
+// breaks hard
+static std::vector<std::string> wrapFaceText(const std::string& text,
+        const stbtt_bakedchar* chars, float maxW) {
+    std::vector<std::string> lines;
+    std::string cur;
+    float curW = 0.0f;
+    auto charW = [&](char c) -> float {
+        if (c < 32 || c >= 128) return 0.0f;
+        return chars[c - 32].xadvance;
+    };
+    for (size_t i = 0; i < text.size(); ++i) {
+        const char c = text[i];
+        if (c == '\n') {
+            lines.push_back(cur);
+            cur.clear();
+            curW = 0.0f;
+            continue;
+        }
+        const float w = charW(c);
+        const bool overWidth = !cur.empty() && curW + w > maxW;
+        const bool overCount = cur.size() >= 58;
+        if (overWidth || overCount) {
+            // break at the last space when there is one
+            const size_t sp = cur.rfind(' ');
+            if (sp != std::string::npos && sp > 0) {
+                lines.push_back(cur.substr(0, sp));
+                cur = cur.substr(sp + 1);
+            }
+            else {
+                lines.push_back(cur);
+                cur.clear();
+            }
+            curW = 0.0f;
+            for (char pc : cur) curW += charW(pc);
+        }
+        cur += c;
+        curW += w;
+    }
+    if (!cur.empty() || lines.empty()) lines.push_back(cur);
+    return lines;
 }
 
 // loading screen drawn straight into the gl surface so it shows even
@@ -702,20 +794,32 @@ TouchUI::TouchUI() {}
 TouchUI::~TouchUI() {}
 
 // ink box of a baked string silkscreen is not monospace so this is
-// a guess
+// a guess the left and right edges are optional callers that only
+// need the advance skip them
 static void bakedTextInk(const char* text, const stbtt_bakedchar* chars,
-                          float* advance, float* top, float* bottom) {
-    float adv = 0.0f, t = 0.0f, b = 0.0f;
+                          float* advance, float* top, float* bottom,
+                          float* left=nullptr, float* right=nullptr) {
+    float adv = 0.0f, t = 0.0f, b = 0.0f, l = 0.0f, r = 0.0f;
+    bool any = false;
     for (const char* p = text; *p; ++p) {
         unsigned char c = (unsigned char)*p;
         if (c < 32 || c >= 128) continue;
         const stbtt_bakedchar& ch = chars[c - 32];
+        if (left != nullptr || right != nullptr) {
+            const float gl = adv + ch.xoff;
+            const float gr = gl + (float)(ch.x1 - ch.x0);
+            if (!any || gl < l) l = gl;
+            if (!any || gr > r) r = gr;
+        }
         adv += ch.xadvance;
         if (ch.yoff < t) t = ch.yoff;
         const float bot = ch.yoff + (float)(ch.y1 - ch.y0);
         if (bot > b) b = bot;
+        any = true;
     }
     *advance = adv; *top = t; *bottom = b;
+    if (left != nullptr) *left = l;
+    if (right != nullptr) *right = r;
 }
 void TouchUI::initialize(int sw,int sh) { m_screenW=sw; m_screenH=sh; compileShaders(); generateQuadGeometry(); loadTouchFont(); loadTouchIcon(); }
 void TouchUI::resize(int sw,int sh) { m_screenW=sw; m_screenH=sh; }
@@ -1037,8 +1141,136 @@ void TouchUI::drawImportPanel() {
             true,menu.engineScroll,L.listTop,L.listH,L.rowH);
 }
 
+// the unsupported mr dialog black box thin white outline white
+// silkscreen the ok button sits in the bottom right corner
+void TouchUI::drawErrorDialog() {
+    auto& backend=AndroidBackend::instance();
+    const float sw=(float)m_screenW, sh=(float)m_screenH;
+    const float white[4]={1.0f,1.0f,1.0f,1.0f};
+    const float black[4]={0.0f,0.0f,0.0f,1.0f};
+
+    std::string name, log;
+    backend.getErrorDialogText(name, log);
+
+    drawBlurredBackdrop();
+
+    const float pad=20.0f;
+    const float boxW=fminf(sw*0.88f,880.0f);
+    const float innerW=boxW-2.0f*pad;
+
+    const std::string title=
+        "THIS ENGINE CONFIGURATION ("+name+") ISN'T SUPPORTED BY ESDROID.";
+    const char* body=
+        "THIS IS NOT BECAUSE OF A BUG IN THE PORT'S CODE, IT IS SIMPLY BECAUSE "
+        "THE OPEN SOURCE VERSION OF ENGINE SIM DOESNT SUPPORT THE EXACT SYNTAX "
+        "USED IN THE .MR YOU IMPORTED, OR IT MAY BE THAT YOUR .MR FILE HAS "
+        "ACTUAL WRONG SYNTAX AND YOU NEED TO FIX IT.";
+
+    const std::vector<std::string> titleLines=
+        wrapFaceText(title,s_fontCharsBold,innerW);
+    const std::vector<std::string> bodyLines=
+        wrapFaceText(body,s_fontCharsSmall,innerW);
+    std::vector<std::string> logLines=
+        wrapFaceText(log,s_fontCharsSmall,innerW);
+    if(logLines.size()>24) logLines.resize(24);
+
+    const float titleH=(float)titleLines.size()*(FONT_SIZE+7.0f);
+    const float bodyH=(float)bodyLines.size()*(FONT_SIZE_SMALL+6.0f);
+    const float logLabelH=FONT_SIZE_SMALL+12.0f;
+    const float logH=(float)logLines.size()*(FONT_SIZE_SMALL+5.0f);
+    const float okW=110.0f, okH=44.0f, okGap=14.0f;
+
+    float boxH=pad+titleH+16.0f+bodyH+16.0f+logLabelH+logH+okGap+okH+pad;
+    const float maxH=sh-36.0f;
+    const bool clipped=boxH>maxH;
+    if(clipped) boxH=maxH;
+
+    const float boxX=(sw-boxW)*0.5f;
+    const float boxY=(sh-boxH)*0.5f;
+
+    // clean black rectangle with the thin white outline of the
+    // original engine sim ui
+    drawRect(boxX,boxY,boxW,boxH,black);
+    auto border=[&](const float* r,float t,const float* c){
+        drawRect(r[0],r[1],r[2],t,c);
+        drawRect(r[0],r[1]+r[3]-t,r[2],t,c);
+        drawRect(r[0],r[1],t,r[3],c);
+        drawRect(r[0]+r[2]-t,r[1],t,r[3],c);
+    };
+    const float box[4]={boxX,boxY,boxW,boxH};
+    border(box,2.0f,white);
+
+    auto centerLine=[&](const std::string& text,float y,
+            const stbtt_bakedchar* chars,GLuint tex,float size,const float* color){
+        float adv=0.0f,inkTop=0.0f,inkBot=0.0f;
+        bakedTextInk(text.c_str(),chars,&adv,&inkTop,&inkBot);
+        drawFaceText(text.c_str(),boxX+(boxW-adv)*0.5f,y,sw,sh,color,chars,tex,size);
+    };
+
+    // bold title centered then the smaller body also centered
+    float ty=boxY+pad;
+    for(const std::string& line : titleLines) {
+        centerLine(line,ty,s_fontCharsBold,s_fontTextureBold,FONT_SIZE,white);
+        ty+=FONT_SIZE+7.0f;
+    }
+    ty+=16.0f;
+    for(const std::string& line : bodyLines) {
+        centerLine(line,ty,s_fontCharsSmall,s_fontTextureSmall,FONT_SIZE_SMALL,white);
+        ty+=FONT_SIZE_SMALL+6.0f;
+    }
+    ty+=16.0f;
+
+    // log block left aligned under its label
+    drawFaceText("LOG OUTPUT:",boxX+pad,ty,sw,sh,white,
+        s_fontCharsSmall,s_fontTextureSmall,FONT_SIZE_SMALL);
+    ty+=logLabelH;
+
+    const float logBottom=boxY+boxH-pad-okH-okGap;
+    if(logBottom>ty) {
+        GLint sx=(GLint)(boxX+pad);
+        GLint sy=(GLint)(sh-logBottom);
+        GLint scw=(GLint)innerW, sch=(GLint)(logBottom-ty);
+        glEnable(GL_SCISSOR_TEST);
+        glScissor(sx,sy,scw>0?scw:0,sch>0?sch:0);
+        float ly=ty;
+        for(const std::string& line : logLines) {
+            if(ly+FONT_SIZE_SMALL>logBottom) break;
+            drawFaceText(line.c_str(),boxX+pad,ly,sw,sh,white,
+                s_fontCharsSmall,s_fontTextureSmall,FONT_SIZE_SMALL);
+            ly+=FONT_SIZE_SMALL+5.0f;
+        }
+        glDisable(GL_SCISSOR_TEST);
+        if(clipped) {
+            // more lines exist than fit the tail says so
+            drawFaceText("...",boxX+pad,logBottom-FONT_SIZE_SMALL-5.0f,sw,sh,white,
+                s_fontCharsSmall,s_fontTextureSmall,FONT_SIZE_SMALL);
+        }
+    }
+
+    // ok button bottom right inverts while held
+    const float okX=boxX+boxW-pad-okW;
+    const float okY=boxY+boxH-pad-okH;
+    const float ok[4]={okX,okY,okW,okH};
+    const bool held=backend.errorOkHeld();
+    drawRect(ok[0],ok[1],ok[2],ok[3],held?white:black);
+    border(ok,2.0f,held?black:white);
+    {
+        float adv=0.0f,inkTop=0.0f,inkBot=0.0f,inkL=0.0f,inkR=0.0f;
+        bakedTextInk("OK",s_fontCharsBold,&adv,&inkTop,&inkBot,&inkL,&inkR);
+        // the exact ink box sits in the buttons middle the pen y is one
+        // line above the baseline so the line height comes off
+        const float baseline=ok[1]+(ok[3]-(inkBot-inkTop))*0.5f-inkTop;
+        drawFaceText("OK",ok[0]+(ok[2]-inkR-inkL)*0.5f,baseline-FONT_SIZE,sw,sh,
+            held?black:white,s_fontCharsBold,s_fontTextureBold,FONT_SIZE);
+    }
+    backend.setErrorOkRect(okX,okY,okW,okH);
+}
+
 void TouchUI::render() {
     if (m_program == 0) return;
+    // an import in flight hides the whole ui the loading screen owns
+    // the frame while the translate worker runs
+    if (AndroidBackend::instance().importPreparing()) return;
     GLint prevProgram; glGetIntegerv(GL_CURRENT_PROGRAM, &prevProgram);
     GLint prevFbo; glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &prevFbo);
     GLboolean prevDepth = glIsEnabled(GL_DEPTH_TEST);
@@ -1068,6 +1300,11 @@ void TouchUI::render() {
         const bool fn=AndroidBackend::instance().fnActive();
         for (const auto& b : AndroidBackend::instance().buttons())
             drawButton(b, b.key==VirtualKey::Fn ? fn : b.held);
+    }
+
+    // the unsupported dialog sits above every other overlay
+    if (AndroidBackend::instance().errorDialogOpen()) {
+        drawErrorDialog();
     }
 
     glDisable(GL_BLEND);

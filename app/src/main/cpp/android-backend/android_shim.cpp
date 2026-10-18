@@ -53,6 +53,7 @@ static int vkToYsKey(esdroid::VirtualKey vk) {
     case K::DynoHold: return (int)Y::H;
     case K::Throttle10: return (int)Y::W;
     case K::Throttle20: return (int)Y::E;
+    case K::ClutchSlip: return (int)Y::T;     // partial clutch pressure ramp
     case K::Starter: return (int)Y::S;
     case K::Ignition: return (int)Y::A;
     case K::Throttle: return (int)Y::R;

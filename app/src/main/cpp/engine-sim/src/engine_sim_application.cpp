@@ -546,6 +546,10 @@ void EngineSimApplication::run() {
                 std::chrono::steady_clock::now() - fadeStart).count();
             if (elapsed < 0.8)
                 esdroid_draw_loading_overlay((float)(1.0 - elapsed / 0.8));
+            // a picked import covers the frame the moment the picker
+            // closes the translate worker still runs behind the cover
+            if (esdroid::AndroidBackend::instance().importPreparing())
+                esdroid_draw_loading_overlay(1.0f);
         }
 #else
         renderScene();
@@ -1061,6 +1065,17 @@ void EngineSimApplication::processEngineInput() {
                 "[SETTINGS] - Set dyno speed to " + std::to_string(units::toRpm(m_dynoSpeed)));
         }
     }
+
+    // the brake ramps in and out so the sudden drivetrain load does
+    // not jolt the engine
+    {
+        const bool brakeDown =
+            esdroid::AndroidBackend::instance().isKeyDown(esdroid::VirtualKey::Brake);
+        const double target = brakeDown ? 1.0 : 0.0;
+        const double step = (brakeDown ? 12.0 : 8.0) * dt;
+        m_brakeInput += clamp(target - m_brakeInput, -step, step);
+        if (m_simulator != nullptr) m_simulator->setVehicleBrake(m_brakeInput);
+    }
 #endif
     m_targetSpeedSetting = fineControlMode ? m_targetSpeedSetting : 0.0;
     if (m_engine.IsKeyDown(ysKey::Code::Q)) {
@@ -1194,7 +1209,12 @@ void EngineSimApplication::processEngineInput() {
     }
 
     if (m_engine.IsKeyDown(ysKey::Code::T)) {
+#if defined(__ANDROID__)
+        // the slip button ramps quicker than the desktop fine control
+        m_targetClutchPressure -= 0.45 * dt;
+#else
         m_targetClutchPressure -= 0.2 * dt;
+#endif
     }
     else if (m_engine.IsKeyDown(ysKey::Code::U)) {
         m_targetClutchPressure += 0.2 * dt;
@@ -1219,13 +1239,8 @@ void EngineSimApplication::processEngineInput() {
     m_simulator->getTransmission()->setClutchPressure(m_clutchPressure);
 
 #if defined(__ANDROID__)
-    // touch has no scroll wheel the fn zoom buttons and the pinch
-    // gesture drive the same zoom path
+    // touch has no scroll wheel the pinch gesture drives the zoom
     if (m_engineView != nullptr) {
-        int zoomScroll = 0;
-        if (esdroid::AndroidBackend::instance().isKeyDown(esdroid::VirtualKey::ZoomIn)) zoomScroll += 900;
-        if (esdroid::AndroidBackend::instance().isKeyDown(esdroid::VirtualKey::ZoomOut)) zoomScroll -= 900;
-        if (zoomScroll != 0) m_engineView->onMouseScroll((int)(zoomScroll * dt));
         const int pinchScroll = esdroid::AndroidBackend::instance().consumePinchScroll();
         if (pinchScroll != 0) {
             // the reported touch position is the pinch midpoint so the

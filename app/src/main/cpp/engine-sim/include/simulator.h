@@ -69,6 +69,9 @@ public:
     int getCurrentIteration() const { return m_currentIteration; }
     double getAverageProcessingTime() const { return m_physicsProcessingTime; }
 
+    // the android brake button feeds the vehicle drag constraint
+    virtual void setVehicleBrake(double brake) { (void)brake; }
+
     int simulationSteps() const { return m_steps; }
 
     virtual double getFilteredDynoTorque() const;

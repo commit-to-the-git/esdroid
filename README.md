@@ -26,7 +26,9 @@ them with your own key before installing over a previous build.
 - Left column: STARTER, IGNITION, THROTTLE, CLUTCH, time scale (1x, 1/10x, 1/100x)
 - Right column: SHIFT +, SHIFT -, PAUSE, RELOAD, IMPORT, EXIT, CAMERA, OSC PAGE
 - CAMERA cycles the view screens, OSC PAGE pages the oscilloscope focus,
-  RELOAD re-runs the engine script, IMPORT loads a .mr file from storage
+  RELOAD re-runs the engine script, IMPORT opens the engine and theme menu
+- FN swaps the button layer: SLIP, BRAKE, ROT +/-, view layers, DYNO, DYNO
+  HOLD, STEP, throttle and speed presets, pinch to zoom
 
 very simple controls
 

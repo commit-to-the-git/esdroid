@@ -39,7 +39,7 @@ enum class VirtualKey : int {
     ShiftUp, ShiftDown,
     Pause, ResetEngine, Camera, OscPage,
     ViewLayerUp, ViewLayerDown, Dyno, DynoHold,
-    Throttle10, Throttle20, ZoomIn, ZoomOut, Fn, Count
+    Throttle10, Throttle20, ClutchSlip, Brake, Fn, Count
 };
 
 struct TouchButton {
@@ -159,6 +159,12 @@ public:
         return b.key;
     }
     void layoutButtons(int sw,int sh);
+    // one touch route shared by the input queue and synthesized clicks
+    // the open overlay decides where the touch lands
+    void touchDown(float x,float y,int pid);
+    void touchMove(float x,float y,int pid);
+    void touchUp(float x,float y,int pid);
+    void touchCancel(int pid);
     // settings panel values live here the app applies them through
     // the dirty bits
     SettingsState& settings() { return m_settings; }
@@ -168,7 +174,7 @@ public:
     void openSettings();
     void closeSettings();
     void layoutSettingsPanel(int sw,int sh);
-    int handleSettingsMotion(AInputEvent* event,int32_t actionMasked);
+    int handleSettingsMotion(int32_t am,float x,float y,int pid);
     static const char* settingLabel(int idx);
     void formatSettingValue(char* out,int len,int idx) const;
     float settingSliderT(int idx) const;
@@ -182,7 +188,7 @@ public:
     void openImportMenu();
     void closeImportMenu();
     void layoutImportPanel(int sw,int sh);
-    int handleImportMotion(AInputEvent* event,int32_t actionMasked);
+    int handleImportMotion(int32_t am,float x,float y,int pid);
     static const MrAsset* importThemes(int* count);
     static const MrAsset* importEngines(int* count);
     // the settings button lives in the info cluster title box corner
@@ -215,13 +221,29 @@ public:
     std::string filesDir() const { return m_filesDir; }
     void setFilesDir(const std::string& d) { m_filesDir=d; }
     void requestMrFilePicker();
-    void onMrFilePicked(const std::string& uri);
+    void onMrFilePicked(const std::string& uri, const std::string& displayName);
     void requestThemeFilePicker();
     void onThemeFilePicked(const std::string& uri);
+    // a mr that cannot load brings this dialog up the default engine
+    // reloads while it sits so ok drops onto a running sim
+    void showEngineErrorDialog(const std::string& logText);
+    void closeErrorDialog();
+    bool errorDialogOpen();
+    void getErrorDialogText(std::string& name,std::string& log);
+    int handleErrorDialogMotion(int32_t am,float x,float y,int pid);
+    void setErrorOkRect(float x,float y,float w,float h) {
+        m_errorOkRect[0]=x;m_errorOkRect[1]=y;
+        m_errorOkRect[2]=w;m_errorOkRect[3]=h;
+    }
+    const float* errorOkRect() const { return m_errorOkRect; }
+    bool errorOkHeld() const { return m_errorOkHeld; }
     void requestValueInput(int idx);
     void requestHideValueInput();
     void consumePendingValueInput();
     bool consumeScriptReloadPending();
+    // true while the import worker translates the picked file the
+    // loading screen covers the frame until the reload stages
+    bool importPreparing() const { return m_importPreparing; }
     std::string activeMrPath() const { return m_activeMrPath; }
     void resetToDefaultMr() { m_activeMrPath="assets/main.mr"; }
     bool shouldQuit() const { return m_shouldQuit; }
@@ -294,11 +316,21 @@ private:
     bool m_audioInited=false;
     std::atomic<bool> m_shouldQuit{false};
     std::atomic<bool> m_scriptReloadPending{false};
+    std::atomic<bool> m_importPreparing{false};
     std::string m_activeMrPath="assets/main.mr";
     // the picked path waits here until the render thread consumes
     // the reload flag
     std::mutex m_mrMutex;
     std::string m_pendingMrPath;
+    // modal dialog state set by the import worker or the load
+    // fallback drawn by the touch ui
+    std::mutex m_errorMutex;
+    bool m_errorOpen=false;
+    std::string m_errorName;
+    std::string m_errorLog;
+    float m_errorOkRect[4]={0.0f,0.0f,0.0f,0.0f};
+    bool m_errorOkHeld=false;
+    int m_errorOkPid=-1;
     TouchUI* m_touchUI=nullptr;
 };
 

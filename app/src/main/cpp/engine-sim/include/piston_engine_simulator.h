@@ -33,6 +33,11 @@ class PistonEngineSimulator : public Simulator {
         int getFluidSimulationSteps() const { return m_fluidSimulationSteps; }
         int getFluidSimulationFrequency() const { return m_fluidSimulationSteps * getSimulationFrequency(); }
 
+        // the brake rides the vehicle drag constraint
+        virtual void setVehicleBrake(double brake) override {
+            m_vehicleDrag.setBrake(brake);
+        }
+
         virtual double getAverageOutputSignal() const override;
 
         DerivativeFilter m_derivativeFilter;

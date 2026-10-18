@@ -25,8 +25,10 @@ import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.provider.OpenableColumns;
 import android.text.InputType;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -69,6 +71,7 @@ public class ESDroidActivity extends NativeActivity {
         dumpLogcat(logDir);
         // imports are per session every launch starts on the default engine
         deleteIfExists(new File(getFilesDir(), "assets/imported.mr"));
+        deleteIfExists(new File(getFilesDir(), "assets/imported_check.mr"));
         deleteIfExists(new File(getFilesDir(), "assets/imported_main.mr"));
         deleteIfExists(new File(getFilesDir(), "assets/imported_theme.mr"));
         deleteIfExists(new File(getFilesDir(), "imported.mr"));
@@ -163,6 +166,30 @@ public class ESDroidActivity extends NativeActivity {
         startMrPicker("theme", "Select .mr theme file");
     }
 
+    // the saf display name the copy on disk is renamed to imported.mr
+    // so the real name has to travel with the pick
+    private String queryDisplayName(Uri uri) {
+        try {
+            Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+            if (cursor != null) {
+                try {
+                    if (cursor.moveToFirst()) {
+                        int idx = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                        if (idx >= 0 && !cursor.isNull(idx)) {
+                            String name = cursor.getString(idx);
+                            if (name != null && !name.isEmpty()) return name;
+                        }
+                    }
+                } finally {
+                    cursor.close();
+                }
+            }
+        } catch (Throwable ignored) {
+        }
+        String last = uri.getLastPathSegment();
+        return last == null ? "" : last;
+    }
+
     private void startMrPicker(final String kind, final String title) {
         // must run on ui thread native code runs elsewhere
         runOnUiThread(new Runnable() {
@@ -223,7 +250,7 @@ public class ESDroidActivity extends NativeActivity {
                 if (theme) {
                     nativeOnThemePicked(outFile.getAbsolutePath());
                 } else {
-                    nativeOnFilePicked(outFile.getAbsolutePath());
+                    nativeOnFilePicked(outFile.getAbsolutePath(), queryDisplayName(uri));
                 }
                 jlog("nativeOnFilePicked returned");
             } catch (Throwable t) {
@@ -440,7 +467,7 @@ public class ESDroidActivity extends NativeActivity {
         }
     }
 
-    public native void nativeOnFilePicked(String path);
+    public native void nativeOnFilePicked(String path, String name);
 
     public native void nativeOnThemePicked(String path);
 

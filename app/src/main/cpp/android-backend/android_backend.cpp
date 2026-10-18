@@ -20,6 +20,7 @@ extern "C" void esdroid_wtflog(const char*,...);
 #include "android_backend.h"
 JavaVM* g_javaVM=nullptr;
 #include "touch_ui.h"
+#include "new_mr_droid.h"
 #include <android/log.h>
 #include <android/window.h>
 #include <android/native_window.h>
@@ -33,6 +34,7 @@ JavaVM* g_javaVM=nullptr;
 #include <cstdio>
 #include <array>
 #include <algorithm>
+#include <thread>
 
 #define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO,"ESDroid",__VA_ARGS__))
 #define LOGW(...) ((void)__android_log_print(ANDROID_LOG_WARN,"ESDroid",__VA_ARGS__))
@@ -109,9 +111,12 @@ static int32_t handle_input_event(android_app* app, AInputEvent* event) {
     int32_t type=AInputEvent_getType(event);
     auto& b=esdroid::AndroidBackend::instance();
     if(type==AINPUT_EVENT_TYPE_KEY) {
+        const int32_t action=AKeyEvent_getAction(event);
+        const int32_t key=AKeyEvent_getKeyCode(event);
         // back closes an open list first then the menu
-        if(AKeyEvent_getKeyCode(event)==AKEYCODE_BACK
-            &&AKeyEvent_getAction(event)==AKEY_EVENT_ACTION_DOWN) {
+        if(key==AKEYCODE_BACK&&action==AKEY_EVENT_ACTION_DOWN) {
+            // the error dialog only answers to its ok button
+            if(b.errorDialogOpen()) return 1;
             if(b.settingsOpen()) { b.closeSettings(); return 1; }
             if(b.importMenuOpen()) {
                 auto& menu=b.importMenu();
@@ -126,54 +131,33 @@ static int32_t handle_input_event(android_app* app, AInputEvent* event) {
     if(type==AINPUT_EVENT_TYPE_MOTION) {
         int32_t action=AMotionEvent_getAction(event);
         int32_t am=action&AMOTION_EVENT_ACTION_MASK;
-        if(b.settingsOpen()) {
-            b.handleSettingsMotion(event,am);
-            return 1;
-        }
-        if(b.importMenuOpen()) {
-            b.handleImportMotion(event,am);
-            return 1;
-        }
         switch(am) {
         case AMOTION_EVENT_ACTION_DOWN:
         case AMOTION_EVENT_ACTION_POINTER_DOWN: {
             int idx=(action&AMOTION_EVENT_ACTION_POINTER_INDEX_MASK)>>AMOTION_EVENT_ACTION_POINTER_INDEX_SHIFT;
-            float x=AMotionEvent_getX(event,idx), y=AMotionEvent_getY(event,idx);
-            int pid=AMotionEvent_getPointerId(event,idx);
-            if(b.settingsButtonValid()) {
-                const float* r=b.settingsButtonRect();
-                if(x>=r[0]&&x<r[0]+r[2]&&y>=r[1]&&y<r[1]+r[3]) {
-                    b.openSettings();
-                    return 1;
-                }
-            }
-            auto* btn=b.hitTestButton(x,y);
-            if(btn){b.pressButton(btn,pid);return 1;}
-            b.pressEngineTouch(pid,x,y);
+            b.touchDown(AMotionEvent_getX(event,idx),AMotionEvent_getY(event,idx),
+                AMotionEvent_getPointerId(event,idx));
             return 1;
         }
         case AMOTION_EVENT_ACTION_MOVE: {
             int pc=AMotionEvent_getPointerCount(event);
             for(int i=0;i<pc;++i) {
-                int pid=AMotionEvent_getPointerId(event,i);
-                b.moveEngineTouch(pid,AMotionEvent_getX(event,i),AMotionEvent_getY(event,i));
+                b.touchMove(AMotionEvent_getX(event,i),AMotionEvent_getY(event,i),
+                    AMotionEvent_getPointerId(event,i));
             }
             return 1;
         }
         case AMOTION_EVENT_ACTION_UP:
         case AMOTION_EVENT_ACTION_POINTER_UP: {
             int idx=(action&AMOTION_EVENT_ACTION_POINTER_INDEX_MASK)>>AMOTION_EVENT_ACTION_POINTER_INDEX_SHIFT;
-            int pid=AMotionEvent_getPointerId(event,idx);
-            b.releaseEngineTouch(pid,false);
-            b.releaseAllButtons(pid); return 1;
+            b.touchUp(AMotionEvent_getX(event,idx),AMotionEvent_getY(event,idx),
+                AMotionEvent_getPointerId(event,idx));
+            return 1;
         }
         case AMOTION_EVENT_ACTION_CANCEL: {
             int pc=AMotionEvent_getPointerCount(event);
-            for(int i=0;i<pc;++i) {
-                int pid=AMotionEvent_getPointerId(event,i);
-                b.releaseEngineTouch(pid,true);
-                b.releaseAllButtons(pid,true);
-            }
+            for(int i=0;i<pc;++i)
+                b.touchCancel(AMotionEvent_getPointerId(event,i));
             return 1;
         }
         }
@@ -237,6 +221,44 @@ TouchButton* AndroidBackend::hitTestButton(float x,float y) {
 static int64_t now_ns() {
     struct timespec ts; clock_gettime(CLOCK_MONOTONIC,&ts);
     return (int64_t)ts.tv_sec*1000000000LL+(int64_t)ts.tv_nsec;
+}
+
+// one route for real touches and synthesized clicks the topmost
+// open overlay decides where the touch lands
+void AndroidBackend::touchDown(float x,float y,int pid) {
+    if(errorDialogOpen()) { handleErrorDialogMotion(AMOTION_EVENT_ACTION_DOWN,x,y,pid); return; }
+    if(settingsOpen()) { handleSettingsMotion(AMOTION_EVENT_ACTION_DOWN,x,y,pid); return; }
+    if(importMenuOpen()) { handleImportMotion(AMOTION_EVENT_ACTION_DOWN,x,y,pid); return; }
+    if(settingsButtonValid()) {
+        const float* r=settingsButtonRect();
+        if(x>=r[0]&&x<r[0]+r[2]&&y>=r[1]&&y<r[1]+r[3]) {
+            openSettings();
+            return;
+        }
+    }
+    TouchButton* btn=hitTestButton(x,y);
+    if(btn){pressButton(btn,pid);return;}
+    pressEngineTouch(pid,x,y);
+}
+void AndroidBackend::touchMove(float x,float y,int pid) {
+    if(errorDialogOpen()) return;
+    if(settingsOpen()) { handleSettingsMotion(AMOTION_EVENT_ACTION_MOVE,x,y,pid); return; }
+    if(importMenuOpen()) { handleImportMotion(AMOTION_EVENT_ACTION_MOVE,x,y,pid); return; }
+    moveEngineTouch(pid,x,y);
+}
+void AndroidBackend::touchUp(float x,float y,int pid) {
+    if(errorDialogOpen()) { handleErrorDialogMotion(AMOTION_EVENT_ACTION_UP,x,y,pid); return; }
+    if(settingsOpen()) { handleSettingsMotion(AMOTION_EVENT_ACTION_UP,x,y,pid); return; }
+    if(importMenuOpen()) { handleImportMotion(AMOTION_EVENT_ACTION_UP,x,y,pid); return; }
+    releaseEngineTouch(pid,false);
+    releaseAllButtons(pid);
+}
+void AndroidBackend::touchCancel(int pid) {
+    if(errorDialogOpen()) { handleErrorDialogMotion(AMOTION_EVENT_ACTION_CANCEL,0.0f,0.0f,pid); return; }
+    if(settingsOpen()) { handleSettingsMotion(AMOTION_EVENT_ACTION_CANCEL,0.0f,0.0f,pid); return; }
+    if(importMenuOpen()) { handleImportMotion(AMOTION_EVENT_ACTION_CANCEL,0.0f,0.0f,pid); return; }
+    releaseEngineTouch(pid,true);
+    releaseAllButtons(pid,true);
 }
 
 // tap toggles the latch hold is momentary
@@ -522,17 +544,11 @@ void AndroidBackend::layoutSettingsPanel(int sw,int sh) {
     }
 }
 
-int AndroidBackend::handleSettingsMotion(AInputEvent* event,int32_t am) {
+int AndroidBackend::handleSettingsMotion(int32_t am,float x,float y,int pid) {
     auto contains=[](const float* r,float x,float y) {
         return x>=r[0]&&x<r[0]+r[2]&&y>=r[1]&&y<r[1]+r[3];
     };
     if(am==AMOTION_EVENT_ACTION_DOWN||am==AMOTION_EVENT_ACTION_POINTER_DOWN) {
-        const int32_t action=AMotionEvent_getAction(event);
-        const int idx=(action&AMOTION_EVENT_ACTION_POINTER_INDEX_MASK)
-            >>AMOTION_EVENT_ACTION_POINTER_INDEX_SHIFT;
-        const float x=AMotionEvent_getX(event,idx);
-        const float y=AMotionEvent_getY(event,idx);
-        const int pid=AMotionEvent_getPointerId(event,idx);
         const auto& L=m_settingsLayout;
         if(contains(L.close,x,y)) { closeSettings(); return 1; }
         for(int i=0;i<esdroid::kSettingCount;++i)
@@ -551,22 +567,14 @@ int AndroidBackend::handleSettingsMotion(AInputEvent* event,int32_t am) {
         return 1;
     }
     if(am==AMOTION_EVENT_ACTION_MOVE) {
-        if(m_sliderPid!=-1) {
-            const int pc=AMotionEvent_getPointerCount(event);
-            for(int i=0;i<pc;++i) {
-                if(AMotionEvent_getPointerId(event,i)!=m_sliderPid) continue;
-                const float* t=m_settingsLayout.track[m_sliderIdx];
-                float tt=(AMotionEvent_getX(event,i)-t[0])/t[2];
-                setSettingFromSlider(m_sliderIdx,clamp01f(tt));
-            }
+        if(m_sliderPid!=-1&&pid==m_sliderPid) {
+            const float* t=m_settingsLayout.track[m_sliderIdx];
+            float tt=(x-t[0])/t[2];
+            setSettingFromSlider(m_sliderIdx,clamp01f(tt));
         }
         return 1;
     }
     if(am==AMOTION_EVENT_ACTION_UP||am==AMOTION_EVENT_ACTION_POINTER_UP) {
-        const int32_t action=AMotionEvent_getAction(event);
-        const int idx=(action&AMOTION_EVENT_ACTION_POINTER_INDEX_MASK)
-            >>AMOTION_EVENT_ACTION_POINTER_INDEX_SHIFT;
-        const int pid=AMotionEvent_getPointerId(event,idx);
         if(pid==m_sliderPid){ m_sliderPid=-1; m_sliderIdx=-1; }
         return 1;
     }
@@ -741,7 +749,7 @@ static float clampListScroll(float scroll,int count,float rowH,float listH) {
     return scroll;
 }
 
-int AndroidBackend::handleImportMotion(AInputEvent* event,int32_t am) {
+int AndroidBackend::handleImportMotion(int32_t am,float x,float y,int pid) {
     auto contains=[](const float* r,float x,float y) {
         return x>=r[0]&&x<r[0]+r[2]&&y>=r[1]&&y<r[1]+r[3];
     };
@@ -763,12 +771,6 @@ int AndroidBackend::handleImportMotion(AInputEvent* event,int32_t am) {
         scroll=clampListScroll(scroll,count,L.rowH,L.listH);
     };
     if(am==AMOTION_EVENT_ACTION_DOWN||am==AMOTION_EVENT_ACTION_POINTER_DOWN) {
-        const int32_t action=AMotionEvent_getAction(event);
-        const int idx=(action&AMOTION_EVENT_ACTION_POINTER_INDEX_MASK)
-            >>AMOTION_EVENT_ACTION_POINTER_INDEX_SHIFT;
-        const float x=AMotionEvent_getX(event,idx);
-        const float y=AMotionEvent_getY(event,idx);
-        const int pid=AMotionEvent_getPointerId(event,idx);
         if(m_import.themeListOpen||m_import.engineListOpen) {
             const bool themeList=m_import.themeListOpen;
             const float* lr=listRect(themeList?L.themeBox:L.engineBox).data();
@@ -809,6 +811,10 @@ int AndroidBackend::handleImportMotion(AInputEvent* event,int32_t am) {
             // entry 0 is default so this also covers a reset to stock
             const MrAsset* t=&kImportThemes[
                 m_import.themeSel>0?m_import.themeSel:0];
+            {
+                std::lock_guard<std::mutex> lk(m_errorMutex);
+                m_errorName=t->path;
+            }
             stageWrapperReload(m_enginePath,m_engineNode,t->path,t->node);
             return 1;
         }
@@ -816,6 +822,10 @@ int AndroidBackend::handleImportMotion(AInputEvent* event,int32_t am) {
             closeImportMenu();
             const MrAsset* e=&kImportEngines[
                 m_import.engineSel>0?m_import.engineSel:0];
+            {
+                std::lock_guard<std::mutex> lk(m_errorMutex);
+                m_errorName=e->path;
+            }
             stageWrapperReload(e->path,e->node,m_themePath,m_themeNode);
             return 1;
         }
@@ -832,33 +842,22 @@ int AndroidBackend::handleImportMotion(AInputEvent* event,int32_t am) {
         return 1;
     }
     if(am==AMOTION_EVENT_ACTION_MOVE) {
-        if(m_import.scrollPid!=-1) {
-            const int pc=AMotionEvent_getPointerCount(event);
-            for(int i=0;i<pc;++i) {
-                if(AMotionEvent_getPointerId(event,i)!=m_import.scrollPid) continue;
-                const float y=AMotionEvent_getY(event,i);
-                if(y-m_import.scrollDownY>12.0f
-                    ||y-m_import.scrollDownY<-12.0f) m_import.tapMoved=true;
-                if(m_import.themeListOpen)
-                    m_import.themeScroll=clampListScroll(
-                        m_import.scrollStart-(y-m_import.scrollDownY),
-                        themeCount,L.rowH,L.listH);
-                else if(m_import.engineListOpen)
-                    m_import.engineScroll=clampListScroll(
-                        m_import.scrollStart-(y-m_import.scrollDownY),
-                        engineCount,L.rowH,L.listH);
-            }
+        if(m_import.scrollPid!=-1&&pid==m_import.scrollPid) {
+            if(y-m_import.scrollDownY>12.0f
+                ||y-m_import.scrollDownY<-12.0f) m_import.tapMoved=true;
+            if(m_import.themeListOpen)
+                m_import.themeScroll=clampListScroll(
+                    m_import.scrollStart-(y-m_import.scrollDownY),
+                    themeCount,L.rowH,L.listH);
+            else if(m_import.engineListOpen)
+                m_import.engineScroll=clampListScroll(
+                    m_import.scrollStart-(y-m_import.scrollDownY),
+                    engineCount,L.rowH,L.listH);
         }
         return 1;
     }
     if(am==AMOTION_EVENT_ACTION_UP||am==AMOTION_EVENT_ACTION_POINTER_UP) {
-        const int32_t action=AMotionEvent_getAction(event);
-        const int idx=(action&AMOTION_EVENT_ACTION_POINTER_INDEX_MASK)
-            >>AMOTION_EVENT_ACTION_POINTER_INDEX_SHIFT;
-        const int pid=AMotionEvent_getPointerId(event,idx);
         if(pid==m_import.scrollPid) {
-            const float x=AMotionEvent_getX(event,idx);
-            const float y=AMotionEvent_getY(event,idx);
             if(!m_import.tapMoved&&m_import.tapEntry>=0) {
                 if(m_import.themeListOpen) {
                     const float* lr=listRect(L.themeBox).data();
@@ -925,6 +924,7 @@ void AndroidBackend::clearAllKeys() {
     m_touchDownEdge=false; m_touchUpEdge=false;
     m_restartPending=false; m_pinchDist=0.0f; m_pinchWheel=0.0f;
     m_sliderPid=-1; m_sliderIdx=-1;
+    m_errorOkHeld=false; m_errorOkPid=-1;
 }
 
 void AndroidBackend::layoutButtons(int sw,int sh) {
@@ -942,8 +942,8 @@ void AndroidBackend::layoutButtons(int sw,int sh) {
         m_buttons.push_back({l,al,x,y,bw,bh,k,ak,false,false,-1});
     };
     float lY=sh-pad-bh;
-    add("STARTER","ZOOM IN",pad,lY,VirtualKey::Starter,VirtualKey::ZoomIn);
-    add("IGNITION","ZOOM OUT",pad,lY-(bh+gap),VirtualKey::Ignition,VirtualKey::ZoomOut);
+    add("STARTER","SLIP",pad,lY,VirtualKey::Starter,VirtualKey::ClutchSlip);
+    add("IGNITION","BRAKE",pad,lY-(bh+gap),VirtualKey::Ignition,VirtualKey::Brake);
     add("THROTTLE","ROT +",pad,lY-2*(bh+gap),VirtualKey::Throttle,VirtualKey::F1);
     add("CLUTCH","ROT -",pad,lY-3*(bh+gap),VirtualKey::Clutch,VirtualKey::F2);
     float rX=sw-pad-bw;
@@ -1268,24 +1268,84 @@ static std::string buildImportedMainScript(const std::string& enginePath,
     return wrapperPath;
 }
 
-void AndroidBackend::onMrFilePicked(const std::string& path) {
+void AndroidBackend::onMrFilePicked(const std::string& path,
+        const std::string& displayName) {
     if (path.empty()) return;
 
-    // stage the script and raise the flag the render thread stops the
-    // game so android_main can rebuild it with the new script
-    std::string mainScript = buildImportedMainScript(path, m_themePath, m_themeNode);
+    // the unsupported dialog names the picked file the copy on disk is
+    // always renamed to imported.mr so the saf display name rides along
     {
-        std::lock_guard<std::mutex> lk(m_mrMutex);
-        m_pendingMrPath = mainScript;
+        std::lock_guard<std::mutex> lk(m_errorMutex);
+        if (!displayName.empty()) {
+            m_errorName = displayName;
+        }
+        else {
+            size_t slash = path.rfind('/');
+            m_errorName = (slash == std::string::npos) ? path : path.substr(slash + 1);
+        }
     }
-    m_scriptReloadPending = true;
-    if (mainScript != path) {
-        // wrapped import remember it as the current engine so a later
-        // load theme keeps it
-        m_enginePath = "imported";
-        m_engineNode = "";
-    }
-    esdroid_wtflog("onMrFilePicked: %s (main script: %s)", path.c_str(), mainScript.c_str());
+
+    // the loading screen goes up right away the translate work takes a
+    // moment and the engine keeps running behind the cover
+    m_importPreparing = true;
+
+    // snapshot the theme so the worker cannot race a menu pick
+    const std::string themePath = m_themePath;
+    const std::string themeNode = m_themeNode;
+
+    // newmrdroid compiles against the real rules so the work runs off
+    // the ui thread a heavy file cannot block input dispatch
+    std::thread([this, path, themePath, themeNode]() {
+        bool usable = false;
+        std::string logText;
+        try {
+            NewMRDroid::ResultInfo info;
+            const NewMRDroid::Result result =
+                NewMRDroid::translate(path, filesDir() + "/assets", &info);
+            usable = (result != NewMRDroid::Rejected);
+            logText = info.errorText;
+        }
+        catch (...) {
+            usable = false;
+        }
+
+        if (usable) {
+            // stage the script and raise the flag the render thread stops
+            // the game so android_main can rebuild it with the new script
+            std::string mainScript = buildImportedMainScript(path, themePath, themeNode);
+            {
+                std::lock_guard<std::mutex> lk(m_mrMutex);
+                m_pendingMrPath = mainScript;
+                if (mainScript != path) {
+                    // wrapped import remember it as the current engine so a
+                    // later load theme keeps it
+                    m_enginePath = "imported";
+                    m_engineNode = "";
+                }
+            }
+            m_importPreparing = false;
+            m_scriptReloadPending = true;
+            return;
+        }
+
+        // the file needs a newer engine sim than this one put the
+        // dialog up and bring the stock engine back in the same pass
+        // so ok drops straight onto a running sim
+        if (logText.empty()) logText = "the file could not be read\n";
+        showEngineErrorDialog(logText);
+        {
+            std::lock_guard<std::mutex> lk(m_mrMutex);
+            m_pendingMrPath = "assets/main.mr";
+            m_enginePath = "engines/atg-video-2/01_subaru_ej25_eh.mr";
+            m_engineNode = "";
+            m_themePath = "themes/default.mr";
+            m_themeNode = "use_default_theme";
+        }
+        m_import.engineSel = 0;
+        m_import.themeSel = 0;
+        m_importPreparing = false;
+        m_scriptReloadPending = true;
+    }).detach();
 }
 
 // theme files publish a use_*_theme node the name is parsed out of
@@ -1319,8 +1379,67 @@ void AndroidBackend::onThemeFilePicked(const std::string& path) {
     std::string base = path.substr(nameStart);
     if (base.size() > 3 && base.compare(base.size() - 3, 3, ".mr") == 0)
         base = base.substr(0, base.size() - 3);
+    // a theme that fails to load gets the dialog too
+    {
+        std::lock_guard<std::mutex> lk(m_errorMutex);
+        m_errorName = base + ".mr";
+    }
     esdroid_wtflog("onThemeFilePicked: %s (theme node %s)", path.c_str(), node.c_str());
     stageWrapperReload(m_enginePath, m_engineNode, base, node);
+}
+
+// the dialog sits over a blurred running engine the default reload
+// happens while it is up so ok never waits on a load
+void AndroidBackend::showEngineErrorDialog(const std::string& logText) {
+    std::lock_guard<std::mutex> lk(m_errorMutex);
+    m_errorLog = logText.empty() ? "no error text was produced\n" : logText;
+    m_errorOpen = true;
+    m_errorOkHeld = false;
+    m_errorOkPid = -1;
+}
+
+void AndroidBackend::closeErrorDialog() {
+    std::lock_guard<std::mutex> lk(m_errorMutex);
+    m_errorOpen = false;
+    m_errorLog.clear();
+    m_errorName.clear();
+    m_errorOkHeld = false;
+    m_errorOkPid = -1;
+}
+
+bool AndroidBackend::errorDialogOpen() {
+    std::lock_guard<std::mutex> lk(m_errorMutex);
+    return m_errorOpen;
+}
+
+void AndroidBackend::getErrorDialogText(std::string& name, std::string& log) {
+    std::lock_guard<std::mutex> lk(m_errorMutex);
+    name = m_errorName.empty() ? "the engine configuration" : m_errorName;
+    log = m_errorLog;
+}
+
+// the dialog is modal only its ok button answers
+int AndroidBackend::handleErrorDialogMotion(int32_t am, float x, float y, int pid) {
+    auto contains=[&](const float* r) {
+        return x>=r[0]&&x<r[0]+r[2]&&y>=r[1]&&y<r[1]+r[3];
+    };
+    if(am==AMOTION_EVENT_ACTION_DOWN||am==AMOTION_EVENT_ACTION_POINTER_DOWN) {
+        m_errorOkHeld = contains(m_errorOkRect);
+        m_errorOkPid = m_errorOkHeld ? pid : -1;
+        return 1;
+    }
+    if(am==AMOTION_EVENT_ACTION_UP||am==AMOTION_EVENT_ACTION_POINTER_UP) {
+        if(pid==m_errorOkPid&&m_errorOkHeld) closeErrorDialog();
+        m_errorOkHeld = false;
+        m_errorOkPid = -1;
+        return 1;
+    }
+    if(am==AMOTION_EVENT_ACTION_CANCEL) {
+        m_errorOkHeld = false;
+        m_errorOkPid = -1;
+        return 1;
+    }
+    return 1;
 }
 
 bool AndroidBackend::consumeScriptReloadPending() {
@@ -1408,7 +1527,7 @@ extern "C" void esdroid_pre_main(struct android_app* app) {
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_esdroid_engine_1sim_ESDroidActivity_nativeOnFilePicked(JNIEnv* env, jobject thiz, jstring path);
+Java_com_esdroid_engine_1sim_ESDroidActivity_nativeOnFilePicked(JNIEnv* env, jobject thiz, jstring path, jstring name);
 
 extern "C" JNIEXPORT void JNICALL
 Java_com_esdroid_engine_1sim_ESDroidActivity_nativeOnThemePicked(JNIEnv* env, jobject thiz, jstring path);
@@ -1425,7 +1544,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*) {
         jclass cls=env->FindClass("com/esdroid/engine_sim/ESDroidActivity");
         if (cls!=nullptr) {
             JNINativeMethod methods[]={
-                {"nativeOnFilePicked","(Ljava/lang/String;)V",
+                {"nativeOnFilePicked","(Ljava/lang/String;Ljava/lang/String;)V",
                  (void*)Java_com_esdroid_engine_1sim_ESDroidActivity_nativeOnFilePicked},
                 {"nativeOnThemePicked","(Ljava/lang/String;)V",
                  (void*)Java_com_esdroid_engine_1sim_ESDroidActivity_nativeOnThemePicked},
@@ -1468,14 +1587,18 @@ void esdroid::AndroidBackend::resizeTouchUI() {
 }
 
 // jni callback the _1 encodes the underscore in the package name
+// the second string is the saf display name for the error dialog
 extern "C" JNIEXPORT void JNICALL
-Java_com_esdroid_engine_1sim_ESDroidActivity_nativeOnFilePicked(JNIEnv* env, jobject thiz, jstring path) {
+Java_com_esdroid_engine_1sim_ESDroidActivity_nativeOnFilePicked(JNIEnv* env, jobject thiz, jstring path, jstring name) {
     if (path == nullptr) return;
     const char* pathStr = env->GetStringUTFChars(path, nullptr);
+    const char* nameStr = (name == nullptr) ? nullptr : env->GetStringUTFChars(name, nullptr);
     if (pathStr != nullptr) {
-        esdroid::AndroidBackend::instance().onMrFilePicked(std::string(pathStr));
+        esdroid::AndroidBackend::instance().onMrFilePicked(std::string(pathStr),
+            (nameStr == nullptr) ? std::string() : std::string(nameStr));
         env->ReleaseStringUTFChars(path, pathStr);
     }
+    if (nameStr != nullptr) env->ReleaseStringUTFChars(name, nameStr);
 }
 
 // same callback for the theme picker both run on the java ui thread

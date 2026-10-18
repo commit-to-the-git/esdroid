@@ -15,6 +15,7 @@
  */
 
 #include "engine_sim_application.h"
+#include "engine-sim/scripting/include/compiler.h"
 #include "android_backend.h"
 #include <android_native_app_glue.h>
 #include <android/log.h>
@@ -95,9 +96,12 @@ extern "C" void esdroid_wtflog(const char* fmt, ...) {
     __android_log_print(ANDROID_LOG_INFO, "ESDroid", "%.*s", n, body);
 }
 
-static void initCrashLogger() {
-    g_logDir = "/data/data/com.esdroid.engine_sim/wtflogs";
-    mkdir("/data/data/com.esdroid.engine_sim", 0755);
+static void initCrashLogger(const char* dataDir) {
+    // the tv build lives in its own package so the log dir follows the
+    // real data dir
+    g_logDir = dataDir != nullptr && dataDir[0] != 0
+        ? std::string(dataDir) + "/wtflogs"
+        : "/data/data/com.esdroid.engine_sim/wtflogs";
     mkdir(g_logDir.c_str(), 0755);
     // fresh log every run the other log files are managed elsewhere
     std::string path = g_logDir + "/wtfhappened.log";
@@ -282,7 +286,8 @@ static EngineSimApplication* createApplication(android_app* app) {
 }
 
 extern "C" void android_main(struct android_app* app) {
-    initCrashLogger();
+    initCrashLogger(app->activity && app->activity->internalDataPath
+        ? app->activity->internalDataPath : nullptr);
     installCrashHandlers();
     wtflog("=== android_main START ===");
 
@@ -343,6 +348,7 @@ extern "C" void android_main(struct android_app* app) {
     {
         std::string staleFiles[] = {
             filesDir + "/assets/imported.mr",
+            filesDir + "/assets/imported_check.mr",
             filesDir + "/assets/imported_main.mr",
             filesDir + "/assets/imported_theme.mr",
             filesDir + "/imported.mr"
@@ -357,10 +363,14 @@ extern "C" void android_main(struct android_app* app) {
         EngineSimApplication* application = createApplication(app);
         if (application == nullptr) break;
 
-        // an imported engine that failed to compile falls back to the default one
+        // an imported engine that failed to compile falls back to the
+        // default one the parsers own error lines go into the dialog
+        // capture must happen before the default rebuild clears them
         if (!application->hasEngine() &&
                 esdroid::AndroidBackend::instance().activeMrPath() != "assets/main.mr") {
             wtflog("Imported engine failed to load, falling back to the default engine");
+            esdroid::AndroidBackend::instance().showEngineErrorDialog(
+                es_script::Compiler::lastErrors());
             try { application->destroy(); } catch (...) {}
             delete application;
             esdroid::AndroidBackend::instance().resetToDefaultMr();
